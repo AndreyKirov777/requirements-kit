@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "task.schema.json",
+  "title": "Task frontmatter schema",
+  "description": "Schema for TASK artifacts — implementation units for AI agents",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "implements", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TASK-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "implementation-task"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["backlog", "ready", "in-progress", "done", "blocked"]
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "ai-agent or human identifier"
+    },
+    "implements": {
+      "type": "string",
+      "description": "Wiki link to the parent functional requirement (FR)"
+    },
+    "part_of_story": {
+      "type": "string",
+      "description": "Wiki link to the parent User Story (source of acceptance criteria)"
+    },
+    "acceptance_criteria_subset": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of AC IDs from the parent User Story (e.g., AC-1, AC-2)"
+    },
+    "target_files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Relative file paths from repo root"
+    },
+    "depends_on_tasks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "estimated_complexity": {
+      "type": "string",
+      "enum": ["simple", "medium", "complex"]
+    },
+    "release_target": {
+      "type": "string"
+    }
+  }
+}

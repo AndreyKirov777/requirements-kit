@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "data-model.schema.json",
+  "title": "Data model frontmatter schema",
+  "description": "Schema for DM artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DM-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "data-model"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "implemented", "verified", "deprecated"]
+    },
+    "related_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_adrs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

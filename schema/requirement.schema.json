@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirement.schema.json",
+  "title": "Requirement frontmatter schema",
+  "description": "Schema for FR (functional requirement), NFR, and CON artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "priority", "owner", "domain", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(FR|NFR|CON)-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "functional-requirement",
+        "non-functional-requirement",
+        "constraint",
+        "use-case",
+        "business-rule"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "in-implementation",
+        "implemented",
+        "verified",
+        "deprecated"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "risk": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "component": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "stakeholders": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "source_docs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_adrs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "blocks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "implemented_by": {
+      "type": "array",
+      "items": { "type": ["string", "integer"] }
+    },
+    "verified_by": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "release_target": {
+      "type": "string"
+    },
+    "quality_attribute": {
+      "type": "string",
+      "description": "For NFRs: performance, security, scalability, etc."
+    },
+    "parent_epic": {
+      "type": "string",
+      "description": "Wiki link to the parent Epic"
+    },
+    "delivered_by": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to User Stories that deliver this requirement"
+    }
+  }
+}

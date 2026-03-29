@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Obsidian workspace (local to each user)
+.obsidian/workspace*.json
+.obsidian/cache
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc

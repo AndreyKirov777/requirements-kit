@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vision.schema.json",
+  "title": "Product Vision frontmatter schema",
+  "description": "Validates YAML frontmatter for VISION-* artifacts",
+  "allOf": [{ "$ref": "base.schema.json" }],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "tags", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^VISION-[A-Z0-9]+-[0-9]{3,}$",
+      "description": "Vision artifact ID: VISION-DOMAIN-NNN"
+    },
+    "type": {
+      "type": "string",
+      "const": "vision"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "superseded", "deprecated"],
+      "description": "Lifecycle status — see status-transitions.md"
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Product owner or PM responsible for this vision"
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Typically 'all' for product-level vision"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "contains": { "const": "vision" },
+      "description": "Must include 'vision' tag"
+    },
+    "agent_instructions": {
+      "type": "object",
+      "description": "Metadata for downstream AI agents",
+      "properties": {
+        "next_stage": {
+          "type": "string",
+          "description": "The pipeline stage that follows vision approval"
+        },
+        "generates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Artifact types this vision seeds"
+        },
+        "approval_gate": {
+          "type": "string",
+          "enum": ["human", "automatic"],
+          "description": "Whether approval requires human review"
+        },
+        "parseable_sections": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Markdown sections agents should extract"
+        }
+      },
+      "required": ["next_stage", "generates", "approval_gate", "parseable_sections"]
+    }
+  }
+}

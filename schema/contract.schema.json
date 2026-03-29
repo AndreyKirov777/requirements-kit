@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contract.schema.json",
+  "title": "API contract frontmatter schema",
+  "description": "Schema for CONTRACT artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "protocol", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CONTRACT-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "api-contract"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "implemented", "verified", "deprecated"]
+    },
+    "protocol": {
+      "type": "string",
+      "enum": ["REST", "gRPC", "Event", "GraphQL", "WebSocket", "Other"]
+    },
+    "component": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_adrs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

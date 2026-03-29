@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "persona.schema.json",
+  "title": "Persona frontmatter schema",
+  "description": "Schema for PERSONA artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^PERSONA-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "persona"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "active", "archived"]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

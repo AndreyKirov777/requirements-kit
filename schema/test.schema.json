@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "test.schema.json",
+  "title": "Test frontmatter schema",
+  "description": "Schema for TEST artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "status", "owner", "verifies", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^TEST-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "ready", "passed", "failed"]
+    },
+    "verifies": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to requirements this test verifies"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["functional", "non-functional", "integration", "e2e", "security", "performance"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "covers_criteria": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of AC IDs this test covers (e.g., AC-1, AC-3)"
+    }
+  }
+}

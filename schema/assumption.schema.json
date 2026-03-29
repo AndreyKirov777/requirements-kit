@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "assumption.schema.json",
+  "title": "Assumption frontmatter schema",
+  "description": "Schema for ASSUM artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "risk_if_wrong", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ASSUM-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "assumption"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["unvalidated", "validating", "validated", "invalidated"]
+    },
+    "risk_if_wrong": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "related_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

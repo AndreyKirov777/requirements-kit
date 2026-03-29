@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "domain-architecture.schema.json",
+  "title": "Domain Architecture frontmatter schema",
+  "description": "Schema for domain-specific Architecture artifacts (ARCH-{DOMAIN}-{NNN})",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "updated", "parent_overview"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ARCH-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "domain-architecture"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "deprecated"]
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Domain code from 00-meta/taxonomy/domains.md"
+    },
+    "parent_overview": {
+      "type": "string",
+      "description": "Wikilink to architecture-overview.md"
+    },
+    "related_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_adrs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "agent_instructions": {
+      "type": "object",
+      "properties": {
+        "next_stage": { "type": "string" },
+        "generates": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "approval_gate": { "type": "string" },
+        "parseable_sections": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

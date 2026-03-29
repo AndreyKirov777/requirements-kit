@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "architecture-overview.schema.json",
+  "title": "Architecture Overview frontmatter schema",
+  "description": "Schema for the system-wide Architecture Overview artifact (one per project)",
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "const": "ARCH-OVERVIEW",
+      "description": "Fixed ID — there is exactly one architecture overview per project"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "const": "architecture-overview"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "deprecated"]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain": {
+      "type": "string",
+      "const": "all",
+      "description": "Architecture overview always covers the entire solution"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "updated": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "agent_instructions": {
+      "type": "object",
+      "properties": {
+        "next_stage": { "type": "string" },
+        "generates": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "approval_gate": { "type": "string" },
+        "parseable_sections": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "risk.schema.json",
+  "title": "Risk frontmatter schema",
+  "description": "Schema for RISK artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "severity", "likelihood", "owner", "domain", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^RISK-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "risk"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "mitigating", "mitigated", "accepted", "closed"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "likelihood": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "affects": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "mitigation_status": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

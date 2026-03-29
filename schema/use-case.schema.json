@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "use-case.schema.json",
+  "title": "Use case frontmatter schema",
+  "description": "Schema for UC artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^UC-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "use-case"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "actors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_requirements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_epics": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}
