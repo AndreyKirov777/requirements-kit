@@ -7,11 +7,6 @@ owner: "@pm"
 domain: all
 tags: [vision, dbp]
 updated: 2026-03-28
-agent_instructions:
-  next_stage: product-discovery
-  generates: [epic, persona, journey]
-  approval_gate: human
-  parseable_sections: [Goals, Non-Goals, Target Users, Key Differentiators, Regulatory Context]
 ---
 
 # Vision
@@ -62,5 +57,3 @@ With the help of a system developed on the DBP Accelerator, economic operators c
 EU Regulation 2023/1542 mandates digital battery passports from February 2027 for EV batteries, LMT batteries, and industrial batteries >2 kWh. Access rights for legitimate-interest users will be specified in implementing acts by 18 August 2026.
 
 # Related Artifacts
-
-- Epics: [[EPIC-INGEST-001]], [[EPIC-PASSPORT-001]], [[EPIC-SEC-001]], [[EPIC-QR-001]], [[EPIC-AUDIT-001]], [[EPIC-API-001]], [[EPIC-UI-001]], [[EPIC-INFRA-001]]

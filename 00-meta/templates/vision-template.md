@@ -7,28 +7,6 @@ owner: ""
 domain: all
 tags: [vision]
 updated: YYYY-MM-DD
-# --- AI Agent Metadata ---
-# Downstream agents use these fields to scope PRD generation,
-# persona creation, and requirements elaboration.
-agent_instructions:
-  next_stage: product-discovery
-  generates:
-    - personas
-    - journeys
-    - assumptions
-    - epics
-  approval_gate: human
-  parseable_sections:
-    - vision_statement
-    - product_description
-    - goals
-    - non_goals
-    - target_users
-    - key_differentiators
-    - constraints_and_risks
-    - success_metrics
-    - regulatory_or_domain_context
-    - related_artifacts
 ---
 
 <!-- ============================================================
@@ -51,13 +29,10 @@ agent_instructions:
           a Change Request (CR-*).
 
      AI AGENT GUIDANCE:
-       - Read `agent_instructions` in frontmatter to determine
-         what to generate next and which sections to parse.
-       - Each section header maps to a `parseable_sections` key
-         (lowercase, underscored). Use this mapping for extraction.
        - Goals are numbered for traceability — downstream epics
          MUST reference which goal(s) they serve.
-       - Target Users entries become seeds for PERSONA-* artifacts.
+       - Target Users entries describe the intended user roles;
+         use them to inform persona and requirement authoring.
        - Non-Goals are explicit scope boundaries — do not generate
          requirements for anything listed here.
      ============================================================ -->
@@ -192,11 +167,9 @@ agent_instructions:
 
 # Related Artifacts
 
-<!-- Wikilinks to downstream artifacts generated from this vision.
-     This section is populated as the pipeline progresses — leave empty
-     in initial drafts.
+<!-- Wikilinks to related artifacts — populate as the project evolves.
+     Leave empty in initial drafts.
 
-     - Personas: [[PERSONA-XXX-001]], …
-     - Epics: [[EPIC-XXX-001]], …
      - Assumptions: [[ASSUM-XXX-001]], …
+     - Change Requests: [[CR-XXX-001]], …
 -->

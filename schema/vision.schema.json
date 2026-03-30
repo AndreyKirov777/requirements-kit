@@ -36,32 +36,6 @@
       "items": { "type": "string" },
       "contains": { "const": "vision" },
       "description": "Must include 'vision' tag"
-    },
-    "agent_instructions": {
-      "type": "object",
-      "description": "Metadata for downstream AI agents",
-      "properties": {
-        "next_stage": {
-          "type": "string",
-          "description": "The pipeline stage that follows vision approval"
-        },
-        "generates": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Artifact types this vision seeds"
-        },
-        "approval_gate": {
-          "type": "string",
-          "enum": ["human", "automatic"],
-          "description": "Whether approval requires human review"
-        },
-        "parseable_sections": {
-          "type": "array",
-          "items": { "type": "string" },
-          "description": "Markdown sections agents should extract"
-        }
-      },
-      "required": ["next_stage", "generates", "approval_gate", "parseable_sections"]
     }
   }
 }
