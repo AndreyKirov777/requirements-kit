@@ -9,6 +9,8 @@ domain: ""
 quality_attribute: performance
 component: []
 source_docs: []
+derives_from: []
+implements_control: []
 related_adrs: []
 depends_on: []
 implemented_by: []

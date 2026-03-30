@@ -53,6 +53,11 @@
     },
     "release_target": {
       "type": "string"
+    },
+    "implements_control": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to CTRL artifacts this task contributes to (compliance-driven projects)"
     }
   }
 }

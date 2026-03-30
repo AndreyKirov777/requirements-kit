@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ctrl.schema.json",
+  "title": "Control frontmatter schema",
+  "description": "Schema for CTRL artifacts — enforceable, auditable statements derived from business requirements (BRQ). A control specifies what must be enforced and proven. CTRL answers 'what must be enforced/proven' and bridges BRQ (why) to FR/NFR (what the system shall do). Used in compliance-driven projects; optional for standard projects.",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "type", "status", "owner", "domain", "derives_from", "verification_method", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CTRL-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "type": {
+      "type": "string",
+      "const": "control"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "identified",
+        "defined",
+        "allocated",
+        "implemented",
+        "verified",
+        "audited",
+        "deprecated"
+      ],
+      "description": "identified: control need recognized; defined: control statement written; allocated: derived FR/NFR created; implemented: all derived FR/NFR implemented; verified: evidence collected and confirmed; audited: external or internal audit passed; deprecated: no longer applicable"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to parent BRQ artifacts this control enforces"
+    },
+    "derived_requirements": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to FR/NFR/CON artifacts that implement this control"
+    },
+    "verification_method": {
+      "type": "string",
+      "enum": ["inspection", "test", "demonstration", "analysis"],
+      "description": "How compliance with this control is verified (INCOSE verification methods)"
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": ["log", "report", "certificate", "audit-trail", "test-result", "review-record", "other"],
+      "description": "Type of evidence required to prove compliance"
+    },
+    "evidence_location": {
+      "type": "string",
+      "description": "Path or URI where evidence is stored or will be stored"
+    },
+    "compliance_deadline": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Date by which this control must be verified (YYYY-MM-DD)"
+    },
+    "audit_status": {
+      "type": "string",
+      "enum": ["not-audited", "audit-scheduled", "audit-passed", "audit-failed", "audit-waived"],
+      "description": "Current audit state for this control"
+    },
+    "control_family": {
+      "type": "string",
+      "description": "Control family or category (e.g., AC — Access Control, AU — Audit, SC — System and Communications)"
+    },
+    "stakeholders": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "related_ctrls": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to related CTRL artifacts"
+    },
+    "verified_by": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to TEST artifacts that verify this control"
+    },
+    "release_target": {
+      "type": "string"
+    }
+  }
+}

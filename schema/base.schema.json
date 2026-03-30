@@ -8,7 +8,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^(FR|US|NFR|EPIC|ADR|ARCH|CR|TEST|CON|TASK|UC|DM|RISK|REL|PERSONA|JOURNEY|ASSUM|CONTRACT|VISION|CODEMAP|GLOSS)-[A-Z0-9]+-[0-9]{3,}$",
+      "pattern": "^(FR|US|NFR|EPIC|ADR|ARCH|CR|TEST|CON|TASK|UC|DM|RISK|REL|PERSONA|JOURNEY|ASSUM|CONTRACT|VISION|BRQ|CTRL|CODEMAP|GLOSS)-[A-Z0-9]+-[0-9]{3,}$",
       "description": "Unique artifact identifier: TYPE-DOMAIN-NNN"
     },
     "title": {

@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 0.2.0** — Domain-agnostic edition
+> **Version 0.2.1** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -142,7 +142,7 @@ Domain codes are registered in `00-meta/taxonomy/domains.md`. IDs use three or m
 ## Core Principles
 
 1. **One requirement per file.** Atomic, linkable, diffable.
-2. **Every artifact links upstream and downstream.** Vision → Epic → User Story → FR → Task → Code → Test.
+2. **Every artifact links upstream and downstream.** BRQ → [CTRL →] Epic → FR ↔ US → Task → Code → Test. FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
 3. **Glossary-driven naming.** Domain terms map to code identifiers via the glossary.
 4. **Human gates at strategic points.** Vision, requirements, and architecture require human approval.
 5. **Structured acceptance criteria.** Use Given/When/Then format with AC-N identifiers.

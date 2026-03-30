@@ -8,6 +8,48 @@ updated: 2026-03-28
 
 Each artifact type has a defined state machine. Agents and humans must follow these transitions. Any transition not listed below is **invalid**.
 
+## Business Requirement (BRQ)
+
+```
+identified → analyzed → approved → allocated → covered → deprecated
+```
+
+| From       | To         | Trigger                                   | Who            |
+| ---------- | ---------- | ----------------------------------------- | -------------- |
+| identified | analyzed   | Impact and scope analysis completed       | Agent or Human |
+| analyzed   | approved   | Stakeholders accept the obligation        | **Human only** |
+| analyzed   | identified | Reviewer requests re-analysis             | Human          |
+| approved   | allocated  | First derived FR/NFR/CON or CTRL created  | Agent          |
+| allocated  | covered    | All derived requirements reach `verified` | Agent          |
+| covered    | deprecated | Obligation no longer applicable           | Human          |
+| approved   | deprecated | Cancelled before allocation               | Human          |
+
+> **Pipeline note:** BRQ must reach `approved` before system requirements (FR/NFR/CON) can be derived from it. For compliance-driven projects, CTRL artifacts are derived first, then FR/NFR from CTRLs.
+
+> **Semantic role:** BRQ = WHY — the business or regulatory motivation for a set of system requirements.
+
+## Control (CTRL)
+
+```
+identified → defined → allocated → implemented → verified → audited → deprecated
+```
+
+| From        | To          | Trigger                                  | Who            |
+| ----------- | ----------- | ---------------------------------------- | -------------- |
+| identified  | defined     | Control statement written and reviewed   | Agent or Human |
+| defined     | allocated   | First derived FR/NFR created             | Agent          |
+| defined     | identified  | Reviewer requests changes                | Human          |
+| allocated   | implemented | All derived FR/NFR reach `implemented`   | Agent          |
+| implemented | verified    | Evidence collected, verification passed  | QA Agent       |
+| verified    | audited     | Internal or external audit passed        | **Human only** |
+| verified    | deprecated  | Control no longer required               | Human          |
+| audited     | deprecated  | Control superseded or retired            | Human          |
+| audited     | verified    | Audit reopened (re-verification needed)  | Human          |
+
+> **Pipeline note:** CTRL is optional — used only in compliance-driven projects. For standard projects, BRQ derives FR/NFR directly. CTRL adds the enforceable/auditable intermediate layer.
+
+> **Semantic role:** CTRL = WHAT MUST BE ENFORCED/PROVEN — the auditable control statement bridging BRQ (why) to FR/NFR (what the system shall do).
+
 ## Product Vision (VISION)
 
 ```

@@ -24,7 +24,7 @@
     },
     "type": {
       "type": "string",
-      "enum": ["functional", "non-functional", "integration", "e2e", "security", "performance"]
+      "enum": ["unit", "integration", "e2e", "manual", "functional", "non-functional", "security", "performance"]
     },
     "priority": {
       "type": "string",
@@ -34,6 +34,11 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "List of AC IDs this test covers (e.g., AC-1, AC-3)"
+    },
+    "verifies_control": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to CTRL artifacts this test provides evidence for (compliance-driven projects)"
     }
   }
 }

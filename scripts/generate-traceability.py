@@ -27,6 +27,11 @@ LINK_FIELDS = [
     "source_docs", "related_adrs", "depends_on", "blocks",
     "implemented_by", "verified_by", "related_requirements",
     "implements", "verifies", "affects", "persona",
+    "derives_from", "implements_control", "derived_requirements",
+    "derived_controls", "part_of_story", "delivered_by", "delivers",
+    "parent_epic", "parent_overview", "related_brqs", "related_ctrls",
+    "verifies_control", "covers_criteria", "requirements_included",
+    "epics_included", "related_epics", "superseded_by",
 ]
 
 

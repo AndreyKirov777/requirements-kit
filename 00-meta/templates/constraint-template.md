@@ -7,6 +7,8 @@ priority: medium
 owner: ""
 domain: ""
 source_docs: []
+derives_from: []
+implements_control: []
 related_adrs: []
 impacts: []
 tags: [constraint]

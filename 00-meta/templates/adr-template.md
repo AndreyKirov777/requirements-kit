@@ -1,10 +1,13 @@
 ---
 id: ADR-XXX-000
-title: 
+title: ""
 status: proposed
 owner: ""
-date: 2026-03-27
+domain: ""
+date: YYYY-MM-DD
+updated: YYYY-MM-DD
 related_requirements: []
+superseded_by: ""
 tags: [adr]
 ---
 

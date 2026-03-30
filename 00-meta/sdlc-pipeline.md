@@ -28,16 +28,31 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 | Output   | Personas, journeys, assumptions in `01-product/` |
 | Gate     | **Human review** of personas and journeys   |
 
-### 3. Requirements Elaboration
+### 3. Business Requirements & Obligations
 
 | Field    | Value                                       |
 | -------- | ------------------------------------------- |
-| Input    | Approved vision + product discovery artifacts |
+| Input    | Approved vision + product discovery + external sources (laws, standards, contracts, policies) |
 | Agent    | Analyst agent                               |
-| Output   | `EPIC-*`, `US-*`, `FR-*`, `NFR-*`, `CON-*` files in `02-requirements/` |
+| Output   | `BRQ-*` files in `02-requirements/business-requirements/`; optionally `CTRL-*` files in `02-requirements/controls/` for compliance-driven projects |
+| Gate     | **Human approval** — BRQ must reach `approved` before deriving system requirements |
+
+> **Why this stage?** Business requirements and obligations are the "why" layer (BABOK Business Requirements). They capture external drivers — regulations, contracts, policies, business goals — before decomposition into system requirements. For compliance-driven projects, controls (CTRL) are derived from BRQ to specify what must be enforced and proven. For standard projects, BRQ can be used to capture high-level business goals without controls.
+
+> **Semantic rule:** BRQ = why; CTRL = what must be enforced/proven; FR/NFR = what the system shall do; ADR = how we chose to do it; TEST = how we prove it.
+
+### 4. Requirements Elaboration
+
+| Field    | Value                                       |
+| -------- | ------------------------------------------- |
+| Input    | Approved BRQ/CTRL + vision + product discovery artifacts |
+| Agent    | Analyst agent                               |
+| Output   | `EPIC-*`, `US-*`, `FR-*`, `NFR-*`, `CON-*` files in `02-requirements/`. Each FR/NFR/CON links back to BRQ or CTRL via `derives_from` / `implements_control` |
 | Gate     | **Human review** — requirements move from `draft` → `proposed` → `approved` |
 
-### 4. Architecture
+> **Traceability rule:** Every FR/NFR/CON should have a `derives_from` link to at least one BRQ (or CTRL). Orphan system requirements without a business justification must be flagged during review.
+
+### 5. Architecture
 
 | Field    | Value                                       |
 | -------- | ------------------------------------------- |
@@ -46,7 +61,7 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 | Output   | `ADR-*` in `03-architecture/adr/`, code maps, contracts, data models |
 | Gate     | **Human approval** of ADRs                  |
 
-### 5. Task Breakdown
+### 6. Task Breakdown
 
 | Field    | Value                                       |
 | -------- | ------------------------------------------- |
@@ -55,7 +70,7 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 | Output   | `TASK-*` files in `04-delivery/tasks/`      |
 | Gate     | **Automatic** if requirements are `approved` and ADRs are `accepted` |
 
-### 6. Implementation
+### 7. Implementation
 
 | Field    | Value                                       |
 | -------- | ------------------------------------------- |
@@ -64,16 +79,16 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 | Output   | Source code, unit tests, updated requirement metadata |
 | Gate     | CI passes + all acceptance criteria covered by tests |
 
-### 7. Verification
+### 8. Verification
 
 | Field    | Value                                       |
 | -------- | ------------------------------------------- |
 | Input    | Implemented code + test results             |
 | Agent    | QA agent                                    |
-| Output   | `TEST-*` results, requirement status → `verified` |
-| Gate     | All acceptance criteria pass, no orphan requirements |
+| Output   | `TEST-*` results, requirement status → `verified`. For compliance-driven projects: CTRL status → `verified`, evidence collected |
+| Gate     | All acceptance criteria pass, no orphan requirements. For compliance: all CTRLs have evidence |
 
-### 8. Release
+### 9. Release
 
 | Field    | Value                                       |
 | -------- | ------------------------------------------- |
@@ -84,16 +99,17 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 
 ## Gate Summary
 
-| Stage                    | Gate Type  | Who Approves     |
-| ------------------------ | ---------- | ---------------- |
-| Vision                   | Manual     | Product Owner    |
-| Product Discovery        | Manual     | Product Owner    |
-| Requirements Elaboration | Manual     | PM + Tech Lead   |
-| Architecture             | Manual     | Tech Lead        |
-| Task Breakdown           | Automatic  | —                |
-| Implementation           | Automatic  | CI pipeline      |
-| Verification             | Automatic  | QA agent + CI    |
-| Release                  | Manual     | Product Owner    |
+| Stage                             | Gate Type  | Who Approves           |
+| --------------------------------- | ---------- | ---------------------- |
+| Vision                            | Manual     | Product Owner          |
+| Product Discovery                 | Manual     | Product Owner          |
+| Business Requirements & Obligations | Manual   | Product Owner + Compliance (if regulatory) |
+| Requirements Elaboration          | Manual     | PM + Tech Lead         |
+| Architecture                      | Manual     | Tech Lead              |
+| Task Breakdown                    | Automatic  | —                      |
+| Implementation                    | Automatic  | CI pipeline            |
+| Verification                      | Automatic  | QA agent + CI          |
+| Release                           | Manual     | Product Owner          |
 
 ## Principles
 

@@ -19,7 +19,7 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "implemented", "verified", "deprecated"]
+      "enum": ["draft", "proposed", "approved", "deprecated"]
     },
     "related_requirements": {
       "type": "array",

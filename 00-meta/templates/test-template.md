@@ -7,6 +7,8 @@ verifies:
   - "[[FR-XXX-000]]"
 type: functional
 priority: medium
+covers_criteria: []
+verifies_control: []
 tags: [test]
 updated: 2026-03-27
 ---

@@ -11,69 +11,88 @@ This file describes how to work with the requirements vault—a system for track
 
 ## Quick Start: The Workflow
 
-When assigned a task, follow this sequence:
+When assigned a task, follow this 8-step sequence:
 
-1. **Find your task** → `04-delivery/tasks/TASK-*.md` with `status: ready`
-2. **Read the requirement** → Follow `implements` to FR, read **Requirement** and **Out of Scope**
-3. **Understand the why and AC** → Follow `part_of_story` to User Story (US) — read **Acceptance Criteria** here
-4. **Check dependencies** → Verify `depends_on` requirements are `implemented` or `verified`
-5. **Read the ADR** → Follow `related_adrs` for architectural constraints
-6. **Find target files** → From `target_files` in task or `03-architecture/code-map/`
-7. **Read the glossary** → Check naming conventions for your domain
-8. **Implement** → Write code satisfying each AC
-9. **Update status** → Mark task `done`, update requirement status, write tests
+1. **Find your task** → Look in `04-delivery/tasks/` for a `TASK-*` file with `status: ready` assigned to you
+2. **Read the requirement** → Follow `implements` to the parent functional requirement (FR) in `02-requirements/fr/`. Read the full file—especially **Requirement** and **Out of Scope**
+3. **Trace the "why"** → Follow `derives_from` in the FR to the parent business requirement (`BRQ-*` in `02-requirements/business-requirements/`). If the FR also has `implements_control`, read the control (`CTRL-*` in `02-requirements/controls/`) to understand what must be enforced and what evidence is needed
+4. **Understand the business purpose and AC** → Follow `part_of_story` to the User Story (US) in `02-requirements/user-stories/` — read **Acceptance Criteria** here (Given/When/Then format, AC-N identifiers)
+5. **Check dependencies** → Verify `depends_on` requirements are `implemented` or `verified`. If not, flag a blocker
+6. **Read the architecture** → Follow `related_adrs` in the FR to understand specific architectural decisions
+7. **Find target files** → From `target_files` in the task, or look up `03-architecture/code-map/` for component mapping
+8. **Implement** → Write code satisfying each acceptance criterion, update status, and write tests
+
+This prevents building the wrong thing technically correct.
 
 ## Vault Structure
 
 ```
 requirements-vault/
 ├── 00-meta/              # Metadata, taxonomy, status rules
-│   ├── glossary/         # Domain-specific naming (e.g., glossary/[your-domain].md)
+│   ├── glossary/         # Domain-specific naming (e.g., glossary/[GLOSSARY_DOMAIN].md)
 │   ├── taxonomy/         # Domain registry, artifact types
-│   └── status-transitions.md
+│   └── status-transitions.md  # Allowed state changes per artifact type
 ├── 01-product/           # Product vision and strategy
 │   └── vision/           # PRODUCT-VISION.md
 ├── 02-requirements/      # Functional and non-functional requirements
+│   ├── business-requirements/  # BRQ-*.md (business/regulatory motivation)
+│   ├── controls/         # CTRL-*.md (auditable control statements)
 │   ├── epics/            # EPIC-*.md (large feature groups)
-│   ├── user-stories/     # US-*.md (user-centric requirements)
-│   ├── fr/               # FR-*.md (functional requirements with AC)
+│   ├── user-stories/     # US-*.md (user-centric requirements with AC)
+│   ├── fr/               # FR-*.md (functional requirements)
 │   ├── nfr/              # NFR-*.md (non-functional requirements)
+│   ├── use-cases/        # UC-*.md (use case descriptions)
 │   └── constraints/      # CON-*.md (system constraints)
 ├── 03-architecture/      # Architecture and decisions
 │   ├── adr/              # ADR-*.md (architectural decision records)
-│   └── code-map/         # Domain-to-code mappings
+│   ├── code-map/         # Domain-to-code mappings
+│   └── architecture-overview.md  # System-wide architecture
 ├── 04-delivery/          # Implementation tracking
 │   ├── tasks/            # TASK-*.md (work assignments)
-│   ├── change-requests/  # CR-*.md (approved changes to requirements)
-│   └── test-evidence/    # TEST-*.md (verification records)
-└── 05-domain/            # Domain-specific content (e.g., [your-domain] concepts)
+│   ├── change-requests/  # CR-*.md (changes to approved artifacts)
+│   ├── releases/         # REL-*.md (release planning)
+│   └── risks/            # RISK-*.md (risk tracking)
+└── 05-quality/           # Quality and test evidence
+    ├── acceptance/       # TEST-*.md (verification records)
+    ├── test-ideas/       # Test planning and ideas
+    └── traceability/     # Traceability matrices
 ```
 
-## Artifact Types and Status
+## Artifact Types and Status Transitions
 
-### Core Artifact Types
+All artifact types have defined state machines. **See `00-meta/status-transitions.md` for the authoritative source** — do not inline incorrect status values. Reference the file instead.
 
-- **EPIC** — Large feature group, scope setting, status: proposed → approved → implemented
-- **US** — User story ("As X, I want Y so that Z"), status: proposed → approved → implemented
-- **FR** — Functional requirement (system specification), status: proposed → approved → in-implementation → implemented → verified
-- **NFR** — Non-functional requirement (performance, security, scalability), status: proposed → approved → implemented → verified
-- **ADR** — Architectural decision record, status: proposed → approved → implemented
-- **CON** — System constraint, status: active (constraints don't have lifecycle)
-- **TASK** — Work assignment to implement a requirement, status: unassigned → ready → in-progress → done
-- **CR** — Change request to approved artifacts, status: proposed → approved → implemented
-- **TEST** — Test evidence linking to acceptance criteria, status: draft → executed → passed/failed
+### Core Artifact Types (Summary)
 
-See `00-meta/status-transitions.md` for allowed state changes.
+- **BRQ** (Business Requirement) — WHY: business or regulatory motivation. Status: `identified` → `analyzed` → `approved` → `allocated` → `covered` → `deprecated`
+- **CTRL** (Control) — WHAT MUST BE ENFORCED: auditable control statement. Status: `identified` → `defined` → `allocated` → `implemented` → `verified` → `audited` → `deprecated`
+- **EPIC** — Large feature group. Status: `draft` → `proposed` → `approved` → `in-progress` → `completed` → `deprecated`
+- **US** (User Story) — User-centric requirement with AC. Status: `draft` → `proposed` → `approved` → `in-implementation` → `implemented` → `verified` → `deprecated`
+- **FR** (Functional Requirement) — System specification. Status: `draft` → `proposed` → `approved` → `in-implementation` → `implemented` → `verified` → `deprecated`
+- **NFR** (Non-Functional Requirement) — Performance, security, scalability. Status: `draft` → `proposed` → `approved` → `in-implementation` → `implemented` → `verified` → `deprecated`
+- **CON** (Constraint) — System constraint or rule. Status: `draft` → `proposed` → `approved` (constraints don't transition further)
+- **ADR** (Architecture Decision Record) — Design decision. Status: `proposed` → `accepted` → `superseded` or `deprecated`
+- **TASK** (Work Assignment) — Implementation work. Status: `backlog` → `ready` → `in-progress` → `done`; can transition `in-progress` → `blocked` → `ready`
+- **CR** (Change Request) — Formal change to approved artifacts. Status: `proposed` → `approved` → `applied` or `rejected`
+- **TEST** (Test Evidence) — Verification record linking to AC. Status: `draft` → `ready` → `passed` or `failed` → (failed can return to `ready` or `draft`)
+
+**Do not guess status values.** Reference `00-meta/status-transitions.md` for authoritative transitions.
 
 ## Artifact ID Format
 
 All artifact IDs follow: `<TYPE>-<DOMAIN>-<NNN>`
 
-Examples:
-- `FR-AUTH-001`, `US-BILLING-015`, `ADR-STORAGE-003`
-- `TASK-API-042`, `TEST-REPORTS-008`, `CR-FRONTEND-001`
+- **TYPE:** BRQ, CTRL, EPIC, FR, US, NFR, CON, TASK, ADR, ARCH, CR, TEST, PERSONA, RISK, REL, UC, etc.
+- **DOMAIN:** uppercase domain code (use [DOMAIN_LIST])
+- **NNN:** three or more digits, zero-padded
 
-Domains are standardized across the vault (e.g., AUTH, BILLING, STORAGE, REPORTING, API, FRONTEND, BACKEND, INFRA). Check `00-meta/taxonomy/domains.md` for your domain.
+Examples:
+- `BRQ-[DOMAIN]-001` (business requirement)
+- `CTRL-[DOMAIN]-001` (control)
+- `FR-[DOMAIN]-001`, `US-[DOMAIN]-015`, `ADR-[DOMAIN]-003`
+- `TASK-[DOMAIN]-042`, `TEST-[DOMAIN]-008`, `CR-[DOMAIN]-001`
+
+When creating new artifacts, check existing IDs in the target folder and increment sequentially.
 
 ## Before Starting Implementation
 
@@ -95,20 +114,25 @@ Read the task file. It contains:
 Follow the `implements` field in your task to the FR in `02-requirements/fr/FR-DOMAIN-NNN.md`.
 
 **Read the entire FR file**, especially:
-
-- **Summary** — one-paragraph description of the feature
-- **Requirement** — what the system shall do (technical specification)
+- **Summary** — one-paragraph description
+- **Requirement** — what the system shall do
 - **Edge Cases** — boundary conditions and failure modes
 - **Out of Scope** — explicitly what NOT to do
-- `parent_epic` — link to the parent Epic
-- `delivered_by` — links to User Stories that deliver this FR
+- `derives_from` — parent BRQ
+- `implements_control` — related CTRL (if compliance-driven)
+- `parent_epic` — link to Epic
+- `delivered_by` — links to User Stories
 - `depends_on` — other requirements that must be satisfied first
 
-### 3. Understand the Business Purpose and Acceptance Criteria
+### 3. Trace the "Why" and Understand Acceptance Criteria
 
-Follow `part_of_story` (from the Task) to the User Story in `02-requirements/user-stories/US-DOMAIN-NNN.md`. The US contains the **Acceptance Criteria** (Given/When/Then with AC-N identifiers):
+Follow `derives_from` in the FR to the Business Requirement (`BRQ-*` in `02-requirements/business-requirements/`). This tells you the business or regulatory motivation.
 
-```
+If the FR has `implements_control`, read the control (`CTRL-*` in `02-requirements/controls/`) to understand what must be enforced and what evidence is needed.
+
+Then follow `part_of_story` to the User Story in `02-requirements/user-stories/US-DOMAIN-NNN.md`. The US contains **Acceptance Criteria** in Given/When/Then format:
+
+```markdown
 ## Acceptance Criteria
 
 **AC-1: [Short title]**
@@ -116,17 +140,21 @@ Follow `part_of_story` (from the Task) to the User Story in `02-requirements/use
 - When: [action]
 - Then: [expected outcome]
 - Testable by: unit | integration | e2e | manual
+
+**AC-2: [Another criterion]**
+- Given: ...
+- When: ...
+- Then: ...
+- Testable by: ...
 ```
 
 Read the US to understand:
 - Who is this for? (the persona)
 - What problem are we solving? (the business need)
 - Why does it matter? (the value)
-- **How we verify** — the AC define exactly what to test
+- **How we verify** — AC define exactly what to test
 
-Your code must satisfy **every** AC you're assigned. Each AC must be testable.
-
-This context prevents you from building the wrong thing technically correct.
+Your code must satisfy **every** AC you're assigned.
 
 ### 4. Check Dependencies
 
@@ -134,7 +162,7 @@ Read `depends_on` in the FR and TASK files.
 
 For each dependency:
 - Check its `status` — must be `implemented` or `verified`
-- If `proposed` or `approved`, it's a blocker — flag it and stop
+- If `proposed`, `draft`, or `approved`, it's a blocker — flag it and stop
 - Do not implement out of order
 
 ### 5. Read the Architecture Decision Record
@@ -152,18 +180,11 @@ Respect the architectural decisions. If you need a new decision not covered by e
 
 From your TASK file, read `target_files` — these are the code files to modify.
 
-If not specified, check `03-architecture/code-map/component-map.md` to find where your domain's code lives.
-
-Example mapping:
-```
-AUTH domain → src/auth/*, src/identity/*
-BILLING domain → src/billing/*, src/payments/*
-STORAGE domain → src/storage/*, src/database/*
-```
+If not specified, check `03-architecture/code-map/` for domain-to-code mappings.
 
 ### 7. Read the Glossary
 
-Check `00-meta/glossary/DOMAIN.md` for your domain's naming conventions.
+Check `00-meta/glossary/[GLOSSARY_DOMAIN].md` for your domain's naming conventions.
 
 The glossary defines:
 - `code_name` — the identifier to use in code (use this, not synonyms)
@@ -171,19 +192,11 @@ The glossary defines:
 - `domain` — which domain owns it
 - `related_terms` — other glossary entries
 
-**Use the glossary names exactly.** Don't invent synonyms. Examples:
-- Use `resourceId`, not `itemId` or `resource_uid`
-- Use `completionStatus`, not `readiness` or `percentComplete`
-- Use `rawTier`, not `unprocessedData` or `stage1`
+**Use the glossary names exactly.** Don't invent synonyms.
 
 ### 8. Check Constraints
 
 Read `02-requirements/constraints/` for system-wide or domain-specific constraints.
-
-Examples:
-- `CON-AUTH-001` — access rules must be configurable, not hardcoded
-- `CON-STORAGE-001` — all raw tier data must be immutable
-- Domain-specific constraints on performance, scalability, or compliance
 
 Do not violate constraints. If a constraint prevents your design, flag it and create a CR.
 
@@ -191,11 +204,11 @@ Do not violate constraints. If a constraint prevents your design, flag it and cr
 
 ### Code Requirements
 
-- **Satisfy every AC.** Write code that makes each acceptance criterion true. If an AC is untestable, flag it.
-- **Use glossary names.** Never invent new names for existing concepts. Check the glossary first.
-- **Respect architecture.** Follow the layered architecture pattern (e.g., raw tier → processing tier → delivery tier). Do not bypass layers.
-- **Follow constraints.** Never hardcode rules that should be configurable. Never violate CON-* requirements.
-- **Link to ADRs.** If your code reflects an architectural decision, add a comment linking to the ADR.
+- **Satisfy every AC.** Write code that makes each acceptance criterion true
+- **Use glossary names.** Never invent new names for existing concepts
+- **Respect architecture.** Follow the [ARCHITECTURE_PATTERN] architecture (e.g., layered tiers). Do not bypass layers
+- **Follow constraints.** Never hardcode rules that should be configurable. Never violate CON-* requirements
+- **Link to ADRs.** If your code reflects an architectural decision, add a comment linking to the ADR
 
 ### ADR Creation
 
@@ -203,7 +216,7 @@ If you need to make an architectural choice not covered by existing ADRs:
 
 1. Create a new file: `03-architecture/adr/ADR-DOMAIN-NNN.md`
 2. Use this structure:
-   ```
+   ```markdown
    ---
    id: ADR-DOMAIN-NNN
    title: [Decision title]
@@ -225,7 +238,7 @@ If you need to make an architectural choice not covered by existing ADRs:
    - FR-* (which requirements rely on this)
    - Other ADR-*
    ```
-3. Set `status: proposed` and stop for review
+3. Set `status: proposed` and **stop for review**
 4. Do not implement based on a proposed ADR until it's approved
 
 ## After Implementation
@@ -235,27 +248,26 @@ If you need to make an architectural choice not covered by existing ADRs:
 In your TASK file, change:
 - `status: done`
 - `completed_at: YYYY-MM-DDTHH:MM:SSZ` (optional)
-- `notes: [brief summary of what you did]` (optional)
 
 ### 2. Update the Functional Requirement
 
 In the FR file, update:
-- `implemented_by: [list of file paths, relative to repo root]`
+- `implemented_by:` — add list of file paths (relative to repo root)
 - If all tasks for this FR are done, change `status: in-implementation` → `implemented`
 
 ### 3. Write or Update Tests
 
 For each AC you implemented:
 - Write a test that verifies the AC is satisfied
-- Create or update a `TEST-DOMAIN-NNN.md` file in `04-delivery/test-evidence/`
+- Create or update a `TEST-DOMAIN-NNN.md` file in `05-quality/acceptance/`
 - Link the test in the FR's `verified_by` field
 
 Test structure:
-```
+```markdown
 ---
 id: TEST-DOMAIN-NNN
 title: [Test description matching AC]
-status: executed
+status: ready
 accepts: US-DOMAIN-NNN#AC-N
 ---
 
@@ -270,10 +282,10 @@ accepts: US-DOMAIN-NNN#AC-N
 [What should happen]
 
 ## Actual Result
-[What actually happened]
+[What actually happened after execution]
 
 ## Status
-PASSED | FAILED | BLOCKED
+PASSED | FAILED
 ```
 
 ### 4. Run Validation
@@ -284,119 +296,160 @@ python scripts/validate-frontmatter.py    # Check YAML is valid
 python scripts/check-orphans.py          # Ensure all requirements are tested
 ```
 
-## Rules — What NOT to Do
+## Requirement Hierarchy and Traceability
 
-### Protected Artifacts
-
-- **Do not modify PRODUCT-VISION.md** without explicit approval
-- **Do not modify EPIC-* files** without explicit approval
-- **Do not modify US-* files** with status `approved` or higher without a Change Request (CR)
-- **Do not modify FR-* files** with status `approved` or higher without a Change Request (CR)
-
-If you must change an approved artifact, create a `CR-DOMAIN-NNN.md` file in `04-delivery/change-requests/`, get approval, and implement the CR.
-
-### Code and Architecture
-
-- **Do not delete or rename artifact files.** Deprecate them instead by adding a "Deprecated" section to the frontmatter.
-- **Do not bypass the architecture.** If working with layered data: never write directly to delivery tier from raw tier. Always flow through processing tier.
-- **Do not hardcode rules.** Access control, validation rules, and configuration must be externalized and configurable.
-- **Do not break verified AC.** If tests pass an AC, do not refactor in ways that would make it fail.
-- **Do not modify approved artifacts without a Change Request.** Even small changes require formal CR tracking.
-
-### Naming and Glossary
-
-- **Do not invent new names.** Use only names from the glossary.
-- **Do not mix naming styles.** Use `camelCase` for code identifiers (as specified in glossary), not `snake_case`, `PascalCase`, etc.
-- **Do not use domain-specific abbreviations** in code unless they're in the glossary (e.g., use `resourceModel`, not `rm`).
-
-## Status Transitions
-
-Artifact status progresses through defined states. See `00-meta/status-transitions.md` for exact rules.
-
-**General flow:**
-- Requirements: `proposed` → `approved` → `in-implementation` → `implemented` → `verified`
-- Tasks: `unassigned` → `ready` → `in-progress` → `done`
-- ADRs: `proposed` → `approved` → `implemented`
-
-Do not skip states. Do not transition without justification.
-
-## Glossary Usage
-
-Every domain has a glossary. Example structure:
+The kit follows a layered requirement model aligned with BABOK and INCOSE:
 
 ```
----
-domain: [YOUR-DOMAIN]
----
-
-## resourceId
-- code_name: `resourceId`
-- description: Unique identifier for a resource within the system
-- type: string (UUID format)
-- related: US-*, FR-*
-
-## rawTier
-- code_name: `rawTier`
-- description: Raw data tier, no validation or normalization
-- type: conceptual tier (not a code type)
-- related: ADR-[YOUR-DOMAIN]-001
+BRQ (WHY — business/regulatory motivation)
+  ↓ derives_from
+[CTRL (WHAT MUST BE ENFORCED — auditable control statement, compliance-driven projects only)]
+  ↓ derives_from or implements
+EPIC (large feature group)
+  ↓ parent_epic
+FR/US (WHAT THE SYSTEM SHALL DO / FOR WHOM)
+  ↓ part_of_story / delivers
+TASK (implementation work)
+  ↓ implements
+TEST (evidence linking to AC)
 ```
 
-Before naming anything in code, check the glossary. If it's not there, add it.
+**Key relationships:**
+- **BRQ → CTRL (optional) → FR/NFR/CON** — BRQ provides motivation; CTRL adds enforceable layer (compliance-driven projects); FR/NFR/CON specify what the system shall do
+- **FR ↔ US (peer-level)** — FR defines *what the system shall do* (technical spec); US defines *for whom* and carries **Acceptance Criteria**. They link via `delivers`/`delivered_by` and both link to parent Epic via `parent_epic`
+- **US → AC** — Acceptance criteria (AC-N in Given/When/Then format) live in User Story markdown body
+- **TASK → TEST** — Task implementation links to TEST evidence; TEST links back to AC via `accepts: US-DOMAIN-NNN#AC-N`
 
-## Domain Organization
-
-The vault is organized by domain. Each domain owns:
-- Requirements (US, FR, NFR)
-- Constraints (CON)
-- Architectural decisions (ADR)
-- Tasks (TASK)
-- Test evidence (TEST)
-- Glossary entries (in `00-meta/glossary/DOMAIN.md`)
-
-Example domains:
-- **AUTH** — Authentication, access control, encryption
-- **BILLING** — Billing logic, payment processing, invoicing
-- **STORAGE** — Data storage, raw tier, transformations
-- **REPORTING** — Analytics, reporting, compliance tracking
-- **API** — API design, endpoints, contracts
-- **FRONTEND** — Frontend, user interactions, forms
-- **BACKEND** — Backend services, business logic, coordination
-- **INFRA** — Infrastructure, deployment, CI/CD
-
-When creating new artifacts, pick the right domain. If unsure, check `00-meta/taxonomy/domains.md`.
+For standard projects, CTRL is optional — BRQ links directly to FR/NFR via `derives_from`. For compliance-driven projects, CTRL sits between BRQ and FR/NFR to provide the auditable layer.
 
 ## Acceptance Criteria Format
 
-Acceptance criteria are **in the markdown body of the User Story (US-*)**, not in FR or YAML frontmatter.
+Acceptance criteria live in **User Story** files (`US-*`), not in FR or Task files. They use structured Given/When/Then format in the markdown body only — NOT in frontmatter:
 
-Format:
 ```markdown
-## Acceptance Criteria
+# Acceptance Criteria
 
-**AC-1: [Short descriptive title]**
-- Given: [precondition or context]
-- When: [the action or event]
-- Then: [the expected outcome]
-- Testable by: unit | integration | e2e | manual
+- **AC-1: [Short title]**
+  - **Given:** [precondition or initial state]
+  - **When:** [action or trigger]
+  - **Then:** [expected outcome or assertion]
+  - **Testable by:** unit | integration | e2e | manual
 
-**AC-2: [Another criterion]**
-- Given: ...
-- When: ...
-- Then: ...
-- Testable by: ...
+- **AC-2: [Another criterion]**
+  - **Given:** [precondition or initial state]
+  - **When:** [action or trigger]
+  - **Then:** [expected outcome or assertion]
+  - **Testable by:** unit | integration | e2e | manual
 ```
 
 **Rules:**
-- Each AC must have a unique ID within the User Story (AC-1, AC-2, AC-3, etc.)
-- Each AC must be testable by at least one test type
+- Each AC must have a unique ID within the US (AC-1, AC-2, AC-3, etc.)
+- Each AC must be testable by at least one test type (unit, integration, e2e, manual)
 - Use present tense ("system stores", not "system should store")
 - Be specific and measurable (avoid "should be fast", prefer "response time < 200ms")
 - One AC per behavior—don't combine multiple scenarios
 
-When referencing AC in tasks or test evidence, use the full format: `US-DOMAIN-NNN#AC-N` (e.g., `US-AUTH-001#AC-2`).
+Tasks reference AC from their parent User Story via `acceptance_criteria_subset` in frontmatter. Map each AC to at least one test case.
 
-## File Paths and Structure
+When referencing AC in tasks or test evidence, use: `US-DOMAIN-NNN#AC-N` (e.g., `US-AUTH-001#AC-2`).
+
+## What NOT to Do
+
+### Protected Artifacts and Change Control
+
+- **Do not modify BRQ** with status `approved` or higher without a Change Request (CR). Changes to BRQ require impact analysis on all derived artifacts
+- **Do not modify CTRL** with status `approved` or higher without a Change Request (CR)
+- **Do not modify PRODUCT-VISION.md** without explicit approval
+- **Do not modify EPIC-* files** without explicit approval
+- **Do not modify US-* files** with status `approved` or higher without a CR
+- **Do not modify FR-* files** with status `approved` or higher without a CR
+
+If you must change an approved artifact, create a `CR-DOMAIN-NNN.md` file in `04-delivery/change-requests/`, get approval, and implement the CR.
+
+### Business Requirements and Controls
+
+- **Do not create FR/NFR/CON without linking to at least one BRQ via `derives_from`** — orphan system requirements must be flagged
+- **Do not create CTRL without linking to a BRQ** — controls must trace back to business/regulatory motivation
+
+### Code and Architecture
+
+- **Do not delete or rename artifact files.** Deprecate them instead
+- **Do not modify `[ARCHITECTURE_PATTERN]` architecture or intended data flow.** If working with layered data: never write directly to delivery tier from raw tier. Always flow through processing tier
+- **Do not hardcode configuration that should be externalized** — check constraints and ADRs for configurable patterns
+- **Do not break verified AC.** If tests pass an AC, do not refactor in ways that would make it fail
+- **Do not introduce technologies not listed in `architecture-overview.md`** without proposing a new ADR
+
+### Naming and Glossary
+
+- **Do not invent new names.** Use only names from `00-meta/glossary/[GLOSSARY_DOMAIN].md`
+- **Do not mix naming styles.** Use the glossary's specified code names (e.g., `camelCase` if specified)
+- **Do not use abbreviations** unless they're in the glossary
+
+### Commits and Deployment
+
+- **Do not commit code that breaks existing verified acceptance criteria**
+- **Do not modify requirements after a CR has been approved** — create a new CR instead
+
+## Cross-Agent Synchronization
+
+Keep these files synchronized for consistent behavior across all agents:
+
+- **CLAUDE.md** — Claude Code agent (source of truth)
+- **.codex/instructions.md** — Codex agent (Visual Studio Code)
+- **.cursor/rules/requirements-vault.mdc** — Cursor agent (Cursor IDE)
+- **.kiro/** — Kiro agent (automation tasks)
+
+Update all files when you change policies, glossary references, domain lists, or workflow steps.
+
+## Traceability Chain (Complete)
+
+Maintain complete traceability from business motivation through verification:
+
+```
+BRQ (business requirement)
+  ↓ derives_from
+CTRL (control, if compliance-driven)
+  ↓ derives_from
+EPIC (epic)
+  ↓ parent_epic
+FR/US (functional requirement ↔ user story, peer-level)
+  ↓ part_of_story / delivers
+TASK (task)
+  ↓ implements
+TEST (test evidence)
+  ↓ accepts US-DOMAIN-NNN#AC-N
+```
+
+**Verifying traceability:**
+- Every BRQ must have at least one derived FR/NFR/CON or CTRL
+- Every CTRL must derive from a BRQ
+- Every FR/NFR/CON must derive from a BRQ (optionally via CTRL)
+- Every EPIC must be parent to at least one FR
+- Every FR must link to at least one US via `delivered_by`
+- Every US must link to at least one FR via `delivers`
+- Every TASK must implement a FR
+- Every AC in a US must be covered by at least one TEST
+- Every TEST must link back to an AC via `accepts: US-DOMAIN-NNN#AC-N`
+
+Run `05-quality/traceability/` reports to identify broken links.
+
+## Status Transitions (Reference)
+
+Artifact status progresses through defined states per artifact type.
+
+**See `00-meta/status-transitions.md` for the authoritative source.** Do not guess statuses.
+
+**General flows:**
+- **Requirements** (FR/US/NFR): `draft` → `proposed` → `approved` → `in-implementation` → `implemented` → `verified` → `deprecated`
+- **Business Requirements** (BRQ): `identified` → `analyzed` → `approved` → `allocated` → `covered` → `deprecated`
+- **Controls** (CTRL): `identified` → `defined` → `allocated` → `implemented` → `verified` → `audited` → `deprecated`
+- **Tasks** (TASK): `backlog` → `ready` → `in-progress` → `done` (or `in-progress` → `blocked` → `ready`)
+- **ADRs**: `proposed` → `accepted` → `superseded` or `deprecated`
+- **Tests** (TEST): `draft` → `ready` → `passed` or `failed`
+
+Do not skip states. Do not transition without justification. Reference `00-meta/status-transitions.md` for allowed transitions.
+
+## File Paths and Relative References
 
 All paths in frontmatter should be **relative to the repository root**:
 
@@ -409,45 +462,45 @@ implemented_by:
 
 Not: `../../src/[domain]/...` or absolute paths.
 
-## Dependency and Traceability
+## Glossary Usage
 
-Maintain clear traceability:
+Every domain has a glossary in `00-meta/glossary/[GLOSSARY_DOMAIN].md`. Example structure:
 
-- **Epic → FR** — Each FR has `parent_epic` linking to the epic
-- **FR → US** — Each FR has `delivered_by` linking to user stories; each US has `delivers` linking to FRs
-- **US → AC** — Acceptance criteria (AC-N) live in the User Story markdown body
-- **FR → AC** — Each FR has AC-N in the markdown body
-- **FR → ADR** — Each FR has `related_adrs` listing architectural constraints
-- **FR → TASK** — Each TASK has `implements` pointing to the FR
-- **TASK → Code** — Each TASK has `target_files` and when done, the FR's `implemented_by` lists those files
-- **AC → TEST** — Each TEST file has `accepts` pointing to `US-DOMAIN-NNN#AC-N`
+```markdown
+---
+domain: [GLOSSARY_DOMAIN]
+---
 
-If a link is broken (e.g., an AC is not covered by any test), the vault is invalid. Run `check-orphans.py` to find these.
+## resourceId
+- **code_name:** `resourceId`
+- **description:** Unique identifier for a resource within the system
+- **type:** string (UUID format)
+- **related:** FR-*, US-*
 
-## Revision and Review
+## rawTier
+- **code_name:** `rawTier`
+- **description:** Raw data tier, no validation or normalization
+- **type:** conceptual tier (not a code type)
+- **related:** ADR-[DOMAIN]-001
+```
 
-When you complete a task:
-
-1. Update all linked artifacts (TASK, FR, TEST)
-2. Run validation scripts
-3. Ensure all AC have corresponding tests
-4. Submit for review (if your project has a review process)
-
-If your change touches an approved artifact, create a Change Request (CR) for audit and approval tracking.
+**Before naming anything in code, check the glossary first.** Use the `code_name` exactly. If a concept is not in the glossary, propose it (create an entry and link it to the FR/US that introduces it).
 
 ## Summary: The Checklist
 
 Before marking a task done:
 
-- [ ] I read the TASK, FR, US, ADRs, glossary, and constraints
+- [ ] I read the TASK, FR, US, BRQ, CTRL (if present), ADRs, glossary, and constraints
+- [ ] I traced the "why" from FR → BRQ (and BRQ → CTRL if compliance-driven)
 - [ ] My code satisfies every AC assigned to me
 - [ ] I used glossary names, not invented ones
-- [ ] I followed the architecture and constraints
-- [ ] I wrote tests for each AC
-- [ ] I linked tests to AC in the TEST file
+- [ ] I followed the [ARCHITECTURE_PATTERN] architecture and constraints
+- [ ] I wrote tests for each AC in `05-quality/acceptance/`
+- [ ] I linked tests to AC in the TEST file via `accepts: US-DOMAIN-NNN#AC-N`
 - [ ] I updated TASK status to `done`
 - [ ] I updated FR status if all tasks are done
-- [ ] I ran validation scripts
+- [ ] I ran validation scripts (validate-frontmatter.py, check-orphans.py)
 - [ ] No approved artifacts were modified without a CR
+- [ ] All traceability is complete (BRQ → CTRL → FR → US → TASK → TEST)
 
 Done. The requirement is implemented and verified.

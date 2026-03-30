@@ -19,7 +19,7 @@
     },
     "status": {
       "type": "string",
-      "enum": ["unvalidated", "validating", "validated", "invalidated"]
+      "enum": ["unvalidated", "validating", "validated", "invalidated", "deprecated"]
     },
     "risk_if_wrong": {
       "type": "string",

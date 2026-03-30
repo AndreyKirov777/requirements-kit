@@ -9,6 +9,8 @@ domain: ""
 component: []
 stakeholders: []
 source_docs: []
+derives_from: []
+implements_control: []
 parent_epic: "[[EPIC-XXX-000]]"
 delivered_by: []
 related_adrs: []

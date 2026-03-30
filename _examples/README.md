@@ -8,6 +8,8 @@ Use these files as a reference when creating your own artifacts. Each example sh
 
 | Folder | Example file | Artifact type |
 |--------|-------------|---------------|
+| `00-meta/glossary/` | `dbp.md` | Domain glossary (12 terms with code_names) |
+| `00-meta/taxonomy/` | `domains.md` | Domain and component registry (8 domains) |
 | `01-product/vision/` | `PRODUCT-VISION.md` | Product vision |
 | `01-product/personas/` | `PERSONA-DBP-001.md` | User persona |
 | `01-product/assumptions/` | `ASSUM-DBP-001.md` | Assumption |

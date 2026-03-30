@@ -19,7 +19,7 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "active", "archived"]
+      "enum": ["draft", "proposed", "approved", "deprecated"]
     },
     "persona": {
       "type": "string"

@@ -19,7 +19,7 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"]
+      "enum": ["draft", "proposed", "approved", "deprecated"]
     },
     "priority": {
       "type": "string",

@@ -39,11 +39,12 @@ The system is organized into domains: [DOMAIN_LIST]. See `00-meta/taxonomy/domai
 
 1. **Find your task.** Look in `04-delivery/tasks/` for a `TASK-*` file with `status: ready` assigned to you (or unassigned).
 2. **Read the requirement.** Follow the `implements` field to the parent functional requirement (FR) in `02-requirements/fr/`. Read the full file — especially the **Requirement** section (what the system shall do) and **Out of Scope** (what NOT to do). Then follow `part_of_story` to the User Story (US) in `02-requirements/user-stories/` to read the **Acceptance Criteria** (how we verify the delivered value) and understand the "why" and "for whom".
-3. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
-4. **Read the architecture.** Start with `03-architecture/architecture-overview.md` for the system-wide picture. If your task belongs to a specific domain, read the corresponding `ARCH-{DOMAIN}-*` file. Then follow `related_adrs` in the requirement to understand specific decisions.
-5. **Find target files.** Check `target_files` in the task, or look up `03-architecture/code-map/` for the component mapping.
-6. **Read the glossary.** Check `00-meta/glossary/[GLOSSARY_DOMAIN].md` for the domain. Use the specified `code_name` for all identifiers (do not invent alternate names).
-7. **Check constraints.** Read `02-requirements/constraints/` — these define non-functional and regulatory requirements.
+3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent business requirement (`BRQ-*` in `02-requirements/business-requirements/`). This tells you the business or regulatory motivation. If the FR also has `implements_control`, read the control (`CTRL-*` in `02-requirements/controls/`) to understand what must be enforced and what evidence is needed.
+4. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
+5. **Read the architecture.** Start with `03-architecture/architecture-overview.md` for the system-wide picture. If your task belongs to a specific domain, read the corresponding `ARCH-{DOMAIN}-*` file. Then follow `related_adrs` in the requirement to understand specific decisions.
+6. **Find target files.** Check `target_files` in the task, or look up `03-architecture/code-map/` for the component mapping.
+7. **Read the glossary.** Check `00-meta/glossary/[GLOSSARY_DOMAIN].md` for the domain. Use the specified `code_name` for all identifiers (do not invent alternate names).
+8. **Check constraints.** Read `02-requirements/constraints/` — these define non-functional and regulatory requirements.
 
 ## During Implementation
 
@@ -67,10 +68,26 @@ The system is organized into domains: [DOMAIN_LIST]. See `00-meta/taxonomy/domai
 
 See `00-meta/status-transitions.md` for allowed state changes per artifact type. Do not skip states.
 
+## Requirement Hierarchy
+
+The kit follows a layered requirement model aligned with BABOK and INCOSE:
+
+- **BRQ** (Business Requirement) = WHY — the business or regulatory motivation
+- **CTRL** (Control) = WHAT MUST BE ENFORCED/PROVEN — auditable control statement (compliance-driven projects only)
+- **FR/NFR/CON** (System Requirements) = WHAT THE SYSTEM SHALL DO
+- **ADR/ARCH** (Design) = HOW WE CHOSE TO DO IT
+- **TEST** (Evidence) = HOW WE PROVE IT
+
+Traceability chain: `BRQ → [CTRL →] Epic → FR ↔ US → TASK → TEST`
+
+FR and US are **peer-level**: FR defines *what the system shall do* (technical spec), US defines *for whom* and carries **Acceptance Criteria**. They link to each other via `delivers`/`delivered_by`. Both link to their parent Epic via `parent_epic`.
+
+For standard projects, CTRL is optional — BRQ links directly to FR/NFR via `derives_from`. For compliance-driven projects, CTRL sits between BRQ and FR/NFR to provide the auditable layer.
+
 ## ID Format
 
 All artifact IDs follow: `<TYPE>-<DOMAIN>-<NNN>` where:
-- TYPE: EPIC, FR, US, NFR, ADR, ARCH, CR, TEST, CON, TASK
+- TYPE: EPIC, FR, US, NFR, ADR, ARCH, CR, TEST, CON, TASK, BRQ, CTRL
 - DOMAIN: uppercase domain code (use your domain list)
 - NNN: three or more digits, zero-padded
 
@@ -101,6 +118,7 @@ Tasks reference AC from their parent User Story via `acceptance_criteria_subset`
 ## What NOT to Do
 
 - Do not change functional requirements (FR) or user stories (US) with status `approved` or higher without a Change Request (`CR-*`).
+- Do not change business requirements (BRQ) or controls (CTRL) with status `approved` or higher without a Change Request (`CR-*`). Changes to BRQ/CTRL require impact analysis on all derived artifacts.
 - Do not delete or rename artifact files — deprecate them instead.
 - Do not modify `PRODUCT-VISION.md` or `EPIC-*` files without human approval.
 - Do not commit code that breaks existing verified acceptance criteria.
@@ -108,6 +126,7 @@ Tasks reference AC from their parent User Story via `acceptance_criteria_subset`
 - Do not introduce technologies not listed in `architecture-overview.md` without proposing a new ADR.
 - Do not hardcode configuration that should be externalized — check constraints and ADRs for configurable patterns.
 - Do not modify requirements after a CR has been approved — create a new CR instead.
+- Do not create FR/NFR/CON without linking to at least one BRQ via `derives_from` — orphan system requirements must be flagged.
 
 ## Cross-Agent Synchronization
 

@@ -3,6 +3,9 @@
   "$id": "user-story.schema.json",
   "title": "User Story frontmatter schema",
   "description": "Schema for US (User Story) artifacts",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
   "type": "object",
   "required": ["id", "title", "type", "status", "owner", "domain", "persona", "updated"],
   "properties": {
@@ -46,6 +49,11 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Wiki links to FRs that this story delivers"
+    },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to parent BRQ artifacts this story is derived from (if applicable)"
     },
     "tags": {
       "type": "array",

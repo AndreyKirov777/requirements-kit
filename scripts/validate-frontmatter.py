@@ -44,6 +44,8 @@ PREFIX_SCHEMA_MAP = {
     "DM": "data-model.schema.json",
     "VISION": "vision.schema.json",
     "ARCH": "domain-architecture.schema.json",
+    "BRQ": "brq.schema.json",
+    "CTRL": "ctrl.schema.json",
 }
 
 # Special-case IDs that don't follow the TYPE-DOMAIN-NNN pattern

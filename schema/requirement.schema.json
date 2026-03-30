@@ -90,6 +90,16 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Wiki links to User Stories that deliver this requirement"
+    },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to parent BRQ or CTRL artifacts this requirement is derived from"
+    },
+    "implements_control": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to CTRL artifacts this requirement implements (compliance-driven projects)"
     }
   }
 }
