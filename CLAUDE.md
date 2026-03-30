@@ -62,7 +62,8 @@ The system is organized into domains: [DOMAIN_LIST]. See `00-meta/taxonomy/domai
 2. **Update the requirement.** Add your implementation files to `implemented_by` (use relative paths from repo root). If all tasks for this requirement are done, set `status: in-implementation` → `implemented`.
 3. **Write or update tests.** Ensure each acceptance criterion has a corresponding test. Link tests in `verified_by`.
 4. **Run validation.** Execute the frontmatter validation script to check all metadata is valid.
-5. **Check orphans.** Execute the orphan-check script to ensure no requirements are left without tests.
+5. **Check duplicates.** Execute `python scripts/check-duplicates.py` to ensure all IDs are unique and filenames match.
+6. **Check orphans.** Execute the orphan-check script to ensure no requirements are left without tests.
 
 ## Status Transitions
 
@@ -91,7 +92,7 @@ All artifact IDs follow: `<TYPE>-<DOMAIN>-<NNN>` where:
 - DOMAIN: uppercase domain code (use your domain list)
 - NNN: three or more digits, zero-padded
 
-When creating new artifacts, check existing IDs in the target folder and increment.
+When creating new artifacts, check existing IDs in the target folder and increment. The filename must match the ID exactly (e.g., `FR-INGEST-001.md` for `id: FR-INGEST-001`). IDs must be globally unique across the entire vault — run `python scripts/check-duplicates.py` to verify.
 
 ## Acceptance Criteria Format
 
