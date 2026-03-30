@@ -22,7 +22,7 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 ### Changed
 
 - **Agent file location**: Claude Code instructions moved from `CLAUDE.md` (project root) to `.claude/CLAUDE.md` for consistency with other agents (`.codex/`, `.cursor/`, `.kiro/`). All four agents now use the same pattern: hidden dot-directory in the project root.
-- **`CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/requirements-vault.mdc`, `.kiro/steering.md`** (in kit repo): Replaced with auto-generated stubs pointing to `docs/agent-instructions.md`. These files are no longer the source of truth and should not be edited manually in the kit repository. Run `python scripts/install-agent-files.py` after cloning or updating the kit.
+- **`CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/requirements-vault.mdc`, `.kiro/steering.md`** (in kit repo): Removed. These files no longer belong in the kit repository — they are generated into the project root by `install-agent-files.py`. To delete them from the kit repo: `git rm CLAUDE.md && git rm -r .claude/ .codex/ .cursor/ .kiro/`.
 
 ### Migration from 0.2.x
 
