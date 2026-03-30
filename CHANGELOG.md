@@ -11,6 +11,15 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.2.2] — 2026-03-30
+
+### Added
+
+- **`scripts/check-duplicates.py`**: New validation script that checks (1) every artifact ID is globally unique across the entire vault, and (2) each file's `id` in frontmatter matches its filename (e.g., `FR-INGEST-001.md` must contain `id: FR-INGEST-001`). Reports `DUPLICATE ID` and `FILENAME MISMATCH` errors with file locations. Covers all 21 artifact types. Exempts well-known fixed-name files (e.g., `PRODUCT-VISION.md`) and meta prefixes (`META-`, `GLOSS-`, `CODEMAP-`). Exit code 1 on any issue — suitable for CI pipelines.
+- **`CLAUDE.md`**: Added instruction to run `check-duplicates.py` as step 5 in the "After Implementation" checklist. Updated ID format section to state that IDs must be globally unique and filenames must match the ID.
+
+---
+
 ## [0.2.1] — 2026-03-30
 
 ### Fixed — Critical
