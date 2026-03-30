@@ -11,6 +11,31 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.3.0] — 2026-03-30
+
+### Added
+
+- **`docs/agent-instructions.md`**: Canonical source file for all AI agent instruction files. Contains the full requirements methodology with `{{VAULT_PREFIX}}` and `{{PROJECT_NAME}}` placeholders instead of hardcoded paths. All four previous agent instruction files (CLAUDE.md, .codex/instructions.md, .cursor/rules/requirements-vault.mdc, .kiro/steering.md) are now generated from this single source.
+- **`scripts/install-agent-files.py`**: New script that reads `docs/agent-instructions.md`, replaces `{{VAULT_PREFIX}}` with the actual vault path, and injects the result into all four agent instruction files in the project root. Target files: `.claude/CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/requirements-vault.mdc`, `.kiro/steering.md` — all uniformly in hidden dot-directories. Manages a clearly marked section (`<!-- BEGIN REQUIREMENTS-KIT --> … <!-- END REQUIREMENTS-KIT -->`) — all content outside these markers (project-specific instructions) is preserved. Supports auto-detection of the vault prefix from the script's own location, explicit `--prefix` override, and `--dry-run` mode. Idempotent: re-running produces no changes if the canonical source has not changed.
+- **`docs/installation-guide.md`**: Step-by-step guide for installing the kit into a real project via `git subtree` and keeping it updated. Documents the full lifecycle: initial install, agent file generation, upstream updates, conflict resolution, version pinning.
+
+### Changed
+
+- **Agent file location**: Claude Code instructions moved from `CLAUDE.md` (project root) to `.claude/CLAUDE.md` for consistency with other agents (`.codex/`, `.cursor/`, `.kiro/`). All four agents now use the same pattern: hidden dot-directory in the project root.
+- **`CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/requirements-vault.mdc`, `.kiro/steering.md`** (in kit repo): Replaced with auto-generated stubs pointing to `docs/agent-instructions.md`. These files are no longer the source of truth and should not be edited manually in the kit repository. Run `python scripts/install-agent-files.py` after cloning or updating the kit.
+
+### Migration from 0.2.x
+
+If you were previously editing agent instruction files directly (`CLAUDE.md`, `.codex/instructions.md`, etc.):
+
+1. Copy your project-specific content (above any kit methodology) to a safe location.
+2. Run `python requirements/scripts/install-agent-files.py` to generate the new managed section.
+3. Re-add your project-specific instructions above the `<!-- BEGIN REQUIREMENTS-KIT -->` marker.
+
+Going forward, edit `requirements/docs/agent-instructions.md` for methodology changes and re-run the script. Do not edit the root agent files manually — they will be overwritten on next run.
+
+---
+
 ## [0.2.2] — 2026-03-30
 
 ### Added
