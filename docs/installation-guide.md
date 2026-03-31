@@ -93,26 +93,53 @@ git commit -m "chore: install and customize requirements kit"
 When the upstream kit has new schemas, scripts, templates, or fixes:
 
 ```bash
+# One-command upgrade (recommended)
+./requirements/scripts/pull-kit-update.sh
+
+# Or pin to a specific version
+./requirements/scripts/pull-kit-update.sh v0.5.0
+
+# Preview first without changing anything
+./requirements/scripts/pull-kit-update.sh --dry-run
+```
+
+The script runs the full pipeline: fetch → subtree pull → structural migrations → agent file regeneration → artifact migration (with interactive confirmation) → validation → commit. If merge conflicts are detected, the script stops and prints instructions.
+
+You can configure the remote name and subtree prefix via environment variables:
+
+```bash
+KIT_REMOTE=my-kit-remote KIT_PREFIX=docs/requirements ./requirements/scripts/pull-kit-update.sh
+```
+
+<details>
+<summary>Manual step-by-step (equivalent to what the script does)</summary>
+
+```bash
 # 1. Fetch the latest changes from the kit remote
 git fetch requirements-kit
 
 # 2. Pull updates into the subtree folder
 git subtree pull --prefix=requirements --squash requirements-kit main
 
-# 3. Re-generate agent files (the canonical source may have changed)
+# 3. Apply structural migrations (folder moves, path updates)
+python requirements/scripts/upgrade-kit.py --dry-run    # preview
+python requirements/scripts/upgrade-kit.py              # apply
+
+# 4. Re-generate agent files (the canonical source may have changed)
 python requirements/scripts/install-agent-files.py
 
-# 4. Migrate existing artifacts to match new schemas/templates
+# 5. Migrate existing artifacts to match new schemas/templates
 python requirements/scripts/migrate-artifacts.py --path requirements --dry-run   # preview
 python requirements/scripts/migrate-artifacts.py --path requirements              # apply
 
-# 5. Validate — ensure all artifacts pass the updated schemas
+# 6. Validate — ensure all artifacts pass the updated schemas
 python requirements/scripts/validate-frontmatter.py --path requirements
 
-# 6. Review and commit
+# 7. Review and commit
 git add requirements/ .claude/ .codex/ .cursor/ .kiro/
 git commit -m "chore: upgrade requirements kit to vX.Y.Z"
 ```
+</details>
 
 ### What happens during the update
 
@@ -191,9 +218,13 @@ python requirements/scripts/install-agent-files.py
 | Add remote (once) | `git remote add requirements-kit <URL>` |
 | Install kit | `git subtree add --prefix=requirements --squash requirements-kit main` |
 | Generate agent files | `python requirements/scripts/install-agent-files.py` |
+| **Full upgrade (one command)** | **`./requirements/scripts/pull-kit-update.sh`** |
+| Full upgrade (dry run) | `./requirements/scripts/pull-kit-update.sh --dry-run` |
+| Full upgrade (pinned) | `./requirements/scripts/pull-kit-update.sh v0.5.0` |
 | Fetch updates | `git fetch requirements-kit` |
 | Preview changes | `git log HEAD..requirements-kit/main --oneline` |
 | Pull updates | `git subtree pull --prefix=requirements --squash requirements-kit main` |
+| Structural migrations | `python requirements/scripts/upgrade-kit.py` |
 | Regenerate after update | `python requirements/scripts/install-agent-files.py` |
 | Migrate artifacts (preview) | `python requirements/scripts/migrate-artifacts.py --path requirements --dry-run` |
 | Migrate artifacts (apply) | `python requirements/scripts/migrate-artifacts.py --path requirements` |
