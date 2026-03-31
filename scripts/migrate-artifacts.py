@@ -595,13 +595,17 @@ def main():
 
     # Locate directories
     schema_dir = root / "schema"
-    template_dir = root / "00-meta" / "templates"
+
+    # v0.4.0 moved templates from 00-meta/templates to _framework/templates
+    template_dir = root / "_framework" / "templates"
+    if not template_dir.exists():
+        template_dir = root / "00-meta" / "templates"  # fallback for pre-0.4.0
 
     if not schema_dir.exists():
         print(f"ERROR: Schema directory not found: {schema_dir}")
         sys.exit(1)
     if not template_dir.exists():
-        print(f"ERROR: Template directory not found: {template_dir}")
+        print(f"ERROR: Template directory not found. Checked _framework/templates/ and 00-meta/templates/")
         sys.exit(1)
 
     # Load reference data

@@ -18,6 +18,12 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 - **`scripts/upgrade-kit.py`**: New migration script for upgrading between kit versions. Reads `.kit-version` to detect which structural migrations are pending, applies only outstanding ones, and updates `.kit-version` on success. Migrations are registered per version in a central registry — adding a new migration for v0.5.0 requires only adding one entry. Supports `--dry-run` (show changes without writing), `--status` (show installed vs current version and pending migrations), and `--path` (explicit vault root). Idempotent: safe to run multiple times. After running, prompts to also run `install-agent-files.py`, `migrate-artifacts.py`, and `validate-frontmatter.py`.
 - **`scripts/pull-kit-update.sh`**: One-command upgrade script for git subtree installations. Runs the full update pipeline: fetch → subtree pull → structural migrations → agent file regeneration → artifact migration (with interactive confirmation) → validation → commit. Supports `--dry-run` for preview, accepts a branch or tag argument for version pinning (e.g., `pull-kit-update.sh v0.5.0`). Configurable via `KIT_REMOTE` and `KIT_PREFIX` environment variables. Stops with clear instructions if merge conflicts are detected.
 
+### Fixed
+
+- **`scripts/pull-kit-update.sh`**: Replaced `python` with auto-detected `python3`/`python` — macOS does not alias `python` by default, causing hard failure at step 3.
+- **`scripts/pull-kit-update.sh`**: Fixed artifact migration auto-confirm logic — the grep pattern now matches actual `migrate-artifacts.py` output markers (`[!]`, `[+]`, `[§]`, `Modified: N`) instead of non-existent keywords.
+- **`scripts/migrate-artifacts.py`**: Updated template directory path to `_framework/templates` (with fallback to `00-meta/templates` for pre-0.4.0 installs). Previously hardcoded `00-meta/templates` which no longer exists after the v0.4.0 restructure.
+
 ### Changed — Breaking
 
 - **Folder layout: `_framework/` extracted from `00-meta/`**. Kit infrastructure files that are project-independent have been moved out of `00-meta/` into a dedicated `_framework/` directory:

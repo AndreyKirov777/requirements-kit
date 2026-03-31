@@ -35,6 +35,18 @@ for arg in "$@"; do
   esac
 done
 
+# ── Detect Python ─────────────────────────────────────────────
+# macOS ships with python3 only; python is not aliased by default.
+
+if command -v python3 &>/dev/null; then
+  PYTHON=python3
+elif command -v python &>/dev/null; then
+  PYTHON=python
+else
+  echo "ERROR: Neither python3 nor python found in PATH." >&2
+  exit 1
+fi
+
 # ── Helpers ───────────────────────────────────────────────────
 
 RED='\033[0;31m'
@@ -130,40 +142,42 @@ fi
 
 step 3 "Running structural migrations (upgrade-kit.py)"
 if $DRY_RUN; then
-  dry python "$PREFIX/scripts/upgrade-kit.py" --dry-run
+  dry $PYTHON "$PREFIX/scripts/upgrade-kit.py" --dry-run
 else
-  python "$PREFIX/scripts/upgrade-kit.py"
+  $PYTHON "$PREFIX/scripts/upgrade-kit.py"
 fi
 
 # ── Step 4: Agent instruction files ──────────────────────────
 
 step 4 "Regenerating agent instruction files"
 if $DRY_RUN; then
-  dry python "$PREFIX/scripts/install-agent-files.py" --dry-run
+  dry $PYTHON "$PREFIX/scripts/install-agent-files.py" --dry-run
 else
-  python "$PREFIX/scripts/install-agent-files.py"
+  $PYTHON "$PREFIX/scripts/install-agent-files.py"
 fi
 
 # ── Step 5: Artifact migration ────────────────────────────────
 
 step 5 "Migrating artifacts"
 if $DRY_RUN; then
-  python "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX" --dry-run
+  $PYTHON "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX" --dry-run
 else
   # Always preview first
   echo -e "  ${CYAN}Preview:${NC}"
-  python "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX" --dry-run 2>&1 | sed 's/^/    /'
+  $PYTHON "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX" --dry-run 2>&1 | sed 's/^/    /'
 
-  # Check if there are actual changes to apply
-  PREVIEW_OUTPUT=$(python "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX" --dry-run 2>&1)
-  if echo "$PREVIEW_OUTPUT" | grep -q "would\|CHANGE\|ADD\|MISSING"; then
+  # Check if there are actual changes to apply.
+  # migrate-artifacts.py uses markers: [!] (required field), [+] (optional field),
+  # [§] (section), and summary line "Modified: N files".
+  PREVIEW_OUTPUT=$($PYTHON "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX" --dry-run 2>&1)
+  if echo "$PREVIEW_OUTPUT" | grep -qE '\[!\]|\[\+\]|\[§\]|Modified: [1-9]'; then
     echo ""
     read -rp "  Apply artifact migrations? [y/N] " CONFIRM
     if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
-      python "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX"
+      $PYTHON "$PREFIX/scripts/migrate-artifacts.py" --path "$PREFIX"
       info "Artifact migrations applied"
     else
-      warn "Artifact migrations skipped (run manually: python $PREFIX/scripts/migrate-artifacts.py --path $PREFIX)"
+      warn "Artifact migrations skipped (run manually: $PYTHON $PREFIX/scripts/migrate-artifacts.py --path $PREFIX)"
     fi
   else
     info "No artifact migrations needed"
@@ -174,9 +188,9 @@ fi
 
 step 6 "Validating frontmatter"
 if $DRY_RUN; then
-  dry python "$PREFIX/scripts/validate-frontmatter.py" --path "$PREFIX"
+  dry $PYTHON "$PREFIX/scripts/validate-frontmatter.py" --path "$PREFIX"
 else
-  if python "$PREFIX/scripts/validate-frontmatter.py" --path "$PREFIX"; then
+  if $PYTHON "$PREFIX/scripts/validate-frontmatter.py" --path "$PREFIX"; then
     info "All artifacts pass validation"
   else
     warn "Validation errors found — review output above"
