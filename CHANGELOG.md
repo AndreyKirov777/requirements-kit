@@ -11,6 +11,15 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.4.1] — 2026-03-31
+
+### Changed
+
+- **Vision template**: Added three new sections — **Product Structure** (logical modules/components), **Scope of Work** (what is included in this phase), and **Out of Scope** (replaces the former "Non-Goals" section). Product Structure gives agents a business-level map for organizing epics; Scope of Work explicitly bounds what agents should generate requirements for; Out of Scope retains the same purpose as Non-Goals with a clearer name.
+- **DBP example (`PRODUCT-VISION.md`)**: Updated to demonstrate the new vision sections with concrete content for the Digital Battery Passport Accelerator.
+
+---
+
 ## [0.4.0] — 2026-03-31
 
 ### Added

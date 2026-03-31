@@ -31,10 +31,14 @@ updated: YYYY-MM-DD
      AI AGENT GUIDANCE:
        - Goals are numbered for traceability — downstream epics
          MUST reference which goal(s) they serve.
+       - Product Structure defines logical modules/components —
+         use them to organize epics and requirements by area.
+       - Scope of Work lists what IS included in this phase —
+         only generate requirements for items listed here.
+       - Out of Scope is an explicit boundary — do not generate
+         requirements for anything listed here.
        - Target Users entries describe the intended user roles;
          use them to inform persona and requirement authoring.
-       - Non-Goals are explicit scope boundaries — do not generate
-         requirements for anything listed here.
      ============================================================ -->
 
 # Vision Statement
@@ -48,6 +52,18 @@ updated: YYYY-MM-DD
 <!-- A paragraph (3–8 sentences) describing what the product IS, what it does,
      and how it delivers value. Focus on capabilities, not implementation.
      This section feeds into epic and requirement generation. -->
+
+# Product Structure
+
+<!-- High-level logical structure of the product — modules, components, or
+     functional areas. This is a BUSINESS/LOGICAL view, not technical architecture.
+     Agents use this to organize epics and requirements by product area.
+
+     Format:
+       - **[Module/Area Name]** — [1-sentence description of its responsibility]
+-->
+
+- **[Module]** — …
 
 # Goals
 
@@ -63,7 +79,20 @@ updated: YYYY-MM-DD
 1. …
 2. …
 
-# Non-Goals
+# Scope of Work
+
+<!-- What IS included in this version/phase. List the key functional blocks,
+     capabilities, or deliverables that are in scope. This complements Goals
+     (which describe outcomes) by specifying the concrete work to be done.
+     Agents should only generate epics and requirements for items listed here.
+
+     Format:
+       - [Capability or deliverable that is in scope for this phase]
+-->
+
+- …
+
+# Out of Scope
 
 <!-- Explicit scope boundaries. List things the product will NOT do in this
      version/phase. Agents must not generate requirements for items listed here.
@@ -171,5 +200,4 @@ updated: YYYY-MM-DD
      Leave empty in initial drafts.
 
      - Assumptions: [[ASSUM-XXX-001]], …
-     - Change Requests: [[CR-XXX-001]], …
 -->
