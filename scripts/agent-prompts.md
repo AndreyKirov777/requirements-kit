@@ -86,7 +86,7 @@ You are a documentation librarian. Check the note set for:
 - Approved notes with open critical questions
 - Stale dates (`updated` more than 30 days old on active artifacts)
 - Glossary compliance (terms used inconsistently with `00-meta/glossary/`)
-- Status consistency (child status incompatible with parent — see `00-meta/status-transitions.md`)
+- Status consistency (child status incompatible with parent — see `_framework/status-transitions.md`)
 
 Return:
 - **Critical issues** — must fix before next release

@@ -62,7 +62,7 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 
 ## Status Transitions
 
-See `{{VAULT_PREFIX}}/00-meta/status-transitions.md` for allowed state changes per artifact type. Do not skip states.
+See `{{VAULT_PREFIX}}/_framework/status-transitions.md` for allowed state changes per artifact type. Do not skip states.
 
 ## Requirement Hierarchy
 

@@ -17,7 +17,7 @@
 
 | Layer | Location | Updated by |
 |-------|----------|------------|
-| Kit infrastructure | `requirements/schema/`, `requirements/scripts/`, `requirements/00-meta/templates/`, `requirements/_examples/`, `requirements/docs/` | `git subtree pull` from upstream |
+| Kit infrastructure | `requirements/schema/`, `requirements/scripts/`, `requirements/_framework/`, `requirements/_examples/`, `requirements/docs/` | `git subtree pull` from upstream |
 | Agent instructions | `.claude/CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/*.mdc`, `.kiro/steering.md` (project root) | `install-agent-files.py` — regenerates from canonical source |
 | Canonical source | `requirements/docs/agent-instructions.md` | `git subtree pull` from upstream (then re-run install script) |
 | Project artifacts | `requirements/01-product/` through `requirements/05-quality/`, `requirements/00-meta/glossary/`, `requirements/00-meta/taxonomy/` | You — fully project-specific |

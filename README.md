@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 0.3.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 0.4.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -27,12 +27,12 @@ All instruction files are domain-agnostic templates. Customize the placeholders 
 ## What is Inside
 
 - A vault folder structure with clear separation of concerns
-- Ready-to-use templates for all artifact types (`00-meta/templates/`)
+- Ready-to-use templates for all artifact types (`_framework/templates/`)
 - One working example of each artifact type (`_examples/`) — uses DBP (Digital Battery Passport) as a sample project
 - JSON Schemas for all artifact types (`schema/`) — 17 schemas for frontmatter validation
-- Status transition rules (state machines) for all artifact types (`00-meta/status-transitions.md`)
+- Status transition rules (state machines) for all artifact types (`_framework/status-transitions.md`)
 - A domain glossary and taxonomy starters (`00-meta/glossary/`, `00-meta/taxonomy/`)
-- An SDLC pipeline definition with stages and gates (`00-meta/sdlc-pipeline.md`)
+- An SDLC pipeline definition with stages and gates (`_framework/sdlc-pipeline.md`)
 - Validation scripts for CI integration (`scripts/`)
 - Agent prompts for each role in the AI SDLC (`scripts/agent-prompts.md`)
 
@@ -40,11 +40,11 @@ All instruction files are domain-agnostic templates. Customize the placeholders 
 
 1. Copy this folder into your repository (monorepo recommended).
 2. Configure agent instruction files — customize `CLAUDE.md` and/or the agent file for your tool.
-3. Read `00-meta/sdlc-pipeline.md` to understand the stages and gates.
+3. Read `_framework/sdlc-pipeline.md` to understand the stages and gates.
 4. Update `00-meta/taxonomy/domains.md` with your project's domains and components.
 5. Update `00-meta/glossary/` with your domain terminology.
 6. Browse `_examples/` to see working samples of each artifact.
-7. Use templates from `00-meta/templates/` to create your first real artifacts.
+7. Use templates from `_framework/templates/` to create your first real artifacts.
 8. Run `python scripts/validate-frontmatter.py --path .` to verify metadata.
 9. Use agent prompts from `scripts/agent-prompts.md` or let agents discover tasks automatically.
 
@@ -62,12 +62,14 @@ CLAUDE.md                    # Agent instructions for Claude Code
 
 _examples/                   # One working example per artifact type (reference only)
 
-00-meta/
+_framework/                  # Kit infrastructure — do not edit (updated from upstream)
   templates/                 # Templates for all artifact types
-  glossary/                  # Domain terms → code naming conventions
-  taxonomy/                  # Domain and component registry
   sdlc-pipeline.md           # Pipeline stages and approval gates
   status-transitions.md      # Valid state machines per artifact type
+
+00-meta/                     # Project-specific context — customize for your project
+  glossary/                  # Domain terms → code naming conventions
+  taxonomy/                  # Domain and component registry
 
 01-product/
   vision/                    # Product vision documents
@@ -146,7 +148,7 @@ Domain codes are registered in `00-meta/taxonomy/domains.md`. IDs use three or m
 3. **Glossary-driven naming.** Domain terms map to code identifiers via the glossary.
 4. **Human gates at strategic points.** Vision, requirements, and architecture require human approval.
 5. **Structured acceptance criteria.** Use Given/When/Then format with AC-N identifiers.
-6. **Status transitions are enforced.** See `00-meta/status-transitions.md`.
+6. **Status transitions are enforced.** See `_framework/status-transitions.md`.
 7. **Code-map bridges requirements to code.** AI agents find targets via `03-architecture/code-map/`.
 8. **Architecture has two levels.** `architecture-overview.md` describes the whole system; `ARCH-{DOMAIN}-*` files detail each domain.
 

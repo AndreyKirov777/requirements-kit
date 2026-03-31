@@ -27,7 +27,7 @@ Use these files as a reference when creating your own artifacts. Each example sh
 
 ## How to use
 
-1. Find the template for the artifact type you need in `00-meta/templates/`.
+1. Find the template for the artifact type you need in `_framework/templates/`.
 2. Copy the template to the appropriate folder in the vault root.
 3. Give it a stable ID: `TYPE-DOMAIN-NNN` (e.g., `FR-AUTH-001`).
 4. Use the example here as a reference for filling in the content.

@@ -4,9 +4,9 @@
 
 1. Copy this kit into your repository (monorepo recommended).
 2. Open `README.md` for a full overview.
-3. Read `00-meta/sdlc-pipeline.md` to understand the AI SDLC stages and approval gates.
-4. Review `00-meta/status-transitions.md` for valid state machines.
-5. Review templates in `00-meta/templates/`.
+3. Read `_framework/sdlc-pipeline.md` to understand the AI SDLC stages and approval gates.
+4. Review `_framework/status-transitions.md` for valid state machines.
+5. Review templates in `_framework/templates/`.
 6. Duplicate `EPIC-INGEST-001.md` and `FR-INGEST-001.md` as your first real artifacts — replace example IDs, owners, and domains.
 7. Update `00-meta/taxonomy/domains.md` with your domains and components.
 8. Create a glossary file in `00-meta/glossary/` for your first domain.
