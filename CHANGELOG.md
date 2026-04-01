@@ -11,6 +11,51 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.5.0] — 2026-04-01
+
+### Changed — Breaking
+
+- **Attribute audit: schemas trimmed to required-only fields.** Applied recommendations from the attribute audit report. All reverse/computed links removed from schemas — they are now derived by the traceability script. Summary of removals per schema:
+  - **requirement.schema.json** (22 → 11 fields): Removed `type`, `risk`, `component`, `stakeholders`, `related_adrs`, `blocks`, `implemented_by`, `verified_by`, `release_target`, `delivered_by`, `implements_control`. Kept: `id`, `title`, `status`, `priority`, `owner`, `domain`, `updated`, `parent_epic`, `derives_from`, `depends_on`, `source_docs`, `quality_attribute`.
+  - **brq.schema.json** (18 → 10 fields): Removed `type`, `risk`, `parent_epic`, `derived_requirements`, `derived_controls`, `related_brqs`, `release_target`. Kept: `id`, `title`, `status`, `source_type`, `priority`, `owner`, `domain`, `updated`, `source_docs`, `regulatory_refs`, `compliance_deadline`, `stakeholders`.
+  - **ctrl.schema.json** (18 → 9 fields): Removed `type`, `derived_requirements`, `evidence_type`, `evidence_location`, `audit_status`, `control_family`, `stakeholders`, `related_ctrls`, `verified_by`, `release_target`. Audit-extension fields (evidence_*, audit_status, control_family) can be added at verification stage. Kept: `id`, `title`, `status`, `priority`, `owner`, `domain`, `updated`, `derives_from`, `verification_method`, `compliance_deadline`.
+  - **epic.schema.json** (9 → 8 fields): Removed `related_requirements` (reverse link — computed via FR.parent_epic).
+  - **user-story.schema.json** (12 → 10 fields): Removed `type`, `derives_from`, `tags`. Kept: `id`, `title`, `status`, `priority`, `owner`, `domain`, `persona`, `parent_epic`, `delivers`, `updated`.
+  - **task.schema.json** (13 → 10 fields): Removed `type`, `depends_on_tasks`, `release_target`, `implements_control`. Added `owner` to required. Kept: `id`, `title`, `status`, `owner`, `updated`, `assigned_to`, `implements`, `part_of_story`, `acceptance_criteria_subset`, `target_files`, `estimated_complexity`.
+- **Templates updated** to match new schemas — no empty optional fields in frontmatter.
+- **Principle: "link up only" (child → parent).** All reverse links (`derived_requirements`, `delivered_by`, `verified_by`, `implemented_by` on parent artifacts) are computed by the traceability script. This eliminates the entire class of bidirectional sync errors.
+- **`blocks` removed** — exact inverse of `depends_on`, computed by script.
+- **`release_target`** kept only on Epic and Task (removed from Requirement, BRQ, CTRL).
+- **`type` field** removed from all schemas — type is encoded in the ID prefix and folder location.
+
+### Migration from 0.4.x
+
+Remove the following fields from existing artifact frontmatter (or leave them — validation will ignore unknown fields due to `additionalProperties: true` in base schema, but they will no longer be validated):
+
+```
+# On FR/NFR/CON files:
+type, risk, component, stakeholders, related_adrs, blocks, implemented_by, verified_by, release_target, delivered_by, implements_control
+
+# On BRQ files:
+type, risk, parent_epic, derived_requirements, derived_controls, related_brqs, release_target
+
+# On CTRL files:
+type, derived_requirements, evidence_type, evidence_location, audit_status, control_family, stakeholders, related_ctrls, verified_by, release_target
+
+# On Epic files:
+related_requirements
+
+# On User Story files:
+type, derives_from, tags
+
+# On Task files:
+type, depends_on_tasks, release_target, implements_control
+```
+
+Re-run `generate-traceability.py` to rebuild TRACEABILITY-MAP.md with computed reverse links.
+
+---
+
 ## [0.4.1] — 2026-03-31
 
 ### Changed

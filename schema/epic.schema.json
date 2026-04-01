@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "epic.schema.json",
   "title": "Epic frontmatter schema",
-  "description": "Schema for EPIC artifacts",
+  "description": "Schema for EPIC artifacts. Reverse link (related_requirements) is computed by the traceability script via FR.parent_epic.",
   "allOf": [
     { "$ref": "base.schema.json" }
   ],
@@ -29,10 +29,6 @@
       "items": { "type": "string" }
     },
     "non_goals": {
-      "type": "array",
-      "items": { "type": "string" }
-    },
-    "related_requirements": {
       "type": "array",
       "items": { "type": "string" }
     },

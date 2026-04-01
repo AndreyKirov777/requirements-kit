@@ -1,15 +1,13 @@
 ---
 id: EPIC-XXX-000
-title: 
+title: ""
 status: draft
 owner: ""
 domain: ""
 goals: []
 non_goals: []
-related_requirements: []
 release_target: ""
-tags: [epic]
-updated: 2026-03-27
+updated: YYYY-MM-DD
 ---
 
 # Goal

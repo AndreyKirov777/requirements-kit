@@ -69,28 +69,34 @@ def main():
             continue
         artifacts[aid] = {"fm": fm, "path": md_file}
 
-    # Check requirements without tests
+    # Build computed reverse-link maps (v0.5.0: "link up only" principle).
+    # Test.verifies → requirement, Task.implements → requirement
+    verified_by_map = {}  # req_id -> [test_ids]
+    implemented_by_map = {}  # req_id -> [task_ids]
+    for aid_inner, info_inner in artifacts.items():
+        fm_inner = info_inner["fm"]
+        prefix_inner = aid_inner.split("-")[0]
+        if prefix_inner == "TEST":
+            for vid in extract_ids(fm_inner.get("verifies", [])):
+                verified_by_map.setdefault(vid, []).append(aid_inner)
+        if prefix_inner == "TASK":
+            for iid in extract_ids(fm_inner.get("implements", "")):
+                implemented_by_map.setdefault(iid, []).append(aid_inner)
+
+    # Check requirements without tests (computed from Test.verifies)
     for aid, info in artifacts.items():
         fm = info["fm"]
         prefix = aid.split("-")[0]
 
         if prefix in ("FR", "NFR"):
-            verified_by = extract_ids(fm.get("verified_by", []))
-            if not verified_by:
-                issues.append(f"ORPHAN: {aid} has no verified_by (no tests linked)")
-            else:
-                for vid in verified_by:
-                    if vid not in artifacts:
-                        issues.append(f"BROKEN LINK: {aid} references {vid} in verified_by, but it does not exist")
+            tests = verified_by_map.get(aid, [])
+            if not tests:
+                issues.append(f"ORPHAN: {aid} has no tests verifying it")
 
-            # Check if requirement has at least one task
-            has_task = any(
-                extract_ids(a["fm"].get("implements", "")) == [aid] or aid in extract_ids(a["fm"].get("implements", ""))
-                for a in artifacts.values()
-                if a["fm"].get("id", "").startswith("TASK")
-            )
+            # Check if requirement has at least one task (computed from Task.implements)
+            tasks = implemented_by_map.get(aid, [])
             status = fm.get("status", "")
-            if status in ("approved", "in-implementation") and not has_task:
+            if status in ("approved", "in-implementation") and not tasks:
                 issues.append(f"MISSING TASK: {aid} is '{status}' but has no TASK referencing it")
 
         # Check tests without requirements
@@ -117,11 +123,6 @@ def main():
         for dep in extract_ids(fm.get("depends_on", [])):
             if dep not in artifacts:
                 issues.append(f"BROKEN LINK: {aid} depends_on {dep}, but it does not exist")
-
-        # Check for broken related_adrs links
-        for adr in extract_ids(fm.get("related_adrs", [])):
-            if adr not in artifacts:
-                issues.append(f"BROKEN LINK: {aid} references ADR {adr}, but it does not exist")
 
     # Report
     if issues:

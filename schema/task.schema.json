@@ -7,15 +7,11 @@
     { "$ref": "base.schema.json" }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "implements", "updated"],
+  "required": ["id", "title", "status", "owner", "implements", "updated"],
   "properties": {
     "id": {
       "type": "string",
       "pattern": "^TASK-[A-Z0-9]+-[0-9]{3,}$"
-    },
-    "type": {
-      "type": "string",
-      "const": "implementation-task"
     },
     "status": {
       "type": "string",
@@ -43,21 +39,9 @@
       "items": { "type": "string" },
       "description": "Relative file paths from repo root"
     },
-    "depends_on_tasks": {
-      "type": "array",
-      "items": { "type": "string" }
-    },
     "estimated_complexity": {
       "type": "string",
       "enum": ["simple", "medium", "complex"]
-    },
-    "release_target": {
-      "type": "string"
-    },
-    "implements_control": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Wiki links to CTRL artifacts this task contributes to (compliance-driven projects)"
     }
   }
 }

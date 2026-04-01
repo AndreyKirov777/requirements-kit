@@ -1,26 +1,13 @@
 ---
 id: FR-XXX-000
 title: ""
-type: functional-requirement
 status: draft
 priority: medium
 owner: ""
 domain: ""
-component: []
-stakeholders: []
-source_docs: []
-derives_from: []
-implements_control: []
 parent_epic: "[[EPIC-XXX-000]]"
-delivered_by: []
-related_adrs: []
+derives_from: []
 depends_on: []
-blocks: []
-implemented_by: []
-verified_by: []
-release_target: ""
-risk: medium
-tags: [fr]
 updated: YYYY-MM-DD
 ---
 
@@ -55,7 +42,5 @@ Explain the value to users or the business.
 # Links
 
 - Epic: [[EPIC-XXX-000]]
-- Delivered by:
 - ADR:
 - Tests:
-- Tickets:

@@ -41,7 +41,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 KIT_VERSION_FILE = ".kit-version"
-CURRENT_KIT_VERSION = "0.4.0"
+CURRENT_KIT_VERSION = "0.5.0"
 
 
 # ---------------------------------------------------------------------------
@@ -135,18 +135,137 @@ def _migrate_0_4_0(vault: Path, dry_run: bool) -> list:
     return changes
 
 
+def _migrate_0_5_0(vault: Path, dry_run: bool) -> list:
+    """
+    v0.5.0: Attribute audit — remove deprecated fields from artifact frontmatter.
+
+    Principle: "link up only" (child → parent). All reverse links are now
+    computed by generate-traceability.py. Fields like `type` (redundant with
+    ID prefix), `risk` on requirements (managed via RISK artifacts), and
+    `component` (architectural concern) are also removed.
+
+    This migration edits YAML frontmatter in-place, preserving all other
+    content. It removes fields line-by-line from the raw YAML text to avoid
+    re-serialization artifacts.
+    """
+    changes = []
+
+    # Fields to remove per ID prefix
+    FIELDS_TO_REMOVE = {
+        "FR": {"type", "risk", "component", "stakeholders", "related_adrs",
+                "blocks", "implemented_by", "verified_by", "release_target",
+                "delivered_by", "implements_control"},
+        "NFR": {"type", "risk", "component", "stakeholders", "related_adrs",
+                "blocks", "implemented_by", "verified_by", "release_target",
+                "delivered_by", "implements_control"},
+        "CON": {"type", "risk", "component", "stakeholders", "related_adrs",
+                "blocks", "implemented_by", "verified_by", "release_target",
+                "delivered_by", "implements_control"},
+        "BRQ": {"type", "risk", "parent_epic", "derived_requirements",
+                "derived_controls", "related_brqs", "release_target"},
+        "CTRL": {"type", "derived_requirements", "evidence_type",
+                 "evidence_location", "audit_status", "control_family",
+                 "stakeholders", "related_ctrls", "verified_by", "release_target"},
+        "EPIC": {"related_requirements"},
+        "US": {"type", "derives_from", "tags"},
+        "TASK": {"type", "depends_on_tasks", "release_target", "implements_control"},
+    }
+
+    # Regex for matching a YAML key and its value (handles scalar, inline list,
+    # and block list/object values that are indented under the key).
+    # We process line-by-line within the frontmatter block.
+    frontmatter_re = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
+
+    skip_folders = {"templates", "scripts", ".codex", ".cursor", ".kiro", ".claude",
+                    ".git", "_examples", ".snapshots", "docs", "schema", "node_modules",
+                    "_framework"}
+
+    # Scan all markdown files
+    artifact_files = []
+    for md_file in sorted(vault.rglob("*.md")):
+        rel_parts = md_file.relative_to(vault).parts
+        if any(part in skip_folders for part in rel_parts):
+            continue
+        if md_file.name.startswith("README") or md_file.name == "CLAUDE.md":
+            continue
+        if md_file.name.endswith("-template.md"):
+            continue
+        artifact_files.append(md_file)
+
+    files_modified = 0
+    fields_removed_total = 0
+
+    for md_file in artifact_files:
+        text = md_file.read_text(encoding="utf-8")
+        match = frontmatter_re.match(text)
+        if not match:
+            continue
+
+        raw_yaml = match.group(1)
+
+        # Determine artifact prefix from id field
+        id_match = re.search(r"^id:\s*(\S+)", raw_yaml, re.MULTILINE)
+        if not id_match:
+            continue
+        artifact_id = id_match.group(1).strip().strip('"').strip("'")
+        prefix = artifact_id.split("-")[0]
+
+        fields_to_remove = FIELDS_TO_REMOVE.get(prefix)
+        if not fields_to_remove:
+            continue
+
+        # Remove fields from raw YAML text line-by-line
+        lines = raw_yaml.split("\n")
+        new_lines = []
+        skip_block = False  # True when inside a block value (indented continuation)
+        removed_fields = []
+
+        for line in lines:
+            # Check if this line starts a new top-level key
+            key_match = re.match(r"^([a-z_][a-z0-9_]*):", line)
+            if key_match:
+                key = key_match.group(1)
+                if key in fields_to_remove:
+                    skip_block = True
+                    removed_fields.append(key)
+                    continue
+                else:
+                    skip_block = False
+            elif skip_block:
+                # Continuation of a block value (indented lines like "  - item")
+                if line.startswith("  ") or line.startswith("\t") or line.strip() == "":
+                    continue
+                else:
+                    skip_block = False
+
+            new_lines.append(line)
+
+        if removed_fields:
+            files_modified += 1
+            fields_removed_total += len(removed_fields)
+            rel = md_file.relative_to(vault)
+            changes.append(f"  {rel}: removed {', '.join(sorted(removed_fields))}")
+
+            if not dry_run:
+                new_yaml = "\n".join(new_lines)
+                new_text = f"---\n{new_yaml}\n---{text[match.end():]}"
+                md_file.write_text(new_text, encoding="utf-8")
+
+    changes.insert(0, f"  Summary: {files_modified} files modified, {fields_removed_total} fields removed")
+    return changes
+
+
 MIGRATIONS = [
     {
         "version": "0.4.0",
         "description": "Extract _framework/ from 00-meta/ (templates, sdlc-pipeline, status-transitions)",
         "fn": _migrate_0_4_0,
     },
-    # Add future migrations here, e.g.:
-    # {
-    #     "version": "0.5.0",
-    #     "description": "...",
-    #     "fn": _migrate_0_5_0,
-    # },
+    {
+        "version": "0.5.0",
+        "description": "Attribute audit — remove deprecated/reverse-link fields from artifact frontmatter",
+        "fn": _migrate_0_5_0,
+    },
 ]
 
 

@@ -1,18 +1,13 @@
 ---
 id: CON-XXX-000
-title: 
-type: constraint
+title: ""
 status: draft
 priority: medium
 owner: ""
 domain: ""
-source_docs: []
 derives_from: []
-implements_control: []
-related_adrs: []
-impacts: []
-tags: [constraint]
-updated: 2026-03-27
+depends_on: []
+updated: YYYY-MM-DD
 ---
 
 # Statement

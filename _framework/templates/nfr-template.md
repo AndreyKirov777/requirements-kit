@@ -1,24 +1,15 @@
 ---
 id: NFR-XXX-000
-title: 
-type: non-functional-requirement
+title: ""
 status: draft
 priority: medium
 owner: ""
 domain: ""
 quality_attribute: performance
-component: []
-source_docs: []
+parent_epic: "[[EPIC-XXX-000]]"
 derives_from: []
-implements_control: []
-related_adrs: []
 depends_on: []
-implemented_by: []
-verified_by: []
-release_target: ""
-risk: medium
-tags: [nfr]
-updated: 2026-03-27
+updated: YYYY-MM-DD
 ---
 
 # Summary

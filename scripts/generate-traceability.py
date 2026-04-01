@@ -22,16 +22,22 @@ except ImportError:
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
 
-# Fields that represent upstream or downstream links
+# Fields that represent upstream links (child → parent, "link up only" principle).
+# Since v0.5.0, reverse links (delivered_by, implemented_by, verified_by, etc.)
+# are no longer stored in frontmatter — they are computed below as REVERSE_MAP.
 LINK_FIELDS = [
-    "source_docs", "related_adrs", "depends_on", "blocks",
-    "implemented_by", "verified_by", "related_requirements",
-    "implements", "verifies", "affects", "persona",
-    "derives_from", "implements_control", "derived_requirements",
-    "derived_controls", "part_of_story", "delivered_by", "delivers",
-    "parent_epic", "parent_overview", "related_brqs", "related_ctrls",
-    "verifies_control", "covers_criteria", "requirements_included",
-    "epics_included", "related_epics", "superseded_by",
+    # Core upward links
+    "derives_from", "depends_on", "parent_epic", "parent_overview",
+    "implements", "implements_control", "part_of_story",
+    "delivers", "verifies", "verifies_control", "covers_criteria",
+    "affects", "persona",
+    # Reference links
+    "source_docs", "superseded_by",
+    "requirements_included", "epics_included", "related_epics",
+    # Legacy fields (still read if present in pre-0.5.0 artifacts)
+    "related_adrs", "blocks", "implemented_by", "verified_by",
+    "related_requirements", "derived_requirements", "derived_controls",
+    "delivered_by", "related_brqs", "related_ctrls",
 ]
 
 

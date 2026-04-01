@@ -88,6 +88,20 @@ def main():
             continue
         artifacts[fm["id"]] = {"fm": fm, "path": md_file}
 
+    # Build computed reverse-link maps (v0.5.0: "link up only" principle).
+    # Test.verifies → requirement, Task.implements → requirement
+    verified_by_map = {}  # req_id -> [test_ids]
+    implemented_by_map = {}  # req_id -> [task_ids]
+    for aid_inner, info_inner in artifacts.items():
+        fm_inner = info_inner["fm"]
+        prefix_inner = aid_inner.split("-")[0]
+        if prefix_inner == "TEST":
+            for vid in extract_ids(fm_inner.get("verifies", [])):
+                verified_by_map.setdefault(vid, []).append(aid_inner)
+        if prefix_inner == "TASK":
+            for iid in extract_ids(fm_inner.get("implements", "")):
+                implemented_by_map.setdefault(iid, []).append(aid_inner)
+
     for aid, info in artifacts.items():
         fm = info["fm"]
         prefix = aid.split("-")[0]
@@ -103,20 +117,18 @@ def main():
 
         # Cross-check: requirement is "implemented" but has tasks still "in-progress"
         if prefix in ("FR", "NFR") and status == "implemented":
-            for task_id, task_info in artifacts.items():
-                if not task_id.startswith("TASK"):
-                    continue
-                implements = extract_ids(task_info["fm"].get("implements", ""))
-                if aid in implements:
-                    task_status = task_info["fm"].get("status", "")
+            for task_id in implemented_by_map.get(aid, []):
+                if task_id in artifacts:
+                    task_status = artifacts[task_id]["fm"].get("status", "")
                     if task_status not in ("done",):
                         issues.append(
                             f"INCONSISTENT: {aid} is 'implemented' but {task_id} is '{task_status}'"
                         )
 
         # Cross-check: requirement is "verified" but tests are not "passed"
+        # (computed from Test.verifies instead of deprecated FR.verified_by)
         if prefix in ("FR", "NFR") and status == "verified":
-            for vid in extract_ids(fm.get("verified_by", [])):
+            for vid in verified_by_map.get(aid, []):
                 if vid in artifacts:
                     test_status = artifacts[vid]["fm"].get("status", "")
                     if test_status != "passed":

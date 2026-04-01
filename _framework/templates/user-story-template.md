@@ -1,7 +1,6 @@
 ---
 id: US-XXX-000
 title: ""
-type: user-story
 status: draft
 priority: medium
 owner: ""
@@ -9,7 +8,6 @@ domain: ""
 persona: "[[PERSONA-XXX-000]]"
 parent_epic: "[[EPIC-XXX-000]]"
 delivers: []
-tags: [user-story]
 updated: YYYY-MM-DD
 ---
 

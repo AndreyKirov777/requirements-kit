@@ -7,7 +7,7 @@
     { "$ref": "base.schema.json" }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "owner", "domain", "persona", "updated"],
+  "required": ["id", "title", "status", "priority", "owner", "domain", "persona", "updated"],
   "properties": {
     "id": {
       "type": "string",
@@ -16,10 +16,6 @@
     "title": {
       "type": "string",
       "minLength": 1
-    },
-    "type": {
-      "type": "string",
-      "const": "user-story"
     },
     "status": {
       "type": "string",
@@ -49,15 +45,6 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Wiki links to FRs that this story delivers"
-    },
-    "derives_from": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Wiki links to parent BRQ artifacts this story is derived from (if applicable)"
-    },
-    "tags": {
-      "type": "array",
-      "items": { "type": "string" }
     },
     "updated": {
       "type": "string",

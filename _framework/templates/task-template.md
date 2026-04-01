@@ -1,18 +1,14 @@
 ---
 id: TASK-XXX-000
 title: ""
-type: implementation-task
 status: backlog
+owner: ""
 assigned_to: ""
 implements: "[[FR-XXX-000]]"
 part_of_story: "[[US-XXX-000]]"
 acceptance_criteria_subset: []
 target_files: []
-depends_on_tasks: []
 estimated_complexity: medium
-release_target: ""
-implements_control: []
-tags: [task]
 updated: YYYY-MM-DD
 ---
 
@@ -41,5 +37,5 @@ This task covers the following acceptance criteria from [[US-XXX-000]]:
 - [ ] Code implements all listed acceptance criteria
 - [ ] Unit tests written and passing
 - [ ] No existing tests broken
-- [ ] Frontmatter updated (status, implemented_by on requirement)
+- [ ] Frontmatter updated (status)
 - [ ] Validation scripts pass (`python scripts/validate-frontmatter.py`)
