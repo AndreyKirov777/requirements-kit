@@ -6,8 +6,8 @@ constraint_type: technical
 priority: medium
 owner: ""
 domain: ""
+parent_epic: "[[EPIC-XXX-000]]"
 derives_from: []
-depends_on: []
 updated: YYYY-MM-DD
 ---
 

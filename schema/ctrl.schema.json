@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ctrl.schema.json",
   "title": "Control frontmatter schema",
-  "description": "Schema for CTRL artifacts — enforceable, auditable statements derived from business requirements (BRQ). Core fields only; audit-extension fields (evidence_type, evidence_location, audit_status, control_family) are added at verification stage. Reverse links (derived_requirements, verified_by) are computed by the traceability script.",
+  "description": "Schema for CTRL artifacts — enforceable, auditable statements derived from business requirements (BRQ). Lives in 01-product/controls/ as part of the Compliance tier (obligation stack: BRQ → BR → CTRL → FR/NFR). Core fields only; audit-extension fields (evidence_type, evidence_location, audit_status, control_family) are added at verification stage. Reverse links (derived_requirements, verified_by) are computed by the traceability script.",
   "allOf": [
     { "$ref": "base.schema.json" }
   ],

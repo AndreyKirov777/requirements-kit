@@ -34,7 +34,7 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 | -------- | ------------------------------------------- |
 | Input    | Approved vision + product discovery + external sources (laws, standards, contracts, policies) |
 | Agent    | Analyst agent                               |
-| Output   | `BRQ-*` files in `01-product/business-requirements/`; optionally `CTRL-*` files in `02-requirements/controls/` for compliance-driven projects |
+| Output   | `BRQ-*` files in `01-product/business-requirements/`; optionally `CTRL-*` files in `01-product/controls/` for compliance-driven projects |
 | Gate     | **Human approval** — BRQ must reach `approved` before deriving system requirements |
 
 > **Why this stage?** Business requirements and obligations are the "why" layer (BABOK Business Requirements). They capture external drivers — regulations, contracts, policies, business goals — before decomposition into system requirements. For compliance-driven projects, controls (CTRL) are derived from BRQ to specify what must be enforced and proven. For standard projects, BRQ can be used to capture high-level business goals without controls.
@@ -60,7 +60,7 @@ This document defines the stages, inputs, outputs, and approval gates for the au
 | -------- | ------------------------------------------- |
 | Input    | Approved BRQ/BR/CTRL + vision + product discovery artifacts |
 | Agent    | Analyst agent                               |
-| Output   | `EPIC-*`, `US-*`, `FR-*`, `NFR-*` files in `02-requirements/`; `CON-*` files in `01-product/constraints/`. Each FR/NFR/CON links back to BRQ, BR, or CTRL via `derives_from` |
+| Output   | `EPIC-*`, `US-*`, `FR-*`, `NFR-*` files in `02-requirements/`; `CON-*` files in `01-product/constraints/`. Each FR/NFR links back to BRQ, BR, CTRL, or CON via `derives_from` |
 | Gate     | **Human review** — requirements move from `draft` → `proposed` → `approved` |
 
 > **Traceability rule:** Every FR/NFR/CON should have a `derives_from` link to at least one BRQ, BR, or CTRL. Orphan system requirements without a business justification must be flagged during review.

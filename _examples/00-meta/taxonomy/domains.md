@@ -1,5 +1,5 @@
 ---
-id: META-TAXONOMY-DOMAINS
+id: META-TAXONOMY-DOMAINS-DBP
 title: Domain and Component Registry
 updated: 2026-03-28
 ---

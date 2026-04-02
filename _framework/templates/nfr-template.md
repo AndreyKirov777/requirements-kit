@@ -6,6 +6,8 @@ priority: medium
 owner: ""
 domain: ""
 quality_attribute: performance
+measurement_method: ""
+target_value: ""
 parent_epic: "[[EPIC-XXX-000]]"
 derives_from: []
 depends_on: []

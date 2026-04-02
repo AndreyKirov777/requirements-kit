@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nfr.schema.json",
+  "title": "Non-Functional Requirement frontmatter schema",
+  "description": "Schema for NFR artifacts — quality attributes the system must meet (performance, security, scalability, etc.). Reverse links (implemented_by, verified_by) are computed by the traceability script.",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "status", "priority", "owner", "domain", "quality_attribute", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^NFR-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "in-implementation",
+        "implemented",
+        "verified",
+        "deprecated"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "quality_attribute": {
+      "type": "string",
+      "enum": ["performance", "security", "scalability", "reliability", "availability", "usability", "maintainability", "portability", "compliance", "observability"],
+      "description": "Quality attribute category this NFR addresses"
+    },
+    "parent_epic": {
+      "type": "string",
+      "description": "Wiki link to the parent Epic"
+    },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to parent BRQ, BR, or CTRL artifacts this requirement is derived from"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to other FR/NFR this requirement depends on"
+    },
+    "source_docs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "External document references."
+    },
+    "measurement_method": {
+      "type": "string",
+      "description": "How compliance with this NFR is measured"
+    },
+    "target_value": {
+      "type": "string",
+      "description": "Measurable target (e.g., 'p95 < 300ms', '>= 99.9%')"
+    }
+  }
+}

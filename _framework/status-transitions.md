@@ -46,7 +46,7 @@ identified → defined → allocated → implemented → verified → audited �
 | audited     | deprecated  | Control superseded or retired            | Human          |
 | audited     | verified    | Audit reopened (re-verification needed)  | Human          |
 
-> **Pipeline note:** CTRL is optional — used only in compliance-driven projects. For standard projects, BRQ derives FR/NFR directly. CTRL adds the enforceable/auditable intermediate layer.
+> **Location note:** CTRL lives in `01-product/controls/` as part of the obligation stack (BRQ → BR → CTRL). CTRL is a **Compliance tier** artifact — used only in compliance-driven projects. For standard projects, BRQ derives FR/NFR directly. CTRL adds the enforceable/auditable intermediate layer.
 
 > **Semantic role:** CTRL = WHAT MUST BE ENFORCED/PROVEN — the auditable control statement bridging BRQ (why) to FR/NFR (what the system shall do).
 
@@ -87,9 +87,9 @@ draft → proposed → approved → superseded
 > **Pipeline note:** The vision must reach `approved` before any downstream
 > product-discovery or requirements-elaboration work begins (see `sdlc-pipeline.md`, Stage 1).
 
-## Functional Requirement / NFR / Constraint (FR, NFR, CON)
+## Functional Requirement (FR) / Non-Functional Requirement (NFR)
 
-> **Location note:** FR and NFR live in `02-requirements/`. CON lives in `01-product/constraints/` — constraints are external forces that shape the solution space. Each CON has a `constraint_type`: `business`, `regulatory`, or `technical`.
+> **Location note:** FR and NFR live in `02-requirements/fr/` and `02-requirements/nfr/` respectively. FR defines *what* the system shall do; NFR defines quality attributes (performance, security, etc.) the system must meet.
 
 ```
 draft → proposed → approved → in-implementation → implemented → verified
@@ -111,6 +111,23 @@ verified → approved    (via Change Request — reopens for rework)
 | verified           | deprecated         | Superseded or removed         | Human          |
 | approved           | deprecated         | Cancelled before implementation | Human        |
 | verified           | approved           | Change Request reopens it     | Human          |
+
+## Constraint (CON)
+
+> **Location note:** CON lives in `01-product/constraints/` — constraints are external forces that shape the solution space. Each CON has a `constraint_type`: `business`, `regulatory`, or `technical`. CON is a **Core tier** artifact — relevant to any project, not only compliance-driven ones.
+
+> **Lifecycle rationale:** Constraints are not "implemented" — they are accepted as binding and respected by derived FR/NFR. Compliance with a constraint is verified through the derived requirements, not through the constraint itself.
+
+```
+draft → proposed → approved → deprecated
+```
+
+| From     | To         | Trigger                              | Who            |
+| -------- | ---------- | ------------------------------------ | -------------- |
+| draft    | proposed   | Author submits for review            | Agent or Human |
+| proposed | approved   | Reviewer accepts                     | **Human only** |
+| proposed | draft      | Reviewer requests changes            | Human          |
+| approved | deprecated | Constraint no longer applicable      | Human          |
 
 ## User Story (US)
 

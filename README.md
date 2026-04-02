@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 0.8.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 1.0.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -22,14 +22,14 @@ The kit provides agent instruction files for four coding agents:
 | Cursor | `.cursor/rules/requirements-vault.mdc` |
 | Kiro | `.kiro/steering.md` |
 
-All instruction files are domain-agnostic templates. Customize the placeholders (`[PROJECT_NAME]`, `[DOMAIN_LIST]`, etc.) for your project.
+All instruction files are domain-agnostic templates. Customize the placeholders (`{{PROJECT_NAME}}`, `{{DOMAIN_LIST}}`, etc.) for your project.
 
 ## What is Inside
 
 - A vault folder structure with clear separation of concerns
 - Ready-to-use templates for all artifact types (`_framework/templates/`)
 - One working example of each artifact type (`_examples/`) — uses DBP (Digital Battery Passport) as a sample project
-- JSON Schemas for all artifact types (`schema/`) — 17 schemas for frontmatter validation
+- JSON Schemas for all artifact types (`schema/`) — 24 schemas for frontmatter validation
 - Status transition rules (state machines) for all artifact types (`_framework/status-transitions.md`)
 - A domain glossary and taxonomy starters (`00-meta/glossary/`, `00-meta/taxonomy/`)
 - An SDLC pipeline definition with stages and gates (`_framework/sdlc-pipeline.md`)
@@ -71,30 +71,29 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
   glossary/                  # Domain terms → code naming conventions
   taxonomy/                  # Domain and component registry
 
-01-product/
-  vision/                    # Product vision documents
-  personas/                  # User personas
-  journeys/                  # User journey maps
-  assumptions/               # Assumptions to validate
-  business-requirements/     # BRQ-* business requirements and obligations
-  business-rules/            # BR-* business rules (regulatory logic, domain facts)
-  constraints/               # CON-* constraints (business, regulatory, technical)
+01-product/                          # Problem Space (WHY + constraints)
+  vision/                    # VISION-* product vision documents
+  personas/                  # PERSONA-* user personas              [discovery]
+  journeys/                  # JOURNEY-* user journey maps           [discovery]
+  assumptions/               # ASSUM-* assumptions to validate       [discovery]
+  use-cases/                 # UC-* use case descriptions            [discovery]
+  business-requirements/     # BRQ-* business requirements           [compliance]
+  business-rules/            # BR-* business rules (domain facts)    [compliance]
+  controls/                  # CTRL-* compliance controls            [compliance]
+  constraints/               # CON-* constraints (business/reg/tech) [core]
 
-02-requirements/
+02-requirements/                     # Solution Space (WHAT system shall do)
   epics/                     # EPIC-* files
   fr/                        # FR-* functional requirements
-  user-stories/              # US-* user stories
-  use-cases/                 # UC-* use case descriptions
   nfr/                       # NFR-* non-functional requirements
-  controls/                  # CTRL-* compliance controls
+  user-stories/              # US-* user stories
 
-03-architecture/
+03-architecture/                     # Design Space (HOW)
   architecture-overview.md   # System-wide architecture (one per project)
   ARCH-{DOMAIN}-{NNN}.md     # Domain-specific architecture documents
   adr/                       # ADR-* architecture decision records
   code-map/                  # Domain → source file mappings
   contracts/                 # API and interface contracts
-  integrations/              # External integration specs
   data-model/                # Data model definitions
 
 04-delivery/
@@ -114,6 +113,13 @@ schema/                      # JSON Schemas per artifact type
 scripts/                     # Validation scripts and agent prompts
 docs/                        # Kit-level documentation
   success-criteria.md        # 37 success criteria for evaluating the kit
+
+# Artifact Tiers:
+#   [core]         — relevant to any project (10 types)
+#   [discovery]    — product discovery, optional (4 types)
+#   [compliance]   — regulated projects (3 types)
+#   [architecture] — complex systems, optional (4 types)
+#   [delivery]     — release management, optional (2 types)
 ```
 
 ## Naming Convention
@@ -149,7 +155,7 @@ Domain codes are registered in `00-meta/taxonomy/domains.md`. IDs use three or m
 ## Core Principles
 
 1. **One requirement per file.** Atomic, linkable, diffable.
-2. **Every artifact links upstream and downstream.** BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Code → Test. BRQ, BR, and CON live in `01-product/` (the "why", domain rules, and external forces); CTRL lives in `02-requirements/` (enforceable controls). FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
+2. **Every artifact links upstream and downstream.** BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Test. BRQ, BR, CTRL, and CON live in `01-product/` (the obligation stack: "why", domain rules, controls, and external forces). FR, NFR, US, and Epic live in `02-requirements/` (the system specification). FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
 3. **Glossary-driven naming.** Domain terms map to code identifiers via the glossary.
 4. **Human gates at strategic points.** Vision, requirements, and architecture require human approval.
 5. **Structured acceptance criteria.** Use Given/When/Then format with AC-N identifiers.

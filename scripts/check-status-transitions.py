@@ -27,7 +27,7 @@ WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
 VALID_STATUSES = {
     "FR": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
     "NFR": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
-    "CON": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
+    "CON": {"draft", "proposed", "approved", "deprecated"},
     "US": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
     "EPIC": {"draft", "proposed", "approved", "in-progress", "completed", "deprecated"},
     "ADR": {"proposed", "accepted", "rejected", "superseded", "deprecated"},
@@ -43,6 +43,9 @@ VALID_STATUSES = {
     "CONTRACT": {"draft", "proposed", "approved", "deprecated"},
     "DM": {"draft", "proposed", "approved", "deprecated"},
     "VISION": {"draft", "proposed", "approved", "superseded", "deprecated"},
+    "BRQ": {"identified", "analyzed", "approved", "allocated", "covered", "deprecated"},
+    "BR": {"draft", "proposed", "approved", "deprecated"},
+    "CTRL": {"identified", "defined", "allocated", "implemented", "verified", "audited", "deprecated"},
 }
 
 # Status ordering for consistency checks

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "constraint.schema.json",
   "title": "Constraint frontmatter schema",
-  "description": "Schema for CON artifacts — constraints that limit solution options. Classified by type: business (budget, timeline, resource), regulatory (laws, standards, compliance), or technical (platform, compatibility, performance). Constraints live in 01-product/ alongside business requirements because they represent external forces that shape the solution space before requirements elaboration begins.",
+  "description": "Schema for CON artifacts — constraints that limit solution options. Classified by type: business (budget, timeline, resource), regulatory (laws, standards, compliance), or technical (platform, compatibility, performance). Constraints live in 01-product/constraints/ because they represent external forces that shape the solution space before requirements elaboration begins. CON is a Core tier artifact — relevant to any project, not only compliance-driven ones.",
   "allOf": [
     { "$ref": "base.schema.json" }
   ],
@@ -19,11 +19,9 @@
         "draft",
         "proposed",
         "approved",
-        "in-implementation",
-        "implemented",
-        "verified",
         "deprecated"
-      ]
+      ],
+      "description": "draft: captured; proposed: reviewed; approved: accepted as binding; deprecated: no longer applicable. Compliance with constraints is verified through derived FR/NFR, not through the constraint's own lifecycle."
     },
     "constraint_type": {
       "type": "string",

@@ -25,8 +25,8 @@ FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 
 # Map ID prefixes to schema files
 PREFIX_SCHEMA_MAP = {
-    "FR": "requirement.schema.json",
-    "NFR": "requirement.schema.json",
+    "FR": "fr.schema.json",
+    "NFR": "nfr.schema.json",
     "CON": "constraint.schema.json",
     "US": "user-story.schema.json",
     "EPIC": "epic.schema.json",

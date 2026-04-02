@@ -11,6 +11,73 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.0.0] — 2026-04-02
+
+### Changed — Breaking
+
+- **CTRL moved from `02-requirements/controls/` to `01-product/controls/`.** Controls are enforceable, auditable statements derived from BRQ — part of the obligation stack (BRQ → BR → CTRL), not part of system specification (FR/NFR). `01-product/` now contains the complete "why" and "what constrains us" stack: vision, personas, journeys, assumptions, use-cases, BRQ, BR, CTRL, and CON.
+- **FR and NFR schemas split.** `requirement.schema.json` is deprecated. New `fr.schema.json` (functional requirements) and `nfr.schema.json` (non-functional requirements) with distinct fields. NFR now has `quality_attribute` as **required** (was optional), plus new optional fields: `measurement_method` and `target_value`. FR no longer inherits the NFR-specific `quality_attribute` field.
+- **CON lifecycle simplified** from 7 statuses (draft → proposed → approved → in-implementation → implemented → verified → deprecated) to 4 (draft → proposed → approved → deprecated). Rationale: constraints are accepted as binding and respected by derived FR/NFR — compliance is verified through derived requirements, not through the constraint itself.
+- **`type` field removed from Vision schema required fields.** Consistent with v0.5.0 decision to encode type via ID prefix and folder location. `type: vision` may still be present in existing files but is no longer validated.
+- **Use Cases moved from `02-requirements/` to `01-product/use-cases/`.** UC is a Discovery tier artifact, not a system specification.
+
+### Added
+
+- **Artifact Tier model.** All 23 artifact types now belong to one of five tiers, documented in README:
+  - **Core** (10): Vision, Epic, FR, NFR, US, Task, Test, ADR, CR, CON
+  - **Discovery** (4): Persona, Journey, Assumption, Use Case
+  - **Compliance** (3): BRQ, BR, CTRL
+  - **Architecture** (4): Arch Overview, Domain Architecture, Contract, Data Model
+  - **Delivery** (2): Risk, Release
+- **BRQ, BR, CTRL added to `check-status-transitions.py`.** These types were missing from the status validation script.
+- **NFR template** gains `measurement_method` and `target_value` frontmatter fields.
+
+### Fixed
+
+- **Traceability chain unified** across all documents to `BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Test`. Agent instructions previously omitted BR.
+- **Agent instructions: removed references to `implemented_by` and `verified_by` manual fields.** These are reverse links computed by the traceability script (v0.5.0 "link up only" principle). Agent instructions and prompts now correctly instruct agents to update forward links only.
+- **Agent prompts (#4 Librarian, #7 Implementation)** updated to remove references to computed fields.
+- **README schema count** corrected from "17" to "24".
+- **README placeholder format** standardized to `{{PLACEHOLDER}}` (was `[PLACEHOLDER]`).
+- **Agent instructions ID format** expanded to list all 23 artifact types grouped by tier.
+- **Agent instructions step 8** corrected wording from "non-functional and regulatory requirements" to "external constraints (business, regulatory, or technical)".
+- **`base.schema.json` ID pattern** removed CODEMAP and GLOSS prefixes (no schema, template, or state machine exists for these).
+- **`.kit-version`** updated to 1.0.0 (was stuck at 0.5.0).
+
+### Migration from 0.8.x
+
+```bash
+# 1. Move controls to 01-product
+mv 02-requirements/controls/ 01-product/controls/
+
+# 2. Move use-cases to 01-product
+mv 02-requirements/use-cases/ 01-product/use-cases/
+
+# 3. Simplify CON frontmatter: remove implementation statuses
+# For each CON-* file with status in-implementation/implemented/verified,
+# change status to "approved" (or "deprecated" if no longer relevant)
+
+# 4. Split FR/NFR: add quality_attribute to NFR files if missing
+# NFR files now require quality_attribute field
+
+# 5. Remove type field from Vision files (optional — validation ignores it)
+
+# 6. Re-run agent file generation and validation
+python scripts/install-agent-files.py
+python scripts/validate-frontmatter.py --path .
+python scripts/check-status-transitions.py --path .
+```
+
+### Rationale
+
+v1.0.0 consolidates 8 rapid iterations (v0.1–v0.8) into a consistent, documented foundation. Key architectural decisions:
+
+1. **`01-product/` = complete obligation stack.** All artifacts that exist independently of the system (business motivation, domain rules, controls, constraints) live in one layer. `02-requirements/` contains only system specifications (EPIC, FR, NFR, US).
+2. **Tier model reduces cognitive load.** 23 artifact types grouped into 5 tiers lets users adopt only what they need — Core tier for standard projects, plus Compliance for regulated projects.
+3. **"Link up only" principle fully enforced.** All references to manual reverse-link fields removed from agent instructions and prompts. Forward links (child → parent) are authoritative; reverse links are computed.
+
+---
+
 ## [0.8.0] — 2026-04-02
 
 ### Changed — Breaking

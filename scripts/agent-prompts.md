@@ -82,7 +82,7 @@ You are a documentation librarian. Check the note set for:
 - Missing required frontmatter fields (validate against schemas in `schema/`)
 - Broken wiki links (references to non-existent artifacts)
 - Orphan requirements (no upstream or downstream links)
-- Requirements without verification links (`verified_by` is empty)
+- Requirements without tests verifying them (no TEST file has this requirement in its `verifies` field)
 - Approved notes with open critical questions
 - Stale dates (`updated` more than 30 days old on active artifacts)
 - Glossary compliance (terms used inconsistently with `00-meta/glossary/`)
@@ -168,5 +168,5 @@ Implementation rules:
 
 After implementation:
 - Update the TASK status to `done`.
-- Add file paths to the requirement's `implemented_by`.
+- Update the FR status to `implemented` if all tasks are done (reverse links like `implemented_by` are computed by the traceability script — do not add them manually).
 - Run `python scripts/validate-frontmatter.py` and `python scripts/check-orphans.py`.

@@ -34,12 +34,12 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 
 1. **Find your task.** Look in `{{VAULT_PREFIX}}/04-delivery/tasks/` for a `TASK-*` file with `status: ready` assigned to you (or unassigned).
 2. **Read the requirement.** Follow the `implements` field to the parent functional requirement (FR) in `{{VAULT_PREFIX}}/02-requirements/fr/`. Read the full file — especially the **Requirement** section (what the system shall do) and **Out of Scope** (what NOT to do). Then follow `part_of_story` to the User Story (US) in `{{VAULT_PREFIX}}/02-requirements/user-stories/` to read the **Acceptance Criteria** (how we verify the delivered value) and understand the "why" and "for whom".
-3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent artifact. This may be a business rule (`BR-*` in `{{VAULT_PREFIX}}/01-product/business-rules/`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/02-requirements/controls/`), or a business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/01-product/business-requirements/`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed.
+3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent artifact. This may be a business rule (`BR-*` in `{{VAULT_PREFIX}}/01-product/business-rules/`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/01-product/controls/`), a constraint (`CON-*` in `{{VAULT_PREFIX}}/01-product/constraints/`), or a business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/01-product/business-requirements/`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed; CON defines external constraints (business, regulatory, or technical) that limit the solution space.
 4. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
 5. **Read the architecture.** Start with `{{VAULT_PREFIX}}/03-architecture/architecture-overview.md` for the system-wide picture. If your task belongs to a specific domain, read the corresponding `ARCH-{DOMAIN}-*` file. Then follow `related_adrs` in the requirement to understand specific decisions.
 6. **Find target files.** Check `target_files` in the task, or look up `{{VAULT_PREFIX}}/03-architecture/code-map/` for the component mapping.
 7. **Read the glossary.** Check `{{VAULT_PREFIX}}/00-meta/glossary/{{GLOSSARY_DOMAIN}}.md` for the domain. Use the specified `code_name` for all identifiers (do not invent alternate names).
-8. **Check constraints.** Read `{{VAULT_PREFIX}}/01-product/constraints/` — these define non-functional and regulatory requirements.
+8. **Check constraints.** Read `{{VAULT_PREFIX}}/01-product/constraints/` — these define external constraints (business, regulatory, or technical) that limit the solution space.
 
 ## During Implementation
 
@@ -54,8 +54,8 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 ## After Implementation
 
 1. **Update the task.** Set `status: done` in the TASK file.
-2. **Update the requirement.** Add your implementation files to `implemented_by` (use relative paths from repo root). If all tasks for this requirement are done, set `status: in-implementation` → `implemented`.
-3. **Write or update tests.** Ensure each acceptance criterion has a corresponding test. Link tests in `verified_by`.
+2. **Update the requirement status.** If all tasks for this FR are done, set `status: implemented`. (Reverse links like `implemented_by` and `verified_by` are computed automatically by the traceability script — do not add them manually.)
+3. **Write or update tests.** Ensure each acceptance criterion has a corresponding test. Set the `verifies` field in the TEST file to link to the FR/NFR.
 4. **Run validation.** Execute `python {{VAULT_PREFIX}}/scripts/validate-frontmatter.py --path {{VAULT_PREFIX}}` to check all metadata is valid.
 5. **Check duplicates.** Execute `python {{VAULT_PREFIX}}/scripts/check-duplicates.py` to ensure all IDs are unique and filenames match.
 6. **Check orphans.** Execute `python {{VAULT_PREFIX}}/scripts/check-orphans.py` to ensure no requirements are left without tests.
@@ -74,9 +74,11 @@ The kit follows a layered requirement model aligned with BABOK and INCOSE:
 - **ADR/ARCH** (Design) = HOW WE CHOSE TO DO IT
 - **TEST** (Evidence) = HOW WE PROVE IT
 
-Traceability chain: `BRQ → [CTRL →] Epic → FR ↔ US → TASK → TEST`
+Traceability chain: `BRQ → [BR →] [CTRL →] Epic → FR ↔ US → TASK → TEST`
 
-**CON** (Constraint) lives in `01-product/` alongside BRQ — constraints are external forces (business, regulatory, or technical) that shape the solution space before requirements elaboration. Each CON has a `constraint_type` field: `business`, `regulatory`, or `technical`.
+**BR** (Business Rule) encodes atomic, verifiable domain facts — regulatory logic, contractual conditions, and business policies. BR derives from BRQ and sits between BRQ (why) and FR/NFR (what the system does). Lives in `01-product/business-rules/`. Compliance tier — optional for non-regulated projects.
+
+**CON** (Constraint) lives in `01-product/constraints/` — external forces (business, regulatory, or technical) that shape the solution space before requirements elaboration. Each CON has a `constraint_type` field: `business`, `regulatory`, or `technical`. Core tier — relevant to any project.
 
 FR and US are **peer-level**: FR defines *what the system shall do* (technical spec), US defines *for whom* and carries **Acceptance Criteria**. They link to each other via `delivers`/`delivered_by`. Both link to their parent Epic via `parent_epic`.
 
@@ -85,7 +87,7 @@ For standard projects, CTRL is optional — BRQ links directly to FR/NFR via `de
 ## ID Format
 
 All artifact IDs follow: `<TYPE>-<DOMAIN>-<NNN>` where:
-- TYPE: EPIC, FR, US, NFR, ADR, ARCH, CR, TEST, CON, TASK, BRQ, CTRL
+- TYPE: EPIC, FR, NFR, US, TASK, TEST, ADR, CR, CON (core); PERSONA, JOURNEY, ASSUM, UC (discovery); BRQ, BR, CTRL (compliance); ARCH, CONTRACT, DM (architecture); RISK, REL (delivery); VISION
 - DOMAIN: uppercase domain code (use your domain list)
 - NNN: three or more digits, zero-padded
 
@@ -181,9 +183,9 @@ Tasks reference AC from their parent User Story via `acceptance_criteria_subset`
 │                   AFTER IMPLEMENTATION                   │
 ├─────────────────────────────────────────────────────────┤
 │ 1. Update TASK status: done                            │
-│ 2. Add implemented_by to FR-*                          │
+│ 2. Update FR status if all tasks done                  │
 │ 3. Write tests covering each AC-N                       │
-│ 4. Link tests in verified_by field                      │
+│ 4. Set verifies field in TEST files                     │
 │ 5. Run validate-frontmatter.py                          │
 │ 6. Run check-orphans.py                                 │
 │ 7. Commit code + tests                                  │

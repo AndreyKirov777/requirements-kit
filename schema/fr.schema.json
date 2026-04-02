@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "requirement.schema.json",
-  "title": "Requirement frontmatter schema",
-  "description": "Schema for FR (functional requirement) and NFR artifacts. CON artifacts use constraint.schema.json. Reverse links (delivered_by, implemented_by, verified_by) are computed by the traceability script.",
+  "$id": "fr.schema.json",
+  "title": "Functional Requirement frontmatter schema",
+  "description": "Schema for FR artifacts — functional requirements specifying what the system shall do. Reverse links (delivered_by, implemented_by, verified_by) are computed by the traceability script.",
   "allOf": [
     { "$ref": "base.schema.json" }
   ],
@@ -11,7 +11,7 @@
   "properties": {
     "id": {
       "type": "string",
-      "pattern": "^(FR|NFR)-[A-Z0-9]+-[0-9]{3,}$"
+      "pattern": "^FR-[A-Z0-9]+-[0-9]{3,}$"
     },
     "status": {
       "type": "string",
@@ -36,7 +36,7 @@
     "derives_from": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Wiki links to parent BRQ or CTRL artifacts this requirement is derived from"
+      "description": "Wiki links to parent BRQ, BR, or CTRL artifacts this requirement is derived from"
     },
     "depends_on": {
       "type": "array",
@@ -47,10 +47,6 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "External document references. Only if derives_from is empty (direct stakeholder requirement)."
-    },
-    "quality_attribute": {
-      "type": "string",
-      "description": "For NFRs only: performance, security, scalability, etc."
     }
   }
 }

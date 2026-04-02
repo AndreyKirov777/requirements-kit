@@ -1,7 +1,6 @@
 ---
 id: VISION-XXX-001
 title: ""
-type: vision
 status: draft
 owner: ""
 domain: all
