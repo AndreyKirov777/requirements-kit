@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "constraint.schema.json",
+  "title": "Constraint frontmatter schema",
+  "description": "Schema for CON artifacts — constraints that limit solution options. Classified by type: business (budget, timeline, resource), regulatory (laws, standards, compliance), or technical (platform, compatibility, performance). Constraints live in 01-product/ alongside business requirements because they represent external forces that shape the solution space before requirements elaboration begins.",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "status", "constraint_type", "priority", "owner", "domain", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CON-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "in-implementation",
+        "implemented",
+        "verified",
+        "deprecated"
+      ]
+    },
+    "constraint_type": {
+      "type": "string",
+      "enum": ["business", "regulatory", "technical"],
+      "description": "Classification of the constraint: business (budget, timeline, resource, organizational), regulatory (laws, standards, compliance mandates), or technical (platform, compatibility, performance bounds, technology choices)"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "parent_epic": {
+      "type": "string",
+      "description": "Wiki link to the parent Epic"
+    },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to parent BRQ or CTRL artifacts this constraint is derived from"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to other requirements this constraint depends on"
+    },
+    "source_docs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "External document references (standards, policies, contracts)"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 0.5.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 0.8.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -76,6 +76,9 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
   personas/                  # User personas
   journeys/                  # User journey maps
   assumptions/               # Assumptions to validate
+  business-requirements/     # BRQ-* business requirements and obligations
+  business-rules/            # BR-* business rules (regulatory logic, domain facts)
+  constraints/               # CON-* constraints (business, regulatory, technical)
 
 02-requirements/
   epics/                     # EPIC-* files
@@ -83,7 +86,7 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
   user-stories/              # US-* user stories
   use-cases/                 # UC-* use case descriptions
   nfr/                       # NFR-* non-functional requirements
-  constraints/               # CON-* constraint definitions
+  controls/                  # CTRL-* compliance controls
 
 03-architecture/
   architecture-overview.md   # System-wide architecture (one per project)
@@ -126,6 +129,8 @@ TASK-<DOMAIN>-<NNN>.md       # Implementation tasks
 TEST-<DOMAIN>-<NNN>.md       # Test definitions
 CR-<DOMAIN>-<NNN>.md         # Change requests
 CON-<DOMAIN>-<NNN>.md        # Constraints
+BR-<DOMAIN>-<NNN>.md         # Business rules
+CTRL-<DOMAIN>-<NNN>.md       # Compliance controls
 UC-<DOMAIN>-<NNN>.md         # Use cases
 RISK-<DOMAIN>-<NNN>.md       # Risks
 REL-<DOMAIN>-<NNN>.md        # Releases
@@ -144,7 +149,7 @@ Domain codes are registered in `00-meta/taxonomy/domains.md`. IDs use three or m
 ## Core Principles
 
 1. **One requirement per file.** Atomic, linkable, diffable.
-2. **Every artifact links upstream and downstream.** BRQ → [CTRL →] Epic → FR ↔ US → Task → Code → Test. FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
+2. **Every artifact links upstream and downstream.** BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Code → Test. BRQ, BR, and CON live in `01-product/` (the "why", domain rules, and external forces); CTRL lives in `02-requirements/` (enforceable controls). FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
 3. **Glossary-driven naming.** Domain terms map to code identifiers via the glossary.
 4. **Human gates at strategic points.** Vision, requirements, and architecture require human approval.
 5. **Structured acceptance criteria.** Use Given/When/Then format with AC-N identifiers.

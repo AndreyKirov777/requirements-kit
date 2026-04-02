@@ -17,7 +17,7 @@ Use these files as a reference when creating your own artifacts. Each example sh
 | `02-requirements/fr/` | `FR-INGEST-001.md` | Functional requirement |
 | `02-requirements/user-stories/` | `US-INGEST-001.md` | User story |
 | `02-requirements/nfr/` | `NFR-SEC-001.md` | Non-functional requirement |
-| `02-requirements/constraints/` | `CON-SEC-001.md` | Constraint |
+| `01-product/constraints/` | `CON-SEC-001.md` | Constraint (regulatory) |
 | `03-architecture/adr/` | `ADR-INGEST-001.md` | Architecture decision record |
 | `03-architecture/code-map/` | `dbp-accelerator.md` | Code map |
 | `04-delivery/tasks/` | `TASK-INGEST-001.md` | Implementation task |

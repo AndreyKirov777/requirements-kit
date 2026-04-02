@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "br.schema.json",
+  "title": "Business Rule frontmatter schema",
+  "description": "Schema for BR artifacts — atomic, verifiable statements about how the business or regulated domain operates, independent of any system. BRs encode regulatory logic, contractual conditions, and domain policies that FR/NFR must implement. Reverse links (implemented_by) are computed by the traceability script.",
+  "allOf": [
+    { "$ref": "base.schema.json" }
+  ],
+  "type": "object",
+  "required": ["id", "title", "status", "priority", "owner", "domain", "classification", "derives_from", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^BR-[A-Z0-9]+-[0-9]{3,}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "deprecated"
+      ],
+      "description": "draft: captured from source; proposed: reviewed for correctness; approved: accepted as authoritative; deprecated: superseded or no longer applicable"
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"]
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["regulatory", "contractual", "policy", "domain-logic"],
+      "description": "Origin category: regulatory (law/regulation), contractual (contract clause), policy (internal policy), domain-logic (business domain fact)"
+    },
+    "derives_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Wiki links to parent BRQ artifacts this rule is derived from"
+    },
+    "regulatory_ref": {
+      "type": "object",
+      "properties": {
+        "framework": {
+          "type": "string",
+          "description": "Name of the regulatory framework (e.g., EU-2023-1542, GDPR, PCI-DSS)"
+        },
+        "article": {
+          "type": "string",
+          "description": "Article or section number"
+        },
+        "paragraph": {
+          "type": "string",
+          "description": "Paragraph or sub-section"
+        }
+      },
+      "required": ["framework"],
+      "description": "Structured reference to specific regulatory article. Only for classification: regulatory."
+    }
+  }
+}

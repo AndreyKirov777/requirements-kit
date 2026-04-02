@@ -50,6 +50,25 @@ identified → defined → allocated → implemented → verified → audited �
 
 > **Semantic role:** CTRL = WHAT MUST BE ENFORCED/PROVEN — the auditable control statement bridging BRQ (why) to FR/NFR (what the system shall do).
 
+## Business Rule (BR)
+
+```
+draft → proposed → approved → deprecated
+```
+
+| From     | To         | Trigger                                        | Who            |
+| -------- | ---------- | ---------------------------------------------- | -------------- |
+| draft    | proposed   | Rule captured and reviewed for correctness     | Agent or Human |
+| proposed | approved   | Stakeholders accept as authoritative           | **Human only** |
+| proposed | draft      | Reviewer requests changes                      | Human          |
+| approved | deprecated | Rule superseded or no longer applicable         | Human          |
+
+> **Location note:** BR lives in `01-product/business-rules/` alongside BRQ and CON — business rules are domain facts that exist independently of any system, not system specifications.
+
+> **Pipeline note:** BR artifacts encode the specific regulatory logic, contractual conditions, or domain policies that FR/NFR must implement. They are derived from BRQ and sit between BRQ (why) and FR/NFR (what the system shall do). For compliance-driven projects, BR captures Article-level rules; CTRL captures what must be enforced/proven; FR/NFR captures what the system does.
+
+> **Semantic role:** BR = WHAT THE BUSINESS/REGULATION SAYS — an atomic, verifiable domain fact or rule that exists independently of any system. BRQ says why; BR says what the rule is; FR/NFR says what the system does about it.
+
 ## Product Vision (VISION)
 
 ```
@@ -69,6 +88,8 @@ draft → proposed → approved → superseded
 > product-discovery or requirements-elaboration work begins (see `sdlc-pipeline.md`, Stage 1).
 
 ## Functional Requirement / NFR / Constraint (FR, NFR, CON)
+
+> **Location note:** FR and NFR live in `02-requirements/`. CON lives in `01-product/constraints/` — constraints are external forces that shape the solution space. Each CON has a `constraint_type`: `business`, `regulatory`, or `technical`.
 
 ```
 draft → proposed → approved → in-implementation → implemented → verified

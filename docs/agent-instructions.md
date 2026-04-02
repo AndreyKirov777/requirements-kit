@@ -34,12 +34,12 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 
 1. **Find your task.** Look in `{{VAULT_PREFIX}}/04-delivery/tasks/` for a `TASK-*` file with `status: ready` assigned to you (or unassigned).
 2. **Read the requirement.** Follow the `implements` field to the parent functional requirement (FR) in `{{VAULT_PREFIX}}/02-requirements/fr/`. Read the full file — especially the **Requirement** section (what the system shall do) and **Out of Scope** (what NOT to do). Then follow `part_of_story` to the User Story (US) in `{{VAULT_PREFIX}}/02-requirements/user-stories/` to read the **Acceptance Criteria** (how we verify the delivered value) and understand the "why" and "for whom".
-3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/02-requirements/business-requirements/`). This tells you the business or regulatory motivation. If the FR also has `implements_control`, read the control (`CTRL-*` in `{{VAULT_PREFIX}}/02-requirements/controls/`) to understand what must be enforced and what evidence is needed.
+3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent artifact. This may be a business rule (`BR-*` in `{{VAULT_PREFIX}}/01-product/business-rules/`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/02-requirements/controls/`), or a business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/01-product/business-requirements/`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed.
 4. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
 5. **Read the architecture.** Start with `{{VAULT_PREFIX}}/03-architecture/architecture-overview.md` for the system-wide picture. If your task belongs to a specific domain, read the corresponding `ARCH-{DOMAIN}-*` file. Then follow `related_adrs` in the requirement to understand specific decisions.
 6. **Find target files.** Check `target_files` in the task, or look up `{{VAULT_PREFIX}}/03-architecture/code-map/` for the component mapping.
 7. **Read the glossary.** Check `{{VAULT_PREFIX}}/00-meta/glossary/{{GLOSSARY_DOMAIN}}.md` for the domain. Use the specified `code_name` for all identifiers (do not invent alternate names).
-8. **Check constraints.** Read `{{VAULT_PREFIX}}/02-requirements/constraints/` — these define non-functional and regulatory requirements.
+8. **Check constraints.** Read `{{VAULT_PREFIX}}/01-product/constraints/` — these define non-functional and regulatory requirements.
 
 ## During Implementation
 
@@ -48,7 +48,7 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 - Follow naming conventions from the glossary — do not invent new names for existing concepts.
 - Use the code names specified in the glossary, not alternate variants or abbreviations.
 - Respect the {{ARCHITECTURE_PATTERN}} architecture: do not bypass intended data flow or layer separation.
-- Respect constraints from `{{VAULT_PREFIX}}/02-requirements/constraints/`.
+- Respect constraints from `{{VAULT_PREFIX}}/01-product/constraints/`.
 - If you need to make an architectural choice not covered by an existing ADR, create a new `ADR-*` file in `{{VAULT_PREFIX}}/03-architecture/adr/` with status `proposed` and stop for review.
 
 ## After Implementation
@@ -75,6 +75,8 @@ The kit follows a layered requirement model aligned with BABOK and INCOSE:
 - **TEST** (Evidence) = HOW WE PROVE IT
 
 Traceability chain: `BRQ → [CTRL →] Epic → FR ↔ US → TASK → TEST`
+
+**CON** (Constraint) lives in `01-product/` alongside BRQ — constraints are external forces (business, regulatory, or technical) that shape the solution space before requirements elaboration. Each CON has a `constraint_type` field: `business`, `regulatory`, or `technical`.
 
 FR and US are **peer-level**: FR defines *what the system shall do* (technical spec), US defines *for whom* and carries **Acceptance Criteria**. They link to each other via `delivers`/`delivered_by`. Both link to their parent Epic via `parent_epic`.
 

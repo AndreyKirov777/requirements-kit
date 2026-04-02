@@ -11,6 +11,92 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [0.8.0] — 2026-04-02
+
+### Changed — Breaking
+
+- **BR moved from `02-requirements/business-rules/` to `01-product/business-rules/`.** Business rules are atomic, verifiable domain facts — regulatory logic, contractual conditions, and business policies — that exist independently of any system. Like BRQ and CON, they belong in `01-product/` (the discovery & motivation layer) rather than `02-requirements/` (the system specification layer). `01-product/` now contains the full "why" and "what constrains us" stack: vision, personas, journeys, assumptions, BRQ, BR, and CON. `02-requirements/` retains only system-level artifacts: epics, FR, NFR, US, UC, CTRL, and controls.
+- **Agent instructions updated** (`docs/agent-instructions.md`): BR path references updated to `01-product/business-rules/`.
+- **SDLC pipeline updated** (`_framework/sdlc-pipeline.md`): Stage 4 output path updated.
+- **Status transitions updated** (`_framework/status-transitions.md`): Location note added to BR section.
+
+### Migration from 0.7.x
+
+```bash
+# 1. Move business-rules to 01-product
+mv 02-requirements/business-rules/ 01-product/business-rules/
+
+# 2. Re-run agent file generation and validation
+python scripts/install-agent-files.py
+python scripts/validate-frontmatter.py --path .
+```
+
+---
+
+## [0.7.0] — 2026-04-02
+
+### Changed — Breaking
+
+- **CON moved from `02-requirements/constraints/` to `01-product/constraints/`.** Constraints are external forces — business, regulatory, or technical — that shape the solution space before requirements elaboration. Like BRQ, they represent the "why/what limits us" layer, not the "what the system shall do" layer. They now live in `01-product/` alongside vision, personas, assumptions, and business requirements.
+- **CON split into its own schema (`constraint.schema.json`).** Previously CON shared `requirement.schema.json` with FR/NFR. The new dedicated schema adds a required `constraint_type` field and removes the `quality_attribute` field (which was NFR-specific).
+- **New required field: `constraint_type`** on all CON artifacts. Classifies constraints by their nature:
+  - `business` — budget, timeline, resource, or organizational constraints
+  - `regulatory` — laws, standards, compliance mandates
+  - `technical` — platform, compatibility, performance bounds, technology choices
+- **`requirement.schema.json`** ID pattern narrowed from `^(FR|NFR|CON)-` to `^(FR|NFR)-`. CON now validated against `constraint.schema.json`.
+- **Agent instructions updated** (`docs/agent-instructions.md`): constraint path references updated to `01-product/constraints/`; requirement hierarchy section now documents CON's location and `constraint_type` field.
+
+### Migration from 0.6.x
+
+```bash
+# 1. Move constraints to 01-product
+mv 02-requirements/constraints/ 01-product/constraints/
+
+# 2. Add constraint_type to all CON-* files
+# For each CON file, add `constraint_type: business|regulatory|technical` to frontmatter
+
+# 3. Re-run agent file generation and validation
+python scripts/install-agent-files.py
+python scripts/validate-frontmatter.py --path .
+```
+
+---
+
+## [0.6.0] — 2026-04-02
+
+### Added
+
+- **Business Rule (BR) artifact type.** New first-class artifact for encoding atomic, verifiable domain facts — regulatory logic, contractual conditions, and business policies that exist independently of any system. Includes:
+  - `_framework/templates/br-template.md` — template with Statement, Source, Conditions, Examples sections
+  - `schema/br.schema.json` — schema with `classification` field (regulatory | contractual | policy | domain-logic), `derives_from` (links to BRQ), and optional `regulatory_ref` (structured article/paragraph reference)
+  - `02-requirements/business-rules/` — folder for BR artifacts
+  - Status transitions in `_framework/status-transitions.md`: `draft → proposed → approved → deprecated`
+  - BR prefix added to `base.schema.json` ID pattern, `validate-frontmatter.py`, `check-duplicates.py`, `migrate-artifacts.py`
+- **SDLC pipeline Stage 4: Business Rules.** New optional stage between Business Requirements & Obligations (Stage 3) and Requirements Elaboration (Stage 5) for compliance-driven projects. BR decomposes BRQ into specific article-level rules before FR/NFR derivation.
+
+### Changed — Breaking
+
+- **BRQ moved from `02-requirements/` to `01-product/`.** Business Requirements are the "why" layer — product-level obligations, goals, and drivers. They now live alongside vision, personas, and assumptions in `01-product/business-requirements/`. This clarifies the semantic split: `01-product/` = discovery & motivation (why); `02-requirements/` = specification & rules (what).
+- **Traceability chain updated.** `BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Code → Test`. BR sits between BRQ (why) and FR/NFR (what the system does), encoding the specific domain rules that FR must implement.
+- **SDLC pipeline stages renumbered** (5–9 → 5–10) to accommodate the new Business Rules stage.
+- **Agent instructions updated** (`docs/agent-instructions.md`): step 3 ("Trace the why") now references BR artifacts and the new BRQ location in `01-product/`.
+
+### Migration from 0.5.x
+
+```bash
+# 1. Move business-requirements to 01-product
+mv 02-requirements/business-requirements/ 01-product/business-requirements/
+
+# 2. Create business-rules folder
+mkdir -p 02-requirements/business-rules/
+
+# 3. Re-run agent file generation and validation
+python scripts/install-agent-files.py
+python scripts/validate-frontmatter.py --path .
+```
+
+---
+
 ## [0.5.0] — 2026-04-01
 
 ### Changed — Breaking

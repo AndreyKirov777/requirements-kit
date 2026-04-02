@@ -1,16 +1,16 @@
 ---
 id: CON-SEC-001
 title: Legitimate-interest access rules pending implementing acts
-type: constraint
 status: approved
+constraint_type: regulatory
 priority: high
-owner: "@pm"
+owner: '@pm'
 domain: SEC
-source_docs: ["[[VISION-DBP-001]]"]
-related_adrs: []
-impacts: ["[[FR-SEC-003]]"]
-tags: [constraint, regulation]
-updated: 2026-03-28
+derives_from: []
+depends_on: []
+source_docs:
+- '[[VISION-DBP-001]]'
+updated: '2026-03-28'
 ---
 
 # Statement

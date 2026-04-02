@@ -30,7 +30,7 @@ FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 ARTIFACT_PREFIXES = {
     "FR", "NFR", "CON", "US", "EPIC", "ADR", "ARCH", "TEST", "TASK",
     "CR", "PERSONA", "ASSUM", "RISK", "REL", "JOURNEY", "UC",
-    "CONTRACT", "DM", "VISION", "BRQ", "CTRL",
+    "CONTRACT", "DM", "VISION", "BRQ", "CTRL", "BR",
 }
 
 # Reference/meta prefixes — still checked for uniqueness, but exempt from

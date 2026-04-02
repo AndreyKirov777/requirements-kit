@@ -2,6 +2,7 @@
 id: CON-XXX-000
 title: ""
 status: draft
+constraint_type: technical
 priority: medium
 owner: ""
 domain: ""

@@ -54,7 +54,7 @@ PLACEHOLDER_RE = re.compile(
 PREFIX_SCHEMA_MAP = {
     "FR": "requirement.schema.json",
     "NFR": "requirement.schema.json",
-    "CON": "requirement.schema.json",
+    "CON": "constraint.schema.json",
     "US": "user-story.schema.json",
     "EPIC": "epic.schema.json",
     "ADR": "adr.schema.json",
@@ -73,6 +73,7 @@ PREFIX_SCHEMA_MAP = {
     "ARCH": "domain-architecture.schema.json",
     "BRQ": "brq.schema.json",
     "CTRL": "ctrl.schema.json",
+    "BR": "br.schema.json",
 }
 
 SPECIAL_ID_SCHEMA_MAP = {
@@ -101,6 +102,7 @@ PREFIX_TEMPLATE_MAP = {
     "VISION": "vision-template.md",
     "BRQ": "brq-template.md",
     "CTRL": "ctrl-template.md",
+    "BR": "br-template.md",
 }
 
 SPECIAL_TEMPLATE_MAP = {

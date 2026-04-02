@@ -27,7 +27,7 @@ FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 PREFIX_SCHEMA_MAP = {
     "FR": "requirement.schema.json",
     "NFR": "requirement.schema.json",
-    "CON": "requirement.schema.json",
+    "CON": "constraint.schema.json",
     "US": "user-story.schema.json",
     "EPIC": "epic.schema.json",
     "ADR": "adr.schema.json",
@@ -46,6 +46,7 @@ PREFIX_SCHEMA_MAP = {
     "ARCH": "domain-architecture.schema.json",
     "BRQ": "brq.schema.json",
     "CTRL": "ctrl.schema.json",
+    "BR": "br.schema.json",
 }
 
 # Special-case IDs that don't follow the TYPE-DOMAIN-NNN pattern
