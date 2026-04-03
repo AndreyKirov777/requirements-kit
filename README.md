@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 1.1.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 1.2.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 

@@ -62,23 +62,26 @@ def load_schemas(schema_dir: Path) -> dict:
         with open(path) as f:
             raw[path.name] = json.load(f)
 
-    # Resolve $ref: inline base schema properties into type-specific schemas
+    # Resolve $ref: inline base schema properties into type-specific schemas.
+    # Schemas that use allOf with $ref to base inherit base properties/required.
+    # Standalone schemas (no allOf) are used as-is — e.g., SRC which intentionally
+    # does not inherit lifecycle fields like owner/status from base.
     base = raw.get("base.schema.json", {})
     schemas = {}
     for name, schema in raw.items():
         if name == "base.schema.json":
             schemas[name] = schema
             continue
-        # Remove allOf with $ref and merge base properties directly
+        # Only merge base into schemas that explicitly reference it via allOf
         if "allOf" in schema:
             schema = {k: v for k, v in schema.items() if k != "allOf"}
-        merged_props = dict(base.get("properties", {}))
-        merged_props.update(schema.get("properties", {}))
-        schema["properties"] = merged_props
-        # Merge required fields
-        base_req = set(base.get("required", []))
-        schema_req = set(schema.get("required", []))
-        schema["required"] = list(base_req | schema_req)
+            merged_props = dict(base.get("properties", {}))
+            merged_props.update(schema.get("properties", {}))
+            schema["properties"] = merged_props
+            # Merge required fields
+            base_req = set(base.get("required", []))
+            schema_req = set(schema.get("required", []))
+            schema["required"] = list(base_req | schema_req)
         schema["additionalProperties"] = True
         schemas[name] = schema
     return schemas

@@ -25,10 +25,25 @@
       "type": "string",
       "description": "Version or edition of the source document (e.g., '2016/679', 'v2.1', 'FY2026')"
     },
+    "status": {
+      "type": "string",
+      "enum": ["in_force", "adopted", "draft", "proposed"],
+      "description": "Current status of the source document (not an artifact lifecycle — an objective property of the source itself)"
+    },
+    "publication_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Date when the document was officially published (YYYY-MM-DD). Distinct from effective_date — used for converting relative deadlines to absolute dates."
+    },
     "effective_date": {
       "type": "string",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
-      "description": "Date when the document became effective (YYYY-MM-DD)"
+      "description": "Date when the document became effective / binding (YYYY-MM-DD)"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the authoritative source (EUR-Lex, ISO catalogue, official gazette). Distinct from original_document which points to the local PDF copy."
     },
     "original_document": {
       "type": "string",

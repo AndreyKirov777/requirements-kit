@@ -11,6 +11,19 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.2.0] — 2026-04-03
+
+### Added
+
+- **Regulation-to-SRC conversion guide** (`_framework/guides/REGULATION-TO-MARKDOWN-GUIDE.md`): step-by-step instructions for AI agents to convert regulatory PDFs into SRC artifacts. Covers structural scan, content extraction with hybrid table format (markdown for small tables, YAML for large), cross-reference mapping, deadline timeline, and quality checklist. Output conforms to `src.schema.json` and `src-template.md`.
+
+### Changed
+
+- **SRC schema extended** (`schema/src.schema.json`): three new optional fields — `status` (enum: in_force/adopted/draft/proposed), `source_url` (authoritative web link), `publication_date` (distinct from effective_date; used for converting relative deadlines to absolute dates).
+- **SRC template updated** (`_framework/templates/src-template.md`): new frontmatter fields; anchor convention documented in comments; optional Cross-references and Deadlines sections for regulation-category sources; hybrid table guidance.
+
+---
+
 ## [1.1.0] — 2026-04-03
 
 ### Added
