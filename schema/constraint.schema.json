@@ -50,6 +50,10 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "External document references (standards, policies, contracts)"
+    },
+    "source_ref": {
+      "type": "string",
+      "description": "Reference to a Source Document artifact in 01-product/sources/ (e.g., 'SRC-PCI-001#section-6'). Optional — not all CON originate from in-repo source documents."
     }
   }
 }

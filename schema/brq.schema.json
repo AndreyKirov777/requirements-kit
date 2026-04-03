@@ -77,6 +77,10 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Stakeholders who own or are affected by this requirement"
+    },
+    "source_ref": {
+      "type": "string",
+      "description": "Reference to a Source Document artifact in 01-product/sources/ (e.g., 'SRC-GDPR-001#article-17'). Optional — not all BRQ originate from in-repo source documents."
     }
   }
 }

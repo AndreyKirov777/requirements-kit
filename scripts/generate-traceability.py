@@ -32,7 +32,7 @@ LINK_FIELDS = [
     "delivers", "verifies", "verifies_control", "covers_criteria",
     "affects", "persona",
     # Reference links
-    "source_docs", "superseded_by",
+    "source_docs", "source_ref", "superseded_by",
     "requirements_included", "epics_included", "related_epics",
     # Legacy fields (still read if present in pre-0.5.0 artifacts)
     "related_adrs", "blocks", "implemented_by", "verified_by",

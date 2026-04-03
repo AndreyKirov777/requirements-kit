@@ -47,6 +47,7 @@ PREFIX_SCHEMA_MAP = {
     "BRQ": "brq.schema.json",
     "CTRL": "ctrl.schema.json",
     "BR": "br.schema.json",
+    "SRC": "src.schema.json",
 }
 
 # Special-case IDs that don't follow the TYPE-DOMAIN-NNN pattern

@@ -8,6 +8,7 @@ owner: ""
 domain: ""
 parent_epic: "[[EPIC-XXX-000]]"
 derives_from: []
+source_ref: ""
 updated: YYYY-MM-DD
 ---
 
@@ -15,7 +16,7 @@ updated: YYYY-MM-DD
 State the constraint clearly.
 
 # Context
-Why does this constraint exist?
+Why does this constraint exist? If derived from a Source Document (SRC-*) in `01-product/sources/`, set `source_ref` in frontmatter.
 
 # Impact
 What parts of the solution are affected?

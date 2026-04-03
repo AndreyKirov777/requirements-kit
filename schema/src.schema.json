@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "src.schema.json",
+  "title": "Source Document frontmatter schema",
+  "description": "Schema for SRC artifacts — passive reference documents (regulations, strategies, policies, standards, contracts) from which BRQ and CON are extracted. SRC is not a managed artifact: it has no lifecycle statuses, no ownership within the team, and does not participate in the obligation stack. It exists so that BRQ/CON can reference it via source_ref. Lives in 01-product/sources/ as a flat folder with category classification in frontmatter.",
+  "type": "object",
+  "required": ["id", "title", "category", "updated"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^SRC-[A-Z0-9]+-[0-9]{3,}$",
+      "description": "Unique artifact identifier: SRC-DOMAIN-NNN"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable title of the source document"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["regulation", "strategy", "policy", "standard", "contract"],
+      "description": "Classification of the source document by origin type"
+    },
+    "version": {
+      "type": "string",
+      "description": "Version or edition of the source document (e.g., '2016/679', 'v2.1', 'FY2026')"
+    },
+    "effective_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Date when the document became effective (YYYY-MM-DD)"
+    },
+    "original_document": {
+      "type": "string",
+      "description": "Path to the original file in 99-attachments/ (e.g., '99-attachments/gdpr-2016-679.pdf')"
+    },
+    "domain": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Domain code from taxonomy"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "updated": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "Date of last update to this markdown file (YYYY-MM-DD)"
+    }
+  },
+  "additionalProperties": true
+}

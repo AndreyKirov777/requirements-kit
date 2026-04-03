@@ -34,7 +34,7 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 
 1. **Find your task.** Look in `{{VAULT_PREFIX}}/04-delivery/tasks/` for a `TASK-*` file with `status: ready` assigned to you (or unassigned).
 2. **Read the requirement.** Follow the `implements` field to the parent functional requirement (FR) in `{{VAULT_PREFIX}}/02-requirements/fr/`. Read the full file — especially the **Requirement** section (what the system shall do) and **Out of Scope** (what NOT to do). Then follow `part_of_story` to the User Story (US) in `{{VAULT_PREFIX}}/02-requirements/user-stories/` to read the **Acceptance Criteria** (how we verify the delivered value) and understand the "why" and "for whom".
-3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent artifact. This may be a business rule (`BR-*` in `{{VAULT_PREFIX}}/01-product/business-rules/`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/01-product/controls/`), a constraint (`CON-*` in `{{VAULT_PREFIX}}/01-product/constraints/`), or a business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/01-product/business-requirements/`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed; CON defines external constraints (business, regulatory, or technical) that limit the solution space.
+3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent artifact. This may be a business rule (`BR-*` in `{{VAULT_PREFIX}}/01-product/business-rules/`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/01-product/controls/`), a constraint (`CON-*` in `{{VAULT_PREFIX}}/01-product/constraints/`), or a business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/01-product/business-requirements/`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed; CON defines external constraints (business, regulatory, or technical) that limit the solution space. If a BRQ or CON has a `source_ref` field, follow it to the Source Document (`SRC-*` in `{{VAULT_PREFIX}}/01-product/sources/`) to read the original regulation, strategy, or policy text.
 4. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
 5. **Read the architecture.** Start with `{{VAULT_PREFIX}}/03-architecture/architecture-overview.md` for the system-wide picture. If your task belongs to a specific domain, read the corresponding `ARCH-{DOMAIN}-*` file. Then follow `related_adrs` in the requirement to understand specific decisions.
 6. **Find target files.** Check `target_files` in the task, or look up `{{VAULT_PREFIX}}/03-architecture/code-map/` for the component mapping.
@@ -68,13 +68,16 @@ See `{{VAULT_PREFIX}}/_framework/status-transitions.md` for allowed state change
 
 The kit follows a layered requirement model aligned with BABOK and INCOSE:
 
+- **SRC** (Source Document) = ORIGIN — the regulation, strategy, policy, standard, or contract from which requirements are extracted. Passive reference artifact — no lifecycle, no ownership. Lives in `01-product/sources/`.
 - **BRQ** (Business Requirement) = WHY — the business or regulatory motivation
 - **CTRL** (Control) = WHAT MUST BE ENFORCED/PROVEN — auditable control statement (compliance-driven projects only)
 - **FR/NFR/CON** (System Requirements) = WHAT THE SYSTEM SHALL DO
 - **ADR/ARCH** (Design) = HOW WE CHOSE TO DO IT
 - **TEST** (Evidence) = HOW WE PROVE IT
 
-Traceability chain: `BRQ → [BR →] [CTRL →] Epic → FR ↔ US → TASK → TEST`
+Traceability chain: `[SRC →] BRQ → [BR →] [CTRL →] Epic → FR ↔ US → TASK → TEST`
+
+**SRC** (Source Document) is a passive reference artifact — a regulation, strategy, policy, standard, or contract stored as structured markdown in `01-product/sources/`. SRC has no lifecycle statuses, no ownership, and does not participate in the obligation stack. BRQ and CON can reference specific SRC sections via the `source_ref` field (e.g., `SRC-GDPR-001#article-17`). Not all projects need SRC — it is optional and most useful for regulatory-driven or strategy-driven projects where traceability to original documents is important.
 
 **BR** (Business Rule) encodes atomic, verifiable domain facts — regulatory logic, contractual conditions, and business policies. BR derives from BRQ and sits between BRQ (why) and FR/NFR (what the system does). Lives in `01-product/business-rules/`. Compliance tier — optional for non-regulated projects.
 
@@ -87,7 +90,7 @@ For standard projects, CTRL is optional — BRQ links directly to FR/NFR via `de
 ## ID Format
 
 All artifact IDs follow: `<TYPE>-<DOMAIN>-<NNN>` where:
-- TYPE: EPIC, FR, NFR, US, TASK, TEST, ADR, CR, CON (core); PERSONA, JOURNEY, ASSUM, UC (discovery); BRQ, BR, CTRL (compliance); ARCH, CONTRACT, DM (architecture); RISK, REL (delivery); VISION
+- TYPE: EPIC, FR, NFR, US, TASK, TEST, ADR, CR, CON (core); PERSONA, JOURNEY, ASSUM, UC (discovery); BRQ, BR, CTRL (compliance); SRC (source documents); ARCH, CONTRACT, DM (architecture); RISK, REL (delivery); VISION
 - DOMAIN: uppercase domain code (use your domain list)
 - NNN: three or more digits, zero-padded
 
@@ -160,7 +163,7 @@ Tasks reference AC from their parent User Story via `acceptance_criteria_subset`
 ├─────────────────────────────────────────────────────────┤
 │ 1. Find TASK-* with status: ready                       │
 │ 2. Read FR-* (Requirement, Out of Scope)               │
-│ 3. Trace BRQ-* and CTRL-* (business & control logic)   │
+│ 3. Trace BRQ-*/CTRL-* (and SRC-* via source_ref)       │
 │ 4. Read US-* (Business context & AC)                    │
 │ 5. Verify depends_on (check blockers)                   │
 │ 6. Read architecture & ADRs (constraints)               │

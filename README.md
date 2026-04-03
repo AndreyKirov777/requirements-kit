@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 1.0.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 1.1.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -29,7 +29,7 @@ All instruction files are domain-agnostic templates. Customize the placeholders 
 - A vault folder structure with clear separation of concerns
 - Ready-to-use templates for all artifact types (`_framework/templates/`)
 - One working example of each artifact type (`_examples/`) — uses DBP (Digital Battery Passport) as a sample project
-- JSON Schemas for all artifact types (`schema/`) — 24 schemas for frontmatter validation
+- JSON Schemas for all artifact types (`schema/`) — 25 schemas for frontmatter validation
 - Status transition rules (state machines) for all artifact types (`_framework/status-transitions.md`)
 - A domain glossary and taxonomy starters (`00-meta/glossary/`, `00-meta/taxonomy/`)
 - An SDLC pipeline definition with stages and gates (`_framework/sdlc-pipeline.md`)
@@ -72,6 +72,7 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
   taxonomy/                  # Domain and component registry
 
 01-product/                          # Problem Space (WHY + constraints)
+  sources/                   # SRC-* source documents (regulations, strategy, policies)
   vision/                    # VISION-* product vision documents
   personas/                  # PERSONA-* user personas              [discovery]
   journeys/                  # JOURNEY-* user journey maps           [discovery]
@@ -118,6 +119,7 @@ docs/                        # Kit-level documentation
 #   [core]         — relevant to any project (10 types)
 #   [discovery]    — product discovery, optional (4 types)
 #   [compliance]   — regulated projects (3 types)
+#   [source]       — source documents for traceability (1 type: SRC)
 #   [architecture] — complex systems, optional (4 types)
 #   [delivery]     — release management, optional (2 types)
 ```
@@ -146,6 +148,7 @@ ASSUM-<DOMAIN>-<NNN>.md     # Assumptions
 CONTRACT-<DOMAIN>-<NNN>.md  # API/interface contracts
 DM-<DOMAIN>-<NNN>.md        # Data model definitions
 VISION-<DOMAIN>-<NNN>.md    # Product vision
+SRC-<DOMAIN>-<NNN>.md       # Source documents (regulations, strategy, policies)
 ```
 
 architecture-overview.md     # System-wide architecture overview (fixed name, one per project)
@@ -155,7 +158,7 @@ Domain codes are registered in `00-meta/taxonomy/domains.md`. IDs use three or m
 ## Core Principles
 
 1. **One requirement per file.** Atomic, linkable, diffable.
-2. **Every artifact links upstream and downstream.** BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Test. BRQ, BR, CTRL, and CON live in `01-product/` (the obligation stack: "why", domain rules, controls, and external forces). FR, NFR, US, and Epic live in `02-requirements/` (the system specification). FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
+2. **Every artifact links upstream and downstream.** [SRC →] BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Test. SRC (source documents), BRQ, BR, CTRL, and CON live in `01-product/` (the obligation stack: "why", domain rules, controls, and external forces). FR, NFR, US, and Epic live in `02-requirements/` (the system specification). FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
 3. **Glossary-driven naming.** Domain terms map to code identifiers via the glossary.
 4. **Human gates at strategic points.** Vision, requirements, and architecture require human approval.
 5. **Structured acceptance criteria.** Use Given/When/Then format with AC-N identifiers.

@@ -11,6 +11,37 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.1.0] — 2026-04-03
+
+### Added
+
+- **Source Document (SRC) artifact type.** New passive reference artifact for storing regulations, business strategies, policies, standards, and contracts as structured markdown. SRC provides traceability from requirements back to their origin documents — particularly valuable for regulatory-driven and strategy-driven projects. Includes:
+  - `01-product/sources/` — flat folder for SRC artifacts (no subfolders; classification via `category` frontmatter field)
+  - `schema/src.schema.json` — standalone schema (does not inherit from base). Required fields: `id`, `title`, `category`, `updated`. Optional: `version`, `effective_date`, `original_document`, `domain`, `tags`
+  - `_framework/templates/src-template.md` — template with Overview and Content sections using heading-based anchors for granular referencing
+  - `category` enum: `regulation`, `strategy`, `policy`, `standard`, `contract`
+  - SRC prefix added to `base.schema.json` ID pattern, `validate-frontmatter.py`, `check-duplicates.py`, `generate-traceability.py`
+- **`source_ref` field on BRQ and CON.** New optional field linking to a specific section of a Source Document (e.g., `SRC-GDPR-001#article-17`). Enables traceability from business requirements and constraints back to their origin in an in-repo source document. Added to schemas and templates for both artifact types.
+
+### Changed
+
+- **Agent instructions updated** (`docs/agent-instructions.md`): step 3 ("Trace the why") now references SRC artifacts via `source_ref`; Requirement Hierarchy section documents SRC as the origin layer; traceability chain updated to `[SRC →] BRQ → [BR →] [CTRL →] Epic → FR ↔ US → TASK → TEST`; ID format section includes SRC; workflow summary updated.
+- **README.md**: folder layout includes `01-product/sources/`; naming convention includes SRC; schema count updated from 24 to 25; traceability chain updated; tier list includes new `[source]` tier.
+- **Traceability chain updated** across all documents from `BRQ → ...` to `[SRC →] BRQ → ...`.
+
+### Design Decisions
+
+SRC is a **passive reference artifact**, not a managed artifact:
+- **No lifecycle.** No status field, no state machine, no transitions. A document is either present or absent.
+- **No ownership.** No `owner` field. SRC represents external documents that predate the project.
+- **No base schema inheritance.** SRC does not extend `base.schema.json` (which requires `status` and `owner`). It has its own standalone schema.
+- **Flat folder + category.** Instead of subfolders by document type (`regulations/`, `strategy/`), SRC uses a single flat folder with a `category` field in frontmatter. This avoids empty subfolder sprawl at small scale while enabling filtering by scripts or agents.
+- **Optional layer.** Not all BRQ/CON originate from documents — `source_ref` is optional. The kit works without any SRC artifacts.
+- **Body = structured markdown.** The source document content is converted to markdown with heading-based anchors (e.g., `## Article 17`), enabling granular `source_ref` links like `SRC-GDPR-001#article-17`. Original files (PDF, docx) go to `99-attachments/` and are linked via the `original_document` field.
+- **Placement in `01-product/sources/`.** Passes the "exists without the system?" test. Source documents are part of the problem space — they exist before the product, before the project. Placing them in `01-product/` avoids top-level folder renumbering (which would be a breaking change).
+
+---
+
 ## [1.0.0] — 2026-04-02
 
 ### Changed — Breaking
