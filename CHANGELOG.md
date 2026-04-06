@@ -11,6 +11,36 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.3.0] — 2026-04-06
+
+### Added
+
+- **Regulation preprocessor pipeline** (`scripts/preprocessor/`): end-to-end pipeline for extracting BRQ, BR, and CTRL artifacts from EU regulatory PDFs. Handles documents that exceed AI context windows by splitting them into per-article chunks and batching into self-contained context packs. All intermediate output stays in `_temp/` until explicitly promoted. Six scripts cover the full pipeline:
+
+  - **`regulation_chunker.py`**: PDF → structured Markdown. Extracts text with PyMuPDF, splits by article, strips Official Journal headers/footers and footnotes, deduplicates articles, extracts cross-references. Output: `_temp/<reg>/chunks/` with one file per article, `_definitions.md`, and `_index.json`. Supports `--src-id` for explicit SRC artifact linking and `--debug` for raw text dump.
+
+  - **`context_builder.py`**: Chunks → context packs for the analyst agent. Groups articles by chapter, batches within a configurable token budget (default 30 000 tokens), and assembles self-contained prompts that include the extraction instructions, definitions article, target articles, and abbreviated cross-references. Output: `_temp/<reg>/packs/` with `pack-NNN.md` files and `_manifest.json`.
+
+  - **`splitter.py`**: Raw agent output → validated artifact files. Parses `---FILE---`-delimited blocks, validates YAML frontmatter against schemas, applies auto-fix rules for common agent mistakes (missing `classification`, empty `compliance_deadline`, wrong `status` values, invalid `verification_method`), and reports duplicate IDs. Output: `_temp/<reg>/artifacts/{brq,br,ctrl}/` with `_report.json`.
+
+  - **`triage.py`**: Artifact relevance classifier — pack builder. Takes all extracted BRQ artifacts and a Product Vision file and builds triage packs for the agent to classify each BRQ as `relevant`, `contextual`, or `out-of-scope` relative to the target system. Output: `_temp/<reg>/triage/packs/` with `triage-pack-NNN.md` files and `_manifest.json`.
+
+  - **`triage_apply.py`**: Applies agent triage classifications. Parses `triage-pack-NNN-output.md` files, adds `relevance` and `relevance_rationale` fields to all BRQ frontmatter, and propagates BRQ relevance to child BR and CTRL artifacts via `derives_from` links (highest-ranked parent wins: `relevant` > `contextual` > `out-of-scope`). Output: `_temp/<reg>/triage/{brq,br,ctrl}/` with `triage-report.json`.
+
+  - **`promote.py`**: Triaged artifacts → vault. Copies artifacts that match the selected relevance level(s) to the target directory, renumbers IDs sequentially (eliminating gaps from batched extraction), and rewrites all cross-references (`derives_from` wiki-links, `source_ref`) to use new IDs. Default target uses Obsidian folder names (`business-requirements/`, `business-rules/`, `controls/`); `--flat` switches to short names (`brq/`, `br/`, `ctrl/`) for test exports to arbitrary folders. Writes `_promote-report.json` with full old→new ID mapping.
+
+- **`scripts/preprocessor/README.md`**: Pipeline guide with step-by-step instructions, CLI reference for all six scripts, complete worked example for EU Battery Regulation 2023/1542, and folder structure reference.
+
+### Design Decisions
+
+- **Scripted orchestration, not subagents.** Chunking, batching, splitting, triage pack assembly, and result application are deterministic Python scripts. Only extraction (Step 3) and triage classification (Step 6) require an AI agent. This keeps the pipeline predictable and debuggable.
+- **`_temp/` as staging area.** All intermediate output (`chunks/`, `packs/`, `extraction/`, `artifacts/`, `triage/`) stays in `_temp/` which is `.gitignore`d. Only `promote.py` writes to version-controlled folders, and only after explicit invocation.
+- **Triage approach: extract all, then filter.** All regulatory provisions are extracted first (completeness), then classified against the Product Vision (relevance). This avoids losing provisions that may become relevant later and makes the filtering decision auditable.
+- **Relevance propagation.** BR and CTRL inherit relevance from their parent BRQ via `derives_from`. When a child has multiple parents, it inherits the highest-ranked relevance. This avoids manual re-classification of hundreds of child artifacts.
+- **`--include-contextual` flag on `promote.py`**: `contextual` artifacts (definitions, scope articles, deadline provisions) are excluded by default but can be promoted when needed as supporting reference material.
+
+---
+
 ## [1.2.0] — 2026-04-03
 
 ### Added
