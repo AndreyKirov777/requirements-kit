@@ -17,6 +17,3 @@ __pycache__/
 
 # Migration reports (generated, not committed)
 migration-report.md
-
-# Temporary processing artifacts (chunked regulations, debug output)
-_temp/

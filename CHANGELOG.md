@@ -11,6 +11,15 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.4.0] — 2026-04-10
+
+### Removed
+
+- **Regulation preprocessor pipeline** (`scripts/preprocessor/`): removed entirely. The six scripts (`regulation_chunker.py`, `context_builder.py`, `splitter.py`, `triage.py`, `triage_apply.py`, `promote.py`) and their `README.md` have been deleted. Regulation-to-SRC conversion is now handled directly by AI agents using `_framework/guides/REGULATION-TO-MARKDOWN-GUIDE.md`.
+- **`_temp/` entry in `.gitignore`**: removed together with the preprocessor pipeline (the `_temp/` staging directory was only used by the preprocessor scripts).
+
+---
+
 ## [1.3.0] — 2026-04-06
 
 ### Added
