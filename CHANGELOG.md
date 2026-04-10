@@ -11,6 +11,31 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.5.0] — 2026-04-10
+
+### Added
+
+- **Traceability matrix XLSX generator** (`scripts/generate-traceability-matrix.py`): produces a three-sheet Excel workbook from the vault's frontmatter links.
+  - **Traceability Matrix** sheet — cross-reference matrix with FR/NFR as rows and US/TASK/TEST as columns. Cells show the link field name; a rightmost "Coverage" column flags each requirement as Covered (green), Partial (yellow), or GAP (red). Frozen panes and rotated column headers for readability.
+  - **Coverage Summary** sheet — one row per FR/NFR with yes/no columns for Has User Story, Has Task, Has Test, plus aggregate statistics (total, covered count, gap count, coverage percentage).
+  - **Orphan Artifacts** sheet — lists artifacts not referenced by any other artifact.
+  - Handles both forward links (`delivers`, `implements`, `verifies`) and legacy reverse fields (`delivered_by`, `implemented_by`, `verified_by`).
+
+- **Multi-level trace chain report** (`scripts/generate-trace-chains.py`): walks the full derivation hierarchy from root artifacts (BRQ, standalone EPICs, unlinked FRs) down through every link path to leaf artifacts. Outputs both formats:
+  - **Markdown** (`05-quality/traceability/TRACE-CHAINS.md`) — Obsidian-native report with wiki-links, grouped by classification (Broken, Stub, Partial, Complete), plus an Unreachable Artifacts section and end-to-end coverage percentage.
+  - **XLSX** (`05-quality/traceability/TRACE-CHAINS.xlsx`) — each chain as a row with Classification (color-coded), Depth, Level columns for each step, and a Gap Description column. Summary sheet with aggregate counts.
+  - Chain classifications: **Complete** (reaches TEST), **Partial** (reaches US/TASK but no TEST), **Stub** (stops at FR/NFR or above), **Broken** (references a missing artifact).
+  - Deduplicates edges when both forward and legacy reverse fields describe the same parent-child relationship.
+
+### Design Decisions
+
+- **Reuses existing graph-building pattern.** Both scripts follow the same YAML-parsing and wiki-link extraction approach as `generate-traceability.py`. They can run independently or as part of the same CI validation pipeline.
+- **XLSX over CSV for the matrix.** The matrix needs color coding, merged headers, frozen panes, and rotated text — features that require a proper spreadsheet format. openpyxl keeps the dependency lightweight.
+- **Dual output for trace chains.** Markdown for Obsidian browsing and AI agent consumption; XLSX for stakeholder reporting and gap analysis in spreadsheet tools.
+- **Edge deduplication in chain walker.** Legacy reverse fields (`delivered_by`, etc.) and forward fields (`delivers`, etc.) can describe the same relationship. The children index deduplicates by (parent, child) pairs to avoid inflated chain counts.
+
+---
+
 ## [1.4.0] — 2026-04-10
 
 ### Removed

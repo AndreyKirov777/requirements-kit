@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC
 
-> **Version 1.4.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 1.5.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -106,7 +106,7 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
 05-quality/
   acceptance/                # TEST-* test definitions
   test-ideas/                # Exploratory test ideas
-  traceability/              # Auto-generated traceability map
+  traceability/              # Auto-generated traceability map, matrix, and chain reports
 
 99-attachments/              # Images, diagrams, reference docs
 
@@ -184,6 +184,8 @@ python scripts/validate-frontmatter.py --path .
 python scripts/check-orphans.py --path .
 python scripts/check-status-transitions.py --path .
 python scripts/generate-traceability.py --path .
+python scripts/generate-traceability-matrix.py --path .
+python scripts/generate-trace-chains.py --path .
 ```
 
 ## Git Workflow
