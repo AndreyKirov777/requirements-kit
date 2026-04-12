@@ -11,6 +11,14 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.5.1] — 2026-04-12
+
+### Added
+
+- **Obsidian Bases index files** (`_index.base`): added to every leaf artifact folder across `00-meta/` through `05-quality/` and their `_examples/` counterparts (43 files total). Each file creates a Bases table view showing `file.name`, `domain`, and `title` for all notes in the folder, with a filter excluding the index itself. Enables in-vault navigation without opening individual files.
+
+---
+
 ## [1.5.0] — 2026-04-10
 
 ### Added

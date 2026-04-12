@@ -1,0 +1,14 @@
+views:
+  - type: table
+    name: Table
+    filters:
+      and:
+        - file.inFolder(this.file.folder)
+        - file.name != "_index.base"
+    order:
+      - file.name
+      - domain
+      - title
+    sort:
+      - property: file.folder
+        direction: DESC
