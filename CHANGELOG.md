@@ -11,6 +11,22 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.6.0] — 2026-04-12
+
+### Added
+
+- **Metadata Menu fileClass generator** (`scripts/generate-fileclasses.mjs`): reads `schema/*.schema.json` and generates Obsidian Metadata Menu fileClass files for all 24 artifact types. Each fileClass provides dropdown selectors for every `enum` frontmatter field (status, priority, constraint_type, quality_attribute, etc.). Output goes to `_metadata-menu/fileclasses/`. Field IDs are deterministic (SHA-256 based), so re-running the script produces stable output.
+
+### Removed
+
+- **`_framework/status-transitions.md`**: removed in favor of JSON schemas as single source of truth for allowed field values. Status transition enforcement is deferred to a later iteration.
+
+### Design Decisions
+
+- **JSON Schema = single source of truth.** All enum-constrained fields (status, priority, severity, etc.) are defined once in `schema/*.schema.json`. The fileClass generator reads schemas at build time, eliminating manual synchronization between schemas, documentation, and Obsidian UI config.
+
+---
+
 ## [1.5.1] — 2026-04-12
 
 ### Added
