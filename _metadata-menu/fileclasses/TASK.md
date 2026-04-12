@@ -14,6 +14,8 @@ favoriteView:
 fieldsOrder:
   - 51UkCC
   - OeP-pO
+  - Fgv1Av
+  - TPKO20
 fields:
   - name: status
     type: Select
@@ -37,6 +39,26 @@ fields:
         "3": "complex"
     path: ""
     id: OeP-pO
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: Fgv1Av
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: TPKO20
 ---
 
 # TASK

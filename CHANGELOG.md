@@ -17,6 +17,8 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 - **Metadata Menu fileClass generator** (`scripts/generate-fileclasses.mjs`): reads `schema/*.schema.json` and generates Obsidian Metadata Menu fileClass files for all 24 artifact types. Each fileClass provides dropdown selectors for every `enum` frontmatter field (status, priority, constraint_type, quality_attribute, etc.). Output goes to `_metadata-menu/fileclasses/`. Field IDs are deterministic (SHA-256 based), so re-running the script produces stable output.
 
+- **Project config for dropdowns** (`project-config.example.json`): project-specific lists (domains, owners) that vary per deployment. Copy to `project-config.json`, fill in your values, re-run the generator — `domain` and `owner` appear as dropdowns in all fileClasses. Without the config, these fields remain free text.
+
 ### Removed
 
 - **`_framework/status-transitions.md`**: removed in favor of JSON schemas as single source of truth for allowed field values. Status transition enforcement is deferred to a later iteration.

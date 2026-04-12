@@ -14,6 +14,8 @@ favoriteView:
 fieldsOrder:
   - qlVf2H
   - OpoJKw
+  - FtFk7e
+  - g7bLIq
 fields:
   - name: category
     type: Select
@@ -38,6 +40,26 @@ fields:
         "4": "proposed"
     path: ""
     id: OpoJKw
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: FtFk7e
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: g7bLIq
 ---
 
 # SRC

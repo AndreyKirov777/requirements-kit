@@ -5,6 +5,10 @@
  * Reads schema/*.schema.json (single source of truth) and generates
  * Metadata Menu fileClass files for Obsidian.
  *
+ * Project-specific values (domains, owners, etc.) come from
+ * project-config.json in the vault root. Copy project-config.example.json
+ * and fill in your values.
+ *
  * Usage:
  *   node scripts/generate-fileclasses.mjs
  *
@@ -16,7 +20,7 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from "fs";
-import { join, basename } from "path";
+import { join } from "path";
 import { createHash } from "crypto";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -24,6 +28,8 @@ import { createHash } from "crypto";
 const ROOT = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
 const SCHEMA_DIR = join(ROOT, "schema");
 const OUT_DIR = join(ROOT, "_metadata-menu", "fileclasses");
+const PROJECT_CONFIG_PATH = join(ROOT, "project-config.json");
+const BASE_SCHEMA_PATH = join(ROOT, "schema", "base.schema.json");
 
 /**
  * Map: schema file name (without .schema.json) → artifact config.
@@ -58,6 +64,16 @@ const ARTIFACT_MAP = {
   "test":                   { name: "TEST",            paths: ["05-quality/acceptance"],             icon: "test-tube" },
 };
 
+/**
+ * Fields from project-config.json that map to base.schema.json properties.
+ * key = property name in project-config.json
+ * value = frontmatter field name in artifacts
+ */
+const PROJECT_CONFIG_FIELDS = {
+  domains: "domain",
+  owners: "owner",
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Deterministic 6-char ID from field + artifact name (stable across runs). */
@@ -68,7 +84,7 @@ function fieldId(artifactName, fieldName) {
   return hash.slice(0, 6);
 }
 
-/** Convert JSON Schema enum values to Metadata Menu ValuesList format. */
+/** Convert an array of values to Metadata Menu ValuesList format. */
 function toValuesList(enumValues) {
   const result = {};
   enumValues.forEach((val, i) => {
@@ -92,6 +108,40 @@ function extractEnumFields(schema) {
   }
 
   return fields;
+}
+
+/**
+ * Load project-config.json and return project-specific Select fields.
+ * Returns array of { name, enumValues } or empty array if no config.
+ */
+function loadProjectConfigFields() {
+  if (!existsSync(PROJECT_CONFIG_PATH)) {
+    return [];
+  }
+
+  const config = JSON.parse(readFileSync(PROJECT_CONFIG_PATH, "utf-8"));
+  const fields = [];
+
+  for (const [configKey, fieldName] of Object.entries(PROJECT_CONFIG_FIELDS)) {
+    const values = config[configKey];
+    if (Array.isArray(values) && values.length > 0) {
+      fields.push({ name: fieldName, enumValues: values });
+    }
+  }
+
+  return fields;
+}
+
+/**
+ * Load base.schema.json and return any enum fields defined there.
+ * These apply to all artifact types.
+ */
+function loadBaseEnumFields() {
+  if (!existsSync(BASE_SCHEMA_PATH)) {
+    return [];
+  }
+  const base = JSON.parse(readFileSync(BASE_SCHEMA_PATH, "utf-8"));
+  return extractEnumFields(base);
 }
 
 /** Build YAML frontmatter string for a fileClass. */
@@ -153,6 +203,30 @@ function main() {
     mkdirSync(OUT_DIR, { recursive: true });
   }
 
+  // Load shared fields: base schema enums + project config
+  const baseEnumFields = loadBaseEnumFields();
+  const projectFields = loadProjectConfigFields();
+
+  if (projectFields.length > 0) {
+    console.log(`📋 project-config.json: ${projectFields.map((f) => `${f.name} (${f.enumValues.length} values)`).join(", ")}`);
+  } else if (existsSync(PROJECT_CONFIG_PATH)) {
+    console.log(`📋 project-config.json: found but no usable fields`);
+  } else {
+    console.log(`📋 project-config.json: not found — domain/owner will be free text`);
+    console.log(`   Copy project-config.example.json → project-config.json to enable dropdowns.\n`);
+  }
+
+  // Combine base + project fields (project overrides base if same name)
+  const sharedFields = [...baseEnumFields];
+  for (const pf of projectFields) {
+    const existing = sharedFields.findIndex((f) => f.name === pf.name);
+    if (existing >= 0) {
+      sharedFields[existing] = pf;
+    } else {
+      sharedFields.push(pf);
+    }
+  }
+
   const schemaFiles = readdirSync(SCHEMA_DIR).filter(
     (f) => f.endsWith(".schema.json") && f !== "base.schema.json"
   );
@@ -171,18 +245,32 @@ function main() {
     }
 
     const schema = JSON.parse(readFileSync(join(SCHEMA_DIR, file), "utf-8"));
-    const enumFields = extractEnumFields(schema);
+    const schemaEnumFields = extractEnumFields(schema);
 
-    if (enumFields.length === 0) {
-      console.log(`   ${config.name}: no enum fields — skipping`);
+    // Merge: schema-specific fields take priority, then shared fields
+    // Only include shared fields if the schema's properties (or base) define that field name
+    const schemaProps = schema.properties || {};
+    const allFields = [...schemaEnumFields];
+
+    for (const sf of sharedFields) {
+      // Add shared field if: (a) not already present from schema enum, and
+      // (b) the artifact actually uses this field (defined in schema or base)
+      const alreadyPresent = allFields.some((f) => f.name === sf.name);
+      if (!alreadyPresent) {
+        allFields.push(sf);
+      }
+    }
+
+    if (allFields.length === 0) {
+      console.log(`   ${config.name}: no fields — skipping`);
       skipped++;
       continue;
     }
 
-    const content = buildFileClass(config.name, config.icon, config.paths, enumFields);
+    const content = buildFileClass(config.name, config.icon, config.paths, allFields);
     const outPath = join(OUT_DIR, `${config.name}.md`);
     writeFileSync(outPath, content, "utf-8");
-    console.log(`✓  ${config.name} → ${enumFields.length} field(s): ${enumFields.map((f) => f.name).join(", ")}`);
+    console.log(`✓  ${config.name} → ${allFields.length} field(s): ${allFields.map((f) => f.name).join(", ")}`);
     generated++;
   }
 

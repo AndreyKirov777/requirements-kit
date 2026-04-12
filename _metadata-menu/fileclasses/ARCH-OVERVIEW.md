@@ -13,6 +13,8 @@ savedViews: []
 favoriteView: 
 fieldsOrder:
   - THKUeS
+  - Q7ivSu
+  - K4CFAo
 fields:
   - name: status
     type: Select
@@ -25,6 +27,26 @@ fields:
         "4": "deprecated"
     path: ""
     id: THKUeS
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: Q7ivSu
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: K4CFAo
 ---
 
 # ARCH-OVERVIEW

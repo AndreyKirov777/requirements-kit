@@ -15,6 +15,8 @@ fieldsOrder:
   - OEY_91
   - jq0UPG
   - O1djwF
+  - JD3TGg
+  - CBymXz
 fields:
   - name: status
     type: Select
@@ -53,6 +55,26 @@ fields:
         "4": "low"
     path: ""
     id: O1djwF
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: JD3TGg
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: CBymXz
 ---
 
 # BRQ

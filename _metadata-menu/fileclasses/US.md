@@ -14,6 +14,8 @@ favoriteView:
 fieldsOrder:
   - LHza-l
   - Bcj8ah
+  - EWOgAi
+  - 75POT5
 fields:
   - name: status
     type: Select
@@ -40,6 +42,26 @@ fields:
         "4": "low"
     path: ""
     id: Bcj8ah
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: EWOgAi
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: 75POT5
 ---
 
 # US

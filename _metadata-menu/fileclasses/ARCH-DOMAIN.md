@@ -13,6 +13,8 @@ savedViews: []
 favoriteView: 
 fieldsOrder:
   - CCmAWf
+  - Mwo87N
+  - CmaQDK
 fields:
   - name: status
     type: Select
@@ -25,6 +27,26 @@ fields:
         "4": "deprecated"
     path: ""
     id: CCmAWf
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: Mwo87N
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: CmaQDK
 ---
 
 # ARCH-DOMAIN

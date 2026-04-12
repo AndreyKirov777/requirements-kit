@@ -15,6 +15,8 @@ fieldsOrder:
   - Sj_CFN
   - bIjQpF
   - VRvGEv
+  - zTS--J
+  - V3SDwI
 fields:
   - name: status
     type: Select
@@ -58,6 +60,26 @@ fields:
         "10": "observability"
     path: ""
     id: VRvGEv
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: zTS--J
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: V3SDwI
 ---
 
 # NFR

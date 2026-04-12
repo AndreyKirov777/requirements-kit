@@ -15,6 +15,8 @@ fieldsOrder:
   - PRiMGE
   - qG3_L6
   - GTMV_g
+  - cBfXCW
+  - jfcWAQ
 fields:
   - name: status
     type: Select
@@ -49,6 +51,26 @@ fields:
         "4": "domain-logic"
     path: ""
     id: GTMV_g
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: cBfXCW
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: jfcWAQ
 ---
 
 # BR

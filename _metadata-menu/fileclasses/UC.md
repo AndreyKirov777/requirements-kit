@@ -14,6 +14,8 @@ favoriteView:
 fieldsOrder:
   - oqsOjY
   - xJXDMr
+  - ICG9Tx
+  - rNKjWo
 fields:
   - name: status
     type: Select
@@ -37,6 +39,26 @@ fields:
         "4": "low"
     path: ""
     id: xJXDMr
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: ICG9Tx
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: rNKjWo
 ---
 
 # UC

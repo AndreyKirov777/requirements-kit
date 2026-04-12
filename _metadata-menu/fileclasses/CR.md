@@ -14,6 +14,8 @@ favoriteView:
 fieldsOrder:
   - KG9XSg
   - K12jkE
+  - 4XJxJR
+  - E0YP3V
 fields:
   - name: status
     type: Select
@@ -37,6 +39,26 @@ fields:
         "4": "low"
     path: ""
     id: K12jkE
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: 4XJxJR
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: E0YP3V
 ---
 
 # CR

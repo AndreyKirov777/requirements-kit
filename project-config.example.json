@@ -1,0 +1,14 @@
+{
+  "$schema": "./schema/project-config.schema.json",
+  "$comment": "Copy this file to project-config.json and fill in your project-specific values. Run `node scripts/generate-fileclasses.mjs` after editing.",
+  "domains": [
+    "auth",
+    "payments",
+    "catalog"
+  ],
+  "owners": [
+    "@alice",
+    "@bob",
+    "team-platform"
+  ]
+}

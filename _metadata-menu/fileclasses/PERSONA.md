@@ -13,6 +13,8 @@ savedViews: []
 favoriteView: 
 fieldsOrder:
   - -cHpqI
+  - t-2xhp
+  - MCJQDu
 fields:
   - name: status
     type: Select
@@ -25,6 +27,26 @@ fields:
         "4": "deprecated"
     path: ""
     id: -cHpqI
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: t-2xhp
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: MCJQDu
 ---
 
 # PERSONA

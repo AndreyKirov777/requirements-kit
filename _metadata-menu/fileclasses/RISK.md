@@ -15,6 +15,8 @@ fieldsOrder:
   - w2tsYO
   - CwnwmJ
   - aVGvWJ
+  - t5O_Ns
+  - tZlqdd
 fields:
   - name: status
     type: Select
@@ -48,6 +50,26 @@ fields:
         "3": "low"
     path: ""
     id: aVGvWJ
+  - name: domain
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "auth"
+        "2": "payments"
+        "3": "catalog"
+    path: ""
+    id: t5O_Ns
+  - name: owner
+    type: Select
+    options:
+      sourceType: ValuesList
+      valuesList:
+        "1": "@alice"
+        "2": "@bob"
+        "3": "team-platform"
+    path: ""
+    id: tZlqdd
 ---
 
 # RISK
