@@ -11,6 +11,22 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.6.1] — 2026-04-29
+
+### Changed
+
+- **Glossary: removed `Used In` field** from term structure (template, example, and JSON schema). Back-traceability from glossary terms to artifacts is not maintainable manually and duplicates information already present in the artifacts themselves. Obsidian backlinks provide equivalent navigation without manual upkeep.
+
+- **Taxonomy: removed `Glossary` field and `Components` sections** from `domains.md` (template and example). Component listings belong in the code-map (`03-architecture/code-map/`), not in the domain registry. The glossary link is derivable from the domain name. Renamed document title from "Domain and Component Registry" to "Domain Registry".
+
+### Added
+
+- **`schema/glossary.schema.json`**: new JSON schema for glossary files. Defines required fields (`id`, `title`, `domain`, `updated`, `terms`) and term-level fields (`name`, `definition`, `code_name`, `type`, `aliases`). `aliases` is optional; `Used In` is absent by design.
+
+- **`schema/taxonomy-domains.schema.json`**: new JSON schema for the domain registry. Defines required fields (`id`, `title`, `updated`, `domains`) and domain-level fields (`code`, `full_name`, `description`, `owner`). `Glossary` and component listings are absent by design.
+
+---
+
 ## [1.6.0] — 2026-04-12
 
 ### Added

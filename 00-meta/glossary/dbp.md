@@ -21,7 +21,6 @@ This glossary defines business and domain terms for [PROJECT_NAME] and maps them
 | Code Name  | `termName`                                                          |
 | Type       | `object` / `string` / `number` / `module` / `role`                 |
 | Aliases    | Other names people might use for this concept                       |
-| Used In    | [[EPIC-XXX-001]], [[FR-XXX-001]]                                   |
 
 ### [Another Term]
 
@@ -31,7 +30,6 @@ This glossary defines business and domain terms for [PROJECT_NAME] and maps them
 | Code Name  | `anotherTerm`                                                       |
 | Type       | ...                                                                 |
 | Aliases    | ...                                                                 |
-| Used In    | ...                                                                 |
 
 ## Naming Rules
 

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "glossary.schema.json",
+  "title": "Glossary Term",
+  "description": "A single domain term entry in the project glossary. Defines the canonical code name and business meaning for use by AI agents and developers.",
+  "type": "object",
+  "required": ["id", "title", "domain", "updated", "terms"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^GLOSS-[A-Z0-9-]+$",
+      "description": "Unique glossary identifier, e.g. GLOSS-DBP"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title of the glossary file, e.g. 'Digital Battery Passport Glossary'"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Domain scope. Use 'all' if terms apply across all domains."
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last update in YYYY-MM-DD format"
+    },
+    "terms": {
+      "type": "array",
+      "description": "List of glossary terms",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/term"
+      }
+    }
+  },
+  "definitions": {
+    "term": {
+      "type": "object",
+      "required": ["name", "definition", "code_name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable term name as it appears in business documents"
+        },
+        "definition": {
+          "type": "string",
+          "description": "Clear business definition of the term in domain language"
+        },
+        "code_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-zA-Z0-9]*$",
+          "description": "Canonical camelCase identifier for use in code, APIs, and database columns"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["object", "string", "number", "boolean", "module", "role"],
+          "description": "Semantic category of the term"
+        },
+        "aliases": {
+          "type": "array",
+          "description": "Alternative names or synonyms used in conversation or documentation",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

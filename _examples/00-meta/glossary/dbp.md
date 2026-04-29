@@ -19,7 +19,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `batteryPassport`                                                   |
 | Type       | `object`                                                            |
 | Aliases    | DBP, digital battery passport, passport                             |
-| Used In    | [[EPIC-PASSPORT-001]], [[FR-PASSPORT-001]]                         |
 
 ### Economic Operator
 
@@ -29,7 +28,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `economicOperator`                                                  |
 | Type       | `object`                                                            |
 | Aliases    | EO, operator                                                        |
-| Used In    | [[VISION-DBP-001]]                                                  |
 
 ### Completeness Score
 
@@ -39,7 +37,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `completenessScore`                                                 |
 | Type       | `number`                                                            |
 | Aliases    | passport completeness, readiness score                              |
-| Used In    | [[FR-PASSPORT-002]], [[EPIC-PASSPORT-001]]                         |
 
 ### Data Cluster
 
@@ -49,7 +46,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `dataCluster`                                                       |
 | Type       | `object`                                                            |
 | Aliases    | attribute group, data category                                      |
-| Used In    | [[FR-PASSPORT-002]]                                                |
 
 ### Static Data
 
@@ -59,7 +55,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `staticData`                                                        |
 | Type       | `object`                                                            |
 | Aliases    | static attributes                                                   |
-| Used In    | [[EPIC-INGEST-001]], [[FR-INGEST-001]]                             |
 
 ### Dynamic Data
 
@@ -69,7 +64,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `dynamicData`                                                       |
 | Type       | `object`                                                            |
 | Aliases    | dynamic attributes, lifecycle data, telemetry                       |
-| Used In    | [[EPIC-INGEST-001]], [[FR-INGEST-002]]                             |
 
 ### Bronze Layer
 
@@ -79,7 +73,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `bronzeLayer`                                                       |
 | Type       | `module`                                                            |
 | Aliases    | raw data layer, ingestion layer                                     |
-| Used In    | [[ADR-INGEST-001]]                                                  |
 
 ### Silver Layer
 
@@ -89,7 +82,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `silverLayer`                                                       |
 | Type       | `module`                                                            |
 | Aliases    | standardization layer, integration layer                            |
-| Used In    | [[ADR-INGEST-001]]                                                  |
 
 ### Gold Layer
 
@@ -99,7 +91,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `goldLayer`                                                         |
 | Type       | `module`                                                            |
 | Aliases    | passport layer, data products layer                                 |
-| Used In    | [[ADR-INGEST-001]]                                                  |
 
 ### Legitimate User
 
@@ -109,7 +100,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `legitimateUser`                                                    |
 | Type       | `role`                                                              |
 | Aliases    | legitimate interest user, authorized third party                    |
-| Used In    | [[EPIC-SEC-001]], [[FR-SEC-003]]                                   |
 
 ### Data Lineage
 
@@ -119,7 +109,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `dataLineage`                                                       |
 | Type       | `object`                                                            |
 | Aliases    | field-level lineage, audit trail                                    |
-| Used In    | [[EPIC-AUDIT-001]], [[FR-AUDIT-001]]                               |
 
 ### Unique Battery Identifier
 
@@ -129,7 +118,6 @@ This glossary defines business and regulatory terms for the DBP Accelerator and 
 | Code Name  | `batteryId`                                                         |
 | Type       | `string`                                                            |
 | Aliases    | battery ID, unique ID, passport ID                                  |
-| Used In    | [[EPIC-QR-001]], [[FR-QR-001]]                                     |
 
 ## Naming Rules
 

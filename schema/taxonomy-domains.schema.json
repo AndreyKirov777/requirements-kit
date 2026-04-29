@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "taxonomy-domains.schema.json",
+  "title": "Domain Registry",
+  "description": "Registry of recognized domains for a project. Domain codes are used in the `domain` frontmatter field across all artifacts.",
+  "type": "object",
+  "required": ["id", "title", "updated", "domains"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^META-TAXONOMY-DOMAINS(-[A-Z0-9-]+)?$",
+      "description": "Unique identifier for this domain registry, e.g. META-TAXONOMY-DOMAINS or META-TAXONOMY-DOMAINS-DBP"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title, e.g. 'Domain Registry'"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last update in YYYY-MM-DD format"
+    },
+    "domains": {
+      "type": "array",
+      "description": "List of recognized domains",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/domain"
+      }
+    }
+  },
+  "definitions": {
+    "domain": {
+      "type": "object",
+      "required": ["code", "full_name", "description", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9-]*$",
+          "description": "Short uppercase domain code used in artifact IDs and frontmatter, e.g. INGEST, SEC, UI"
+        },
+        "full_name": {
+          "type": "string",
+          "description": "Human-readable domain name, e.g. 'Data Ingestion & Validation'"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this domain covers — scope, responsibilities, key concerns"
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^@.+$",
+          "description": "Responsible owner handle, e.g. @techlead or @pm"
+        }
+      }
+    }
+  }
+}
