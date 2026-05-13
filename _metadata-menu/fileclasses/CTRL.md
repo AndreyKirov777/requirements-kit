@@ -15,8 +15,6 @@ fieldsOrder:
   - SwikeO
   - 1uGdXb
   - Ct6iM-
-  - zSaTor
-  - FzOmni
 fields:
   - name: status
     type: Select
@@ -54,26 +52,6 @@ fields:
         "4": "analysis"
     path: ""
     id: Ct6iM-
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: zSaTor
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: FzOmni
 ---
 
 # CTRL

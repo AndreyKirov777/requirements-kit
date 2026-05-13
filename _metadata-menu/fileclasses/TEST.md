@@ -15,8 +15,6 @@ fieldsOrder:
   - 0YG1H_
   - vRX1JY
   - 5yxtXi
-  - TOehWm
-  - Zet3F1
 fields:
   - name: status
     type: Select
@@ -55,26 +53,6 @@ fields:
         "4": "low"
     path: ""
     id: 5yxtXi
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: TOehWm
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: Zet3F1
 ---
 
 # TEST

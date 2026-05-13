@@ -15,8 +15,6 @@ fieldsOrder:
   - oAWXtG
   - 0MgPTu
   - jUMycg
-  - 2U81AS
-  - ZfMx53
 fields:
   - name: status
     type: Select
@@ -50,26 +48,6 @@ fields:
         "4": "low"
     path: ""
     id: jUMycg
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: 2U81AS
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: ZfMx53
 ---
 
 # CON

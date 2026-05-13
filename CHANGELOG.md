@@ -11,6 +11,14 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [1.6.2] — 2026-05-13
+
+### Changed
+
+- **Script language unified to Python**: `scripts/generate-fileclasses.mjs` rewritten as `scripts/generate-fileclasses.py`. All kit scripts now share a single runtime (Python 3, no Node.js dependency). Output is byte-for-byte identical to the previous Node version (verified by side-by-side run on all 24 artifact types). Field IDs remain stable across the migration — no regeneration of `_metadata-menu/fileclasses/` content is required, though re-running the script will update the auto-generated comment line. Update any local commands from `node scripts/generate-fileclasses.mjs` to `python scripts/generate-fileclasses.py`.
+
+---
+
 ## [1.6.1] — 2026-04-29
 
 ### Changed
@@ -31,7 +39,7 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ### Added
 
-- **Metadata Menu fileClass generator** (`scripts/generate-fileclasses.mjs`): reads `schema/*.schema.json` and generates Obsidian Metadata Menu fileClass files for all 24 artifact types. Each fileClass provides dropdown selectors for every `enum` frontmatter field (status, priority, constraint_type, quality_attribute, etc.). Output goes to `_metadata-menu/fileclasses/`. Field IDs are deterministic (SHA-256 based), so re-running the script produces stable output.
+- **Metadata Menu fileClass generator** (`scripts/generate-fileclasses.py`): reads `schema/*.schema.json` and generates Obsidian Metadata Menu fileClass files for all 24 artifact types. Each fileClass provides dropdown selectors for every `enum` frontmatter field (status, priority, constraint_type, quality_attribute, etc.). Output goes to `_metadata-menu/fileclasses/`. Field IDs are deterministic (SHA-256 based), so re-running the script produces stable output.
 
 - **Project config for dropdowns** (`project-config.example.json`): project-specific lists (domains, owners) that vary per deployment. Copy to `project-config.json`, fill in your values, re-run the generator — `domain` and `owner` appear as dropdowns in all fileClasses. Without the config, these fields remain free text.
 

@@ -1,6 +1,6 @@
 {
   "$schema": "./schema/project-config.schema.json",
-  "$comment": "Copy this file to project-config.json and fill in your project-specific values. Run `node scripts/generate-fileclasses.mjs` after editing.",
+  "$comment": "Copy this file to project-config.json and fill in your project-specific values. Run `python scripts/generate-fileclasses.py` after editing.",
   "domains": [
     "auth",
     "payments",

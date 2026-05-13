@@ -14,8 +14,6 @@ favoriteView:
 fieldsOrder:
   - cJP_8n
   - _MBM-4
-  - oFRrXF
-  - UsXtTw
 fields:
   - name: status
     type: Select
@@ -42,26 +40,6 @@ fields:
         "4": "low"
     path: ""
     id: _MBM-4
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: oFRrXF
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: UsXtTw
 ---
 
 # FR

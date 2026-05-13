@@ -14,8 +14,6 @@ favoriteView:
 fieldsOrder:
   - xou33j
   - 9FX3F9
-  - 3R2NZK
-  - PcCpGE
 fields:
   - name: status
     type: Select
@@ -39,26 +37,6 @@ fields:
         "3": "low"
     path: ""
     id: 9FX3F9
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: 3R2NZK
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: PcCpGE
 ---
 
 # ASSUM

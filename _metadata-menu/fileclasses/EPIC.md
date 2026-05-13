@@ -13,8 +13,6 @@ savedViews: []
 favoriteView: 
 fieldsOrder:
   - WqtRQ6
-  - bHHkZU
-  - p-We1h
 fields:
   - name: status
     type: Select
@@ -29,26 +27,6 @@ fields:
         "6": "deprecated"
     path: ""
     id: WqtRQ6
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: bHHkZU
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: p-We1h
 ---
 
 # EPIC

@@ -13,8 +13,6 @@ savedViews: []
 favoriteView: 
 fieldsOrder:
   - 7wON53
-  - ehSaE3
-  - kNeWGn
 fields:
   - name: status
     type: Select
@@ -27,26 +25,6 @@ fields:
         "4": "deprecated"
     path: ""
     id: 7wON53
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: ehSaE3
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: kNeWGn
 ---
 
 # JOURNEY

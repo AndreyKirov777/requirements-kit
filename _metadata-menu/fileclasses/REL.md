@@ -13,8 +13,6 @@ savedViews: []
 favoriteView: 
 fieldsOrder:
   - 89qZsI
-  - aACISO
-  - OvgAPB
 fields:
   - name: status
     type: Select
@@ -27,26 +25,6 @@ fields:
         "4": "rolled-back"
     path: ""
     id: 89qZsI
-  - name: domain
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "auth"
-        "2": "payments"
-        "3": "catalog"
-    path: ""
-    id: aACISO
-  - name: owner
-    type: Select
-    options:
-      sourceType: ValuesList
-      valuesList:
-        "1": "@alice"
-        "2": "@bob"
-        "3": "team-platform"
-    path: ""
-    id: OvgAPB
 ---
 
 # REL
