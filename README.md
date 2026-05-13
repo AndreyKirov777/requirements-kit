@@ -1,4 +1,4 @@
-# Obsidian Requirements Kit for AI SDLC
+# Obsidian Requirements Kit for AI SDLC 
 
 > **Version 1.6.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
