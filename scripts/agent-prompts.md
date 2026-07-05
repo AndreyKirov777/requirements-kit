@@ -141,6 +141,7 @@ For each proposed ADR, provide:
 - Decision (your recommendation)
 - Alternatives considered (at least 2)
 - Trade-offs (benefits vs. costs)
+- Rules (normative rules distilled from the decision — see prompt 8)
 
 ## 7. Implementation Agent
 
@@ -157,7 +158,8 @@ You are an AI coding agent. Before writing any code:
 3. Read the relevant acceptance criteria (AC-N) listed in `acceptance_criteria_subset`.
 4. Read the code-map for target file locations.
 5. Read the glossary for naming conventions.
-6. Read related ADRs for architectural constraints.
+6. Read `03-architecture/architecture-rules.md` — the binding rulebook extracted from accepted ADRs. Every rule applies to every task. Open the full ADR only when you need the rationale.
+7. Read related ADRs for architectural constraints not yet covered by rules.
 
 Implementation rules:
 - Write code that directly satisfies each listed acceptance criterion.
@@ -170,3 +172,54 @@ After implementation:
 - Update the TASK status to `done`.
 - Update the FR status to `implemented` if all tasks are done (reverse links like `implemented_by` are computed by the traceability script — do not add them manually).
 - Run `python scripts/validate-frontmatter.py` and `python scripts/check-orphans.py`.
+
+## 8. ADR Rules Distillation
+
+**Role:** Solution Architect
+
+**Context:** Write (or review) the `# Rules` section of an ADR — the normative rules that will be extracted into `architecture-rules.md` and loaded into every coding agent's context.
+
+**Instructions:**
+
+You are distilling an architecture decision into rules for AI coding agents. The agent will read each rule WITHOUT the ADR, so every rule must stand alone.
+
+For the given ADR:
+
+1. Read Context, Decision, and Consequences.
+2. Ask: "what must an agent do — or never do — in a diff for this decision to hold?"
+3. Write 2–5 bullets, each following ALL of these:
+   - Starts with MUST / MUST NOT / SHOULD / SHOULD NOT (RFC 2119).
+   - One observable behavior per bullet — a reviewer looking at a diff can say pass/fail.
+   - Self-contained: name concrete paths, modules, layers; never "this approach" or "it".
+   - Append `[check: <tool>]` if the rule is (or should be) machine-enforced.
+4. For technology-choice decisions ("use X"), do not stop at `MUST use X` — add the boundary rules that actually get violated (e.g., `MUST NOT bypass the outbox when publishing events`).
+5. If the decision is purely informational, write the single bullet `- (no normative rules)`.
+
+Anti-patterns to reject:
+- Restating the Decision as prose ("We adopt a layered architecture")
+- Untestable rules ("SHOULD follow best practices")
+- Rules that bundle several behaviors in one bullet
+- Rationale mixed into the rule (rationale lives in the ADR)
+
+**Examples:**
+
+Decision: "All outbound HTTP goes through `infra/gateway/HttpGateway` (owns timeouts, retries, auth)."
+
+```markdown
+# Rules
+- MUST route all outbound HTTP through `infra/gateway/HttpGateway`; direct use of `requests`/`httpx` is forbidden outside `infra/gateway/` [check: lint ban-direct-http]
+- MUST NOT override the gateway's default timeout without a comment referencing an NFR or ADR
+- SHOULD register a named circuit-breaker policy in the gateway config for each new external dependency
+```
+
+Decision: "Migrations are additive-only within a release; destructive changes use expand → migrate → contract."
+
+```markdown
+# Rules
+- MUST NOT drop or rename a column in the same release that stops writing to it
+- MUST write new-code paths to tolerate both pre- and post-migration schema within one release
+- MUST create a follow-up TASK for the contract step when using expand/contract
+- SHOULD NOT add non-nullable columns without a database-level default [check: migration-linter]
+```
+
+After writing, run `python scripts/generate-architecture-rules.py --check` to lint the section.

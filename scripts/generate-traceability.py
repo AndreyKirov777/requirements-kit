@@ -31,12 +31,14 @@ LINK_FIELDS = [
     "implements", "implements_control", "part_of_story",
     "delivers", "verifies", "verifies_control", "covers_criteria",
     "affects", "persona",
-    # Reference links
+    # Reference links (live fields)
     "source_docs", "source_ref", "superseded_by",
     "requirements_included", "epics_included", "related_epics",
-    # Legacy fields (still read if present in pre-0.5.0 artifacts)
-    "related_adrs", "blocks", "implemented_by", "verified_by",
-    "related_requirements", "derived_requirements", "derived_controls",
+    "related_requirements", "related_adrs",
+    # Legacy / computed fields (still read if present in pre-0.5.0 artifacts —
+    # reverse links are computed, never authored; see kit-manifest.json).
+    "blocks", "implemented_by", "verified_by",
+    "derived_requirements", "derived_controls",
     "delivered_by", "related_brqs", "related_ctrls",
 ]
 

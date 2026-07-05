@@ -35,7 +35,3 @@ How will compliance with this control be verified?
 # Open Questions
 
 - ...
-
-# Links
-
-- Parent BRQ: [[BRQ-XXX-000]]

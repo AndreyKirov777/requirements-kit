@@ -52,7 +52,3 @@ Brief description of what this release delivers and its business value.
 # Rollback Plan
 
 Steps to revert if critical issues are found post-deploy.
-
-# Links
-
-- Previous release: [[REL-XXX-000]]

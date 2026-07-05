@@ -50,4 +50,4 @@ Verify that the static data ingestion endpoint accepts valid payloads, rejects i
 
 # Notes
 - Use glossary code names: `batteryId`, `staticData`, `bronzeLayer`
-- Edge cases (payload size limits, concurrent submissions) are documented in FR-INGEST-001 edge cases but not covered by these acceptance criteria — see test-ideas/ for exploratory coverage
+- Edge cases (payload size limits, concurrent submissions) are documented in the [[FR-INGEST-001]] edge cases but are not covered by these acceptance criteria; capture exploratory coverage as additional TEST scenarios.

@@ -48,8 +48,3 @@ erDiagram
 
 Key considerations for implementing this data model:
 - …
-
-# Links
-
-- Requirements: [[FR-XXX-000]]
-- ADR: [[ADR-XXX-000]]

@@ -4,7 +4,13 @@
   "title": "Base frontmatter schema",
   "description": "Common fields shared by all artifact types",
   "type": "object",
-  "required": ["id", "title", "status", "owner", "updated"],
+  "required": [
+    "id",
+    "title",
+    "status",
+    "owner",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -29,12 +35,14 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "updated": {
       "type": "string",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

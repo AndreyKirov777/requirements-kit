@@ -11,6 +11,77 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
+## [2.1.0] — 2026-07-05
+
+Architecture rules: a deterministic bridge from ADRs to an always-loaded, agent-facing rulebook. Distillation of a decision into normative rules happens at ADR authoring time (by the author or an agent, reviewed at the ADR's human gate); generation is verbatim extraction and is CI-friendly.
+
+### Added
+
+- **`# Rules` section in the ADR template** (`_framework/templates/adr-template.md`). Each accepted ADR must distill its Decision into 2–5 self-contained, testable rules starting with RFC 2119 keywords (MUST / MUST NOT / SHOULD / SHOULD NOT), optionally tagged `[check: <tool>]` for machine-enforced rules. Purely informational decisions opt out with `- (no normative rules)`. The template embeds the authoring checklist.
+- **`scripts/generate-architecture-rules.py`** — extracts `# Rules` sections from ADRs with `status: accepted` into `03-architecture/architecture-rules.md`: a generated rulebook grouped by domain, with stable per-rule IDs (`ADR-XXX-NNN.R<n>`) that review agents cite when flagging violations. Superseded/deprecated/proposed ADRs are excluded, so rules retire automatically with their ADR. `--check` mode lints (accepted ADR without a valid `# Rules` section, non-RFC-2119 bullets) and exits non-zero for CI.
+- **Prompt 8 "ADR Rules Distillation"** in `scripts/agent-prompts.md` — few-shot instructions for writing the `# Rules` section, including the technology-choice pattern (boundary rules, not just `MUST use X`) and anti-patterns to reject.
+
+### Changed
+
+- **`docs/agent-instructions.md`**: reading `03-architecture/architecture-rules.md` is now a mandatory pre-task step (always tier); "During Implementation" requires flagging (not silently working around) any blocking rule by ID; new proposed ADRs must include a draft `# Rules` section. Conditional steps renumbered. Re-run `python scripts/install-agent-files.py` to refresh the per-tool instruction files.
+- **`scripts/agent-prompts.md`**: Architecture Review (prompt 6) must propose rules with each ADR; Implementation Agent (prompt 7) reads the rulebook before related ADRs.
+- **`_examples/03-architecture/adr/ADR-INGEST-001.md`**: added an example `# Rules` section (tier-boundary rules for the three-tier data architecture).
+- README: version badge, "What is Inside" entry, and folder layout updated for `architecture-rules.md`; `scripts/README-FIRST.md` lists the new generate/lint commands.
+
+## [2.0.0] — 2026-07-04
+
+Major release addressing the findings in `V2-REVIEW-FINDINGS.md`. **Breaking changes** are allowed in this release; existing vaults do not need to migrate.
+
+### Breaking Changes
+
+- **Closed schema field set.** Every artifact schema now rejects unknown frontmatter fields (`additionalProperties: false`). Project-specific fields must be prefixed with `x_` (e.g., `x_jira_key`). `validate-frontmatter.py` also emits a "did you mean" hint when an unknown field is within edit-distance 2 of a real field (catches typos like `derive_from` → `derives_from`). This will flag pre-2.0 artifacts that carried off-schema fields. (П.10)
+- **Folder renamed: `03-architecture/integrations/` → `03-architecture/contracts/`.** Matches the `CONTRACT` artifact type and its template. README, `REQUIREMENTS-OVERVIEW.md` type maps, and the generated fileClass were updated. (П.4)
+- **`_framework/status-transitions.md` reinstated as a generated file** and referenced again across the docs. It is now produced from `kit-manifest.json` by `generate-status-transitions.py` — do not edit it by hand. (П.1, П.6)
+
+### Added
+
+- **`kit-manifest.json` — single source of truth** for the artifact-type registry: prefix, folder, schema, tier, lifecycle flag, valid statuses, status-transition graph, and up-link fields (with target types). `scripts/kit_manifest.py` loads it, and `validate-frontmatter.py`, `check-status-transitions.py`, and `generate-fileclasses.py` now read the registry from it instead of hardcoding it — eliminating the drift that produced findings П.1 and П.4. (П.7)
+- **Honest status-transition gate.** `check-status-transitions.py --git [--git-base REF]` reads the old status from git and the new status from the working tree and rejects illegal edges (e.g., `draft → approved`). The snapshot mode (default) still validates current statuses and parent/child consistency. (П.6)
+- **`scripts/generate-status-transitions.py`** — regenerates `_framework/status-transitions.md` from the manifest.
+- **`scripts/assemble-context.py TASK-XXX-NNN`** — collects a task's full trace chain (task, FR/NFR, user story with acceptance criteria, obligation chain, related ADRs, target files) into one markdown bundle: one read instead of ten. (П.8)
+- **`scripts/check-updated-dates.py`** — warns when an artifact's `updated:` field disagrees with the file's last git-commit date. (П.9)
+- **Full example coverage.** `_examples/` now contains one working, cross-linked example of every artifact type — added SRC, BRQ (×2), BR, CTRL, JOURNEY, UC, RISK, REL, CONTRACT, DM, a domain ARCH, the architecture overview, a second persona, and a security TEST. The set forms one coherent DBP project and passes every kit script. (П.2, П.12.4)
+
+### Changed
+
+- **Examples brought into strict conformance.** Rewrote `FR-INGEST-001` and cleaned `NFR-SEC-001`, `US-INGEST-001`, `TASK-INGEST-001`, `ADR-INGEST-001`, `CON-SEC-001`, and `PRODUCT-VISION.md`: removed hand-authored reverse links and off-schema fields, added the `SRC → BRQ → BR/CTRL → FR/NFR` obligation chain, and made the FR atomic. (П.2)
+- **"Before Starting Any Task" ritual is now tiered** in `docs/agent-instructions.md` — mandatory steps vs. conditional steps (compliance, architecture, constraints), with a pointer to `assemble-context.py`. (П.8)
+- **Traceability notation split into two dimensions** in README and agent-instructions: the obligation chain (`SRC → BRQ → BR/CTRL → FR/NFR`) vs. the solution structure (`Epic ⊃ (FR ↔ US) → TASK → TEST`). An Epic groups solution work; it is not a link in the obligation chain. (П.11)
+- **Wiki-link resolution rule documented** explicitly for non-Obsidian agents (`[[ID]]` → `ID.md`; folder resolved via the manifest). (П.12.3)
+- **Templates de-duplicated.** Removed the `# Links` section from all templates (Obsidian shows frontmatter links and backlinks) and stopped copying acceptance-criterion text into the task template — tasks reference `AC-N` only. (П.9)
+- **`generate-traceability.py`**: `related_requirements` and `related_adrs` reclassified from "legacy" to live reference links. (П.3)
+- **`validate-frontmatter.py`** now skips `_metadata-menu/` (generated fileClasses), fixing false "missing id" errors on a whole-repo run.
+- **`check-duplicates.py`**: `architecture-overview.md` added to the filename-exception list.
+
+### Removed
+
+- Version cruft from the repo root: `.kit-version.test`, `_temp/`, `migration-report.md`, and `.snapshots/` (Obsidian plugin data). `.kit-version` is now the single machine-readable version source (`2.0.0`), and `.gitignore` excludes `_temp/`, `*.test`, and `.snapshots/`. (П.5)
+- `05-quality/test-ideas/` folder removed; exploratory test ideas live as additional TEST scenarios. (П.12.2)
+
+### Fixed
+
+- **All dangling references to the deleted `_framework/status-transitions.md`** now resolve — the file is generated again from the manifest. (П.1)
+- **`docs/success-criteria.md` translated to English** for a consistent agent-context language. (П.12.1)
+
+---
+
+## [1.6.3] — 2026-07-04
+
+### Fixed
+
+- **REQUIREMENTS-OVERVIEW query 7a repaired**: the "FRs / NFRs missing verification" query filtered on the `verified_by` frontmatter field, which no longer exists after the v0.5.0 link-up-only change — it reported every requirement as unverified. The query now computes reverse links on the fly by scanning `verifies` fields of TEST artifacts. Added a note to section 7 explaining that reverse links are always computed, never stored.
+
+### Added
+
+- **REQUIREMENTS-OVERVIEW query 7d**: "FRs without a delivering User Story" — computes `delivered_by` on the fly from the `delivers` field of US artifacts, flagging FRs that have no carrier of acceptance criteria.
+
+---
+
 ## [1.6.2] — 2026-05-13
 
 ### Changed

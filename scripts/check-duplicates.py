@@ -42,7 +42,7 @@ SKIP_FOLDERS = {"templates", "scripts", ".codex", "node_modules", ".git"}
 
 # Well-known files that use a fixed filename different from their ID
 # (e.g., PRODUCT-VISION.md is the canonical name for the single vision doc)
-FILENAME_EXCEPTIONS = {"PRODUCT-VISION.md"}
+FILENAME_EXCEPTIONS = {"PRODUCT-VISION.md", "architecture-overview.md"}
 
 
 def extract_frontmatter(filepath: Path) -> dict | None:

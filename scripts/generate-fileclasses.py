@@ -22,7 +22,11 @@ in Metadata Menu plugin settings.
 import base64
 import hashlib
 import json
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kit_manifest import load_manifest
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -32,36 +36,32 @@ OUT_DIR = ROOT / "_metadata-menu" / "fileclasses"
 PROJECT_CONFIG_PATH = ROOT / "project-config.json"
 BASE_SCHEMA_PATH = SCHEMA_DIR / "base.schema.json"
 
-# Map: schema file name (without .schema.json) → artifact config.
-#   name  — fileClass name (used as filename and display name)
-#   paths — vault-relative folder paths where these artifacts live
-#   icon  — Lucide icon name for Metadata Menu sidebar
-ARTIFACT_MAP = {
-    "fr":                    {"name": "FR",            "paths": ["02-requirements/fr"],               "icon": "file-check"},
-    "nfr":                   {"name": "NFR",           "paths": ["02-requirements/nfr"],              "icon": "shield-check"},
-    "user-story":            {"name": "US",            "paths": ["02-requirements/user-stories"],     "icon": "user"},
-    "epic":                  {"name": "EPIC",          "paths": ["02-requirements/epics"],            "icon": "layers"},
-    "brq":                   {"name": "BRQ",           "paths": ["01-product/business-requirements"], "icon": "briefcase"},
-    "br":                    {"name": "BR",            "paths": ["01-product/business-rules"],        "icon": "book-open"},
-    "ctrl":                  {"name": "CTRL",          "paths": ["01-product/controls"],              "icon": "lock"},
-    "constraint":            {"name": "CON",           "paths": ["01-product/constraints"],           "icon": "alert-triangle"},
-    "vision":                {"name": "VISION",        "paths": ["01-product/vision"],                "icon": "eye"},
-    "persona":               {"name": "PERSONA",       "paths": ["01-product/personas"],              "icon": "users"},
-    "journey":               {"name": "JOURNEY",       "paths": ["01-product/journeys"],              "icon": "map"},
-    "assumption":            {"name": "ASSUM",         "paths": ["01-product/assumptions"],           "icon": "help-circle"},
-    "use-case":              {"name": "UC",            "paths": ["01-product/use-cases"],             "icon": "git-branch"},
-    "src":                   {"name": "SRC",           "paths": ["01-product/sources"],               "icon": "file-text"},
-    "adr":                   {"name": "ADR",           "paths": ["03-architecture/adr"],              "icon": "git-commit"},
-    "architecture-overview": {"name": "ARCH-OVERVIEW", "paths": ["03-architecture"],                  "icon": "layout"},
-    "domain-architecture":   {"name": "ARCH-DOMAIN",   "paths": ["03-architecture"],                  "icon": "layout"},
-    "data-model":            {"name": "DM",            "paths": ["03-architecture/data-model"],       "icon": "database"},
-    "contract":              {"name": "CONTRACT",      "paths": ["03-architecture/integrations"],     "icon": "file-signature"},
-    "change-request":        {"name": "CR",            "paths": ["04-delivery/change-requests"],      "icon": "git-pull-request"},
-    "release":               {"name": "REL",           "paths": ["04-delivery/releases"],             "icon": "rocket"},
-    "risk":                  {"name": "RISK",          "paths": ["04-delivery/risks"],                "icon": "alert-octagon"},
-    "task":                  {"name": "TASK",          "paths": ["04-delivery/tasks"],                "icon": "check-square"},
-    "test":                  {"name": "TEST",          "paths": ["05-quality/acceptance"],            "icon": "test-tube"},
+# Map: schema file name (without .schema.json) → artifact config, derived from
+# kit-manifest.json (single source of truth). The fileClass display name is
+# taken from the manifest's ARCH-OVERVIEW/ARCH-DOMAIN naming where the prefix
+# differs from the fileClass name.
+_MANIFEST = load_manifest()
+
+# Manifest prefix → fileClass display name (only where they differ).
+_FILECLASS_NAME_OVERRIDE = {
+    "ARCH-OVERVIEW": "ARCH-OVERVIEW",
+    "ARCH": "ARCH-DOMAIN",
 }
+
+
+def _build_artifact_map() -> dict:
+    out = {}
+    for prefix, cfg in _MANIFEST["artifact_types"].items():
+        schema_key = cfg["schema"][: -len(".schema.json")]
+        out[schema_key] = {
+            "name": _FILECLASS_NAME_OVERRIDE.get(prefix, prefix),
+            "paths": [cfg["folder"]],
+            "icon": cfg.get("icon", "file"),
+        }
+    return out
+
+
+ARTIFACT_MAP = _build_artifact_map()
 
 # Fields from project-config.json that map to base.schema.json properties.
 # key   = property name in project-config.json

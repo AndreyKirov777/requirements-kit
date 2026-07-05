@@ -4,7 +4,7 @@ mapWithTag: false
 icon: file-signature
 tagNames: 
 filesPaths:
-  - 03-architecture/integrations
+  - 03-architecture/contracts
 bookmarksGroups: 
 excludes: 
 extends: 
@@ -43,5 +43,5 @@ fields:
 
 # CONTRACT
 
-> Auto-generated from `schema/` by `scripts/generate-fileclasses.mjs`.
+> Auto-generated from `schema/` by `scripts/generate-fileclasses.py`.
 > Do not edit manually — re-run the script after changing schemas.

@@ -67,8 +67,3 @@ What is true after successful completion?
 # Business Rules
 
 - …
-
-# Links
-
-- Epic: [[EPIC-XXX-000]]
-- Requirements: [[FR-XXX-000]]

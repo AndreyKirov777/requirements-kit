@@ -4,10 +4,21 @@
   "title": "Assumption frontmatter schema",
   "description": "Schema for ASSUM artifacts",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "owner", "domain", "risk_if_wrong", "updated"],
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "domain",
+    "risk_if_wrong",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,20 +30,34 @@
     },
     "status": {
       "type": "string",
-      "enum": ["unvalidated", "validating", "validated", "invalidated", "deprecated"]
+      "enum": [
+        "unvalidated",
+        "validating",
+        "validated",
+        "invalidated",
+        "deprecated"
+      ]
     },
     "risk_if_wrong": {
       "type": "string",
-      "enum": ["high", "medium", "low"]
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
     },
     "related_requirements": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

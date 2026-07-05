@@ -1,149 +1,149 @@
-# Критерии успеха: Requirements as Code Kit
+# Success Criteria: Requirements as Code Kit
 
-> Версия: 0.1 | Дата: 2026-03-29
-> Цель: оценить эффективность подхода Requirements as Code при работе с AI Coding Agents
-
----
-
-## 1. Понимание требований агентом (Agent Comprehension)
-
-**Что проверяем:** способен ли AI-агент найти, прочитать и правильно интерпретировать требования из vault.
-
-| # | Критерий | Как измерить | Целевое значение |
-|---|----------|-------------|-----------------|
-| 1.1 | Агент находит нужный TASK и связанный FR без ручного указания пути | Дать агенту только ID задачи — проверить, нашёл ли он FR, US, ADR | 100% случаев |
-| 1.2 | Агент правильно извлекает Acceptance Criteria из markdown body | Сравнить список AC, извлечённых агентом, с эталонным | ≥95% AC корректно извлечены |
-| 1.3 | Агент учитывает секцию "Out of Scope" и не реализует лишнее | Проверить, нет ли в коде функциональности, явно исключённой в FR | 0 нарушений out-of-scope |
-| 1.4 | Агент читает и применяет ADR-ограничения | Дать задачу с привязанным ADR — проверить соблюдение архитектурного решения | 100% ADR-constraint соблюдены |
-| 1.5 | Агент использует glossary для именования в коде | Проверить имена функций/классов на соответствие `code_name` из глоссария | ≥90% совпадений |
+> Version: 0.1 | Date: 2026-03-29
+> Goal: evaluate the effectiveness of the Requirements as Code approach when working with AI Coding Agents
 
 ---
 
-## 2. Качество генерируемого кода (Output Quality)
+## 1. Agent Comprehension
 
-**Что проверяем:** приводит ли структурированность требований к более качественному коду по сравнению с ad-hoc промптами.
+**What we check:** whether the AI agent is able to find, read, and correctly interpret requirements from the vault.
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 2.1 | Покрытие Acceptance Criteria в коде | % AC из US, для которых есть соответствующая реализация | ≥95% |
-| 2.2 | Покрытие AC автотестами | % AC, для которых агент написал тесты | ≥90% |
-| 2.3 | Снижение количества итераций доработки | Сколько циклов "ревью → правка" до принятия PR (сравнить с baseline без kit) | ≤2 итерации (vs 4-5 без kit) |
-| 2.4 | Соответствие архитектурным ограничениям | % сгенерированного кода, соответствующего ADR и architecture-overview | ≥95% |
-| 2.5 | Отсутствие "галлюцинаций" в реализации | Количество функций/endpoints, которых нет в требованиях | 0 непрошенных additions |
+| 1.1 | Agent finds the relevant TASK and linked FR without a manually specified path | Give the agent only the task ID — check whether it found the FR, US, ADR | 100% of cases |
+| 1.2 | Agent correctly extracts Acceptance Criteria from the markdown body | Compare the list of AC extracted by the agent against the reference | ≥95% of AC extracted correctly |
+| 1.3 | Agent respects the "Out of Scope" section and does not implement extra functionality | Check whether the code contains functionality explicitly excluded in the FR | 0 out-of-scope violations |
+| 1.4 | Agent reads and applies ADR constraints | Give a task with a linked ADR — check that the architectural decision is respected | 100% of ADR constraints respected |
+| 1.5 | Agent uses the glossary for naming in the code | Check function/class names against `code_name` from the glossary | ≥90% matches |
 
 ---
 
-## 3. Трассируемость (Traceability)
+## 2. Output Quality
 
-**Что проверяем:** сохраняется ли цепочка связей BRQ → [CTRL →] Epic → FR ↔ US → Task → Code → Test (FR и US — peer-level, связаны через `delivers`/`delivered_by`).
+**What we check:** whether the structured requirements lead to higher-quality code compared to ad-hoc prompts.
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 3.1 | Отсутствие осиротевших артефактов | `check-orphans.py` после полного цикла реализации | 0 orphans |
-| 3.2 | Агент обновляет `implemented_by` в FR после реализации | Проверить, добавил ли агент ссылки на файлы в FR frontmatter | 100% реализованных FR обновлены |
-| 3.3 | Агент обновляет статусы (TASK → done, FR → implemented) | `check-status-transitions.py` после реализации | 0 нарушений state machine |
-| 3.4 | Traceability map генерируется без ошибок | `generate-traceability.py` выполняется успешно | 0 broken links |
-| 3.5 | Каждый тест привязан к конкретным AC-N | Проверить, что TEST-файлы ссылаются на конкретные AC | 100% тестов имеют AC-привязку |
+| 2.1 | Acceptance Criteria coverage in the code | % of AC from the US that have a corresponding implementation | ≥95% |
+| 2.2 | AC coverage by automated tests | % of AC for which the agent wrote tests | ≥90% |
+| 2.3 | Reduction in the number of rework iterations | How many "review → fix" cycles until PR acceptance (compared to the baseline without the kit) | ≤2 iterations (vs 4-5 without the kit) |
+| 2.4 | Compliance with architectural constraints | % of generated code that conforms to the ADR and architecture-overview | ≥95% |
+| 2.5 | No "hallucinations" in the implementation | Number of functions/endpoints that are not in the requirements | 0 unrequested additions |
 
 ---
 
-## 4. Кросс-агентная совместимость (Cross-Agent Portability)
+## 3. Traceability
 
-**Что проверяем:** одинаково ли хорошо работают разные агенты с одним и тем же vault.
+**What we check:** whether the chain of links BRQ → [CTRL →] Epic → FR ↔ US → Task → Code → Test is preserved (FR and US are peer-level, linked via `delivers`/`delivered_by`).
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 4.1 | Все 4 агента успешно находят и читают требования | Один и тот же TASK — дать каждому агенту | 4/4 агента успешно |
-| 4.2 | Результаты реализации сопоставимы | Сравнить покрытие AC между агентами на одной задаче | Разброс ≤10% |
-| 4.3 | Instruction files достаточны без дополнительных промптов | Агент работает только на основе CLAUDE.md / instructions.md / etc. | Не требуется ручной промпт |
-| 4.4 | Валидационные скрипты работают с выходом каждого агента | Запустить validate + check-orphans после каждого агента | 0 ошибок валидации |
+| 3.1 | No orphaned artifacts | `check-orphans.py` after a full implementation cycle | 0 orphans |
+| 3.2 | Agent updates `implemented_by` in the FR after implementation | Check whether the agent added file references to the FR frontmatter | 100% of implemented FR updated |
+| 3.3 | Agent updates statuses (TASK → done, FR → implemented) | `check-status-transitions.py` after implementation | 0 state machine violations |
+| 3.4 | Traceability map generates without errors | `generate-traceability.py` runs successfully | 0 broken links |
+| 3.5 | Each test is linked to specific AC-N | Check that TEST files reference specific AC | 100% of tests have an AC link |
 
 ---
 
-## 5. Эффективность процесса (Process Efficiency)
+## 4. Cross-Agent Portability
 
-**Что проверяем:** экономит ли kit время и усилия по сравнению с работой без него.
+**What we check:** whether different agents work equally well with the same vault.
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 5.1 | Время от задачи до рабочего PR | Замерить wall-clock time для задач с kit vs без | Сокращение ≥30% |
-| 5.2 | Объём ручного вмешательства (human-in-the-loop) | Количество ручных корректировок промпта/кода за задачу | ≤3 вмешательства на задачу |
-| 5.3 | Время онбординга нового проекта | Сколько минут от клонирования kit до первого валидного FR | ≤30 минут |
-| 5.4 | Переиспользуемость промптов из agent-prompts.md | % промптов, которые работают без модификации | ≥80% |
-| 5.5 | Стоимость токенов на задачу | Суммарные input+output tokens на реализацию одного TASK | Снижение ≥20% vs ad-hoc |
+| 4.1 | All 4 agents successfully find and read the requirements | The same TASK — give it to each agent | 4/4 agents successful |
+| 4.2 | Implementation results are comparable | Compare AC coverage across agents on the same task | Spread ≤10% |
+| 4.3 | Instruction files are sufficient without additional prompts | Agent works solely on the basis of CLAUDE.md / instructions.md / etc. | No manual prompt required |
+| 4.4 | Validation scripts work with the output of each agent | Run validate + check-orphans after each agent | 0 validation errors |
 
 ---
 
-## 6. Масштабируемость (Scalability)
+## 5. Process Efficiency
 
-**Что проверяем:** работает ли подход при росте количества требований.
+**What we check:** whether the kit saves time and effort compared to working without it.
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 6.1 | Валидационные скрипты работают при 100-500 FR | Время выполнения `validate-frontmatter.py` на полном vault | ≤30 секунд |
-| 6.2 | Агент не теряет контекст при большом vault | Точность навигации агента при 200+ артефактах | Деградация ≤5% vs малый vault |
-| 6.3 | Traceability map остаётся читаемой | `generate-traceability.py` на 500 артефактах — человек может ориентироваться | Субъективная оценка: ≥7/10 |
-| 6.4 | Время поиска нужного FR агентом при большом vault | Замерить от запроса до нахождения правильного FR | ≤10 секунд |
+| 5.1 | Time from task to a working PR | Measure wall-clock time for tasks with the kit vs without | Reduction ≥30% |
+| 5.2 | Amount of manual intervention (human-in-the-loop) | Number of manual prompt/code corrections per task | ≤3 interventions per task |
+| 5.3 | Onboarding time for a new project | How many minutes from cloning the kit to the first valid FR | ≤30 minutes |
+| 5.4 | Reusability of prompts from agent-prompts.md | % of prompts that work without modification | ≥80% |
+| 5.5 | Token cost per task | Total input+output tokens to implement one TASK | Reduction ≥20% vs ad-hoc |
 
 ---
 
-## 7. Качество самих требований (Requirements Quality)
+## 6. Scalability
 
-**Что проверяем:** помогает ли структура kit писать более качественные требования.
+**What we check:** whether the approach works as the number of requirements grows.
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 7.1 | Полнота frontmatter | % обязательных полей, заполненных корректно | 100% required fields |
-| 7.2 | Каждый FR доставлен хотя бы одним US с ≥1 AC | Проверить, что каждый FR имеет `delivered_by` → US, и каждый US содержит AC в markdown body | 100% FR имеют связанный US с AC |
-| 7.3 | AC являются тестируемыми (Given/When/Then) | Ревью формата AC — все ли содержат конкретные условия | ≥90% AC тестируемы |
-| 7.4 | Отсутствие дублирования требований | Семантический анализ FR на пересечения | 0 дубликатов |
-| 7.5 | Валидация схем проходит | `validate-frontmatter.py` на всём vault | 0 schema violations |
+| 6.1 | Validation scripts work with 100-500 FR | Execution time of `validate-frontmatter.py` on a full vault | ≤30 seconds |
+| 6.2 | Agent does not lose context with a large vault | Agent navigation accuracy with 200+ artifacts | Degradation ≤5% vs a small vault |
+| 6.3 | Traceability map remains readable | `generate-traceability.py` on 500 artifacts — a human can navigate it | Subjective rating: ≥7/10 |
+| 6.4 | Time for the agent to find the relevant FR in a large vault | Measure from query to finding the correct FR | ≤10 seconds |
+
+---
+
+## 7. Requirements Quality
+
+**What we check:** whether the kit's structure helps write higher-quality requirements.
+
+| # | Criterion | How to measure | Target value |
+|---|----------|-------------|-----------------|
+| 7.1 | Frontmatter completeness | % of required fields filled in correctly | 100% required fields |
+| 7.2 | Each FR is delivered by at least one US with ≥1 AC | Check that each FR has `delivered_by` → US, and each US contains AC in the markdown body | 100% of FR have a linked US with AC |
+| 7.3 | AC are testable (Given/When/Then) | Review the AC format — whether all contain specific conditions | ≥90% of AC testable |
+| 7.4 | No duplication of requirements | Semantic analysis of FR for overlaps | 0 duplicates |
+| 7.5 | Schema validation passes | `validate-frontmatter.py` on the entire vault | 0 schema violations |
 
 ---
 
 ## 8. Adoption & Developer Experience
 
-**Что проверяем:** насколько легко и приятно использовать kit на практике.
+**What we check:** how easy and pleasant the kit is to use in practice.
 
-| # | Критерий | Как измерить | Целевое значение |
+| # | Criterion | How to measure | Target value |
 |---|----------|-------------|-----------------|
-| 8.1 | README достаточен для самостоятельного старта | Пользователь без подготовки создаёт первый FR по шаблону | Успех с первой попытки |
-| 8.2 | Шаблоны понятны и не требуют объяснений | Опрос: "Понятно ли, что заполнять?" | ≥8/10 |
-| 8.3 | Obsidian-совместимость | Vault открывается в Obsidian, ссылки работают, граф отображается | 100% ссылок рабочие |
-| 8.4 | Git-friendliness | Diff-ы читаемы, merge conflicts минимальны | Субъективная оценка: ≥8/10 |
-| 8.5 | Документация покрывает edge cases | Есть ответы на "а что если..." (нет ADR, нет теста, зависимость не готова) | ≥80% типовых вопросов покрыты |
+| 8.1 | README is sufficient for a self-guided start | An unprepared user creates their first FR from the template | Success on the first attempt |
+| 8.2 | Templates are clear and require no explanation | Survey: "Is it clear what to fill in?" | ≥8/10 |
+| 8.3 | Obsidian compatibility | Vault opens in Obsidian, links work, the graph renders | 100% of links working |
+| 8.4 | Git-friendliness | Diffs are readable, merge conflicts are minimal | Subjective rating: ≥8/10 |
+| 8.5 | Documentation covers edge cases | There are answers to "what if..." (no ADR, no test, dependency not ready) | ≥80% of common questions covered |
 
 ---
 
-## Методика оценки
+## Evaluation Methodology
 
-### Baseline-эксперимент
+### Baseline experiment
 
-Для объективной оценки критериев из групп 2 и 5 необходим **A/B эксперимент**:
+An objective evaluation of the criteria in groups 2 and 5 requires an **A/B experiment**:
 
-- **Группа A (control):** AI-агент получает задачу в виде текстового описания в промпте (ad-hoc подход).
-- **Группа B (treatment):** AI-агент работает с тем же заданием, но через vault с полной цепочкой требований.
-- **Задачи:** 5-10 типовых TASK разной сложности (CRUD, интеграция, бизнес-логика).
-- **Метрики:** покрытие AC, количество итераций, время, стоимость токенов.
+- **Group A (control):** the AI agent receives the task as a text description in the prompt (ad-hoc approach).
+- **Group B (treatment):** the AI agent works on the same task, but through a vault with a full chain of requirements.
+- **Tasks:** 5-10 typical TASKs of varying complexity (CRUD, integration, business logic).
+- **Metrics:** AC coverage, number of iterations, time, token cost.
 
 ### Scoring
 
-Для каждого критерия:
+For each criterion:
 
-- **Pass** — целевое значение достигнуто
-- **Partial** — результат в пределах 70-99% от целевого
-- **Fail** — результат ниже 70% от целевого
+- **Pass** — the target value is achieved
+- **Partial** — the result is within 70-99% of the target
+- **Fail** — the result is below 70% of the target
 
-**Общая оценка kit:** % критериев со статусом Pass. Целевой порог для production-ready: ≥75% Pass, 0 Fail в группах 1 и 3 (понимание и трассируемость — критичны).
+**Overall kit rating:** % of criteria with a Pass status. The target threshold for production-ready: ≥75% Pass, 0 Fail in groups 1 and 3 (comprehension and traceability are critical).
 
 ---
 
-## Приоритизация
+## Prioritization
 
-Если ресурсы ограничены, проверять в первую очередь:
+If resources are limited, check first:
 
-1. **Группа 1** (Agent Comprehension) — если агент не понимает требования, всё остальное не имеет смысла
-2. **Группа 3** (Traceability) — ключевое преимущество подхода, без него kit = просто шаблоны
-3. **Группа 2** (Output Quality) — конечная цель, ради которой всё затевается
-4. **Группа 4** (Cross-Agent) — подтверждение универсальности
-5. Остальные группы — по мере зрелости kit
+1. **Group 1** (Agent Comprehension) — if the agent does not understand the requirements, nothing else matters
+2. **Group 3** (Traceability) — the key advantage of the approach; without it, the kit is just templates
+3. **Group 2** (Output Quality) — the ultimate goal that everything is aimed at
+4. **Group 4** (Cross-Agent) — confirmation of universality
+5. The remaining groups — as the kit matures

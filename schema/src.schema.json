@@ -4,7 +4,12 @@
   "title": "Source Document frontmatter schema",
   "description": "Schema for SRC artifacts — passive reference documents (regulations, strategies, policies, standards, contracts) from which BRQ and CON are extracted. SRC is not a managed artifact: it has no lifecycle statuses, no ownership within the team, and does not participate in the obligation stack. It exists so that BRQ/CON can reference it via source_ref. Lives in 01-product/sources/ as a flat folder with category classification in frontmatter.",
   "type": "object",
-  "required": ["id", "title", "category", "updated"],
+  "required": [
+    "id",
+    "title",
+    "category",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -18,7 +23,13 @@
     },
     "category": {
       "type": "string",
-      "enum": ["regulation", "strategy", "policy", "standard", "contract"],
+      "enum": [
+        "regulation",
+        "strategy",
+        "policy",
+        "standard",
+        "contract"
+      ],
       "description": "Classification of the source document by origin type"
     },
     "version": {
@@ -27,7 +38,12 @@
     },
     "status": {
       "type": "string",
-      "enum": ["in_force", "adopted", "draft", "proposed"],
+      "enum": [
+        "in_force",
+        "adopted",
+        "draft",
+        "proposed"
+      ],
       "description": "Current status of the source document (not an artifact lifecycle — an objective property of the source itself)"
     },
     "publication_date": {
@@ -56,7 +72,9 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "updated": {
       "type": "string",
@@ -64,5 +82,5 @@
       "description": "Date of last update to this markdown file (YYYY-MM-DD)"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

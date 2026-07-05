@@ -1,7 +1,6 @@
 ---
 id: VISION-DBP-001
 title: Digital Battery Passport Accelerator Vision
-type: vision
 status: approved
 owner: "@pm"
 domain: all

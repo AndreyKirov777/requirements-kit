@@ -27,10 +27,10 @@ Guidance for the implementing agent: approach, constraints, patterns to follow.
 
 # Acceptance Criteria Covered
 
-This task covers the following acceptance criteria from [[US-XXX-000]]:
-
-- **AC-1**: (copy the criterion here for quick reference)
-- **AC-2**: …
+The AC IDs this task covers are listed in `acceptance_criteria_subset` in the
+frontmatter (e.g., `[AC-1, AC-2]`). Read the full criterion text from the parent
+User Story [[US-XXX-000]] — do not copy AC text here, it drifts when the US is
+edited. (`scripts/assemble-context.py TASK-XXX-000` inlines the AC text for you.)
 
 # Done Checklist
 

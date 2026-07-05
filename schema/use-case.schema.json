@@ -4,10 +4,20 @@
   "title": "Use case frontmatter schema",
   "description": "Schema for UC artifacts",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "owner", "domain", "updated"],
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "domain",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,28 +29,46 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "deprecated"]
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "deprecated"
+      ]
     },
     "priority": {
       "type": "string",
-      "enum": ["critical", "high", "medium", "low"]
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
     },
     "actors": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "related_requirements": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "related_epics": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

@@ -1,18 +1,32 @@
 #!/usr/bin/env python3
 """
-Validate that artifact statuses are consistent with the defined state machine.
-Checks current status validity and cross-references parent/child status consistency.
+Validate artifact statuses against the state machine defined in kit-manifest.json.
+
+Two modes:
+
+  Default (snapshot) — checks that every artifact's *current* status is a valid
+  status for its type, and that parent/child statuses are mutually consistent.
+
+  --git (transition) — the honest transition gate. For files changed since a base
+  git ref, it reads the OLD status from git and the NEW status from the working
+  tree and verifies the change is an allowed edge in the transition graph
+  (e.g., draft → approved skipping proposed is rejected). Requires a git repo.
 
 Usage:
     python scripts/check-status-transitions.py [--path PATH]
+    python scripts/check-status-transitions.py --git [--git-base REF]   # in CI
 
 Requires: pip install pyyaml
 """
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kit_manifest import load_manifest, valid_statuses, transitions
 
 try:
     import yaml
@@ -23,37 +37,15 @@ except ImportError:
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 WIKILINK_RE = re.compile(r"\[\[([^\]]+)\]\]")
 
-# Valid statuses per artifact type prefix
-VALID_STATUSES = {
-    "FR": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
-    "NFR": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
-    "CON": {"draft", "proposed", "approved", "deprecated"},
-    "US": {"draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"},
-    "EPIC": {"draft", "proposed", "approved", "in-progress", "completed", "deprecated"},
-    "ADR": {"proposed", "accepted", "rejected", "superseded", "deprecated"},
-    "TASK": {"backlog", "ready", "in-progress", "done", "blocked"},
-    "TEST": {"draft", "ready", "passed", "failed"},
-    "CR": {"proposed", "approved", "applied", "rejected"},
-    "PERSONA": {"draft", "proposed", "approved", "deprecated"},
-    "ASSUM": {"unvalidated", "validating", "validated", "invalidated", "deprecated"},
-    "JOURNEY": {"draft", "proposed", "approved", "deprecated"},
-    "RISK": {"open", "mitigating", "mitigated", "accepted", "closed"},
-    "REL": {"planned", "ready", "released", "rolled-back"},
-    "UC": {"draft", "proposed", "approved", "deprecated"},
-    "CONTRACT": {"draft", "proposed", "approved", "deprecated"},
-    "DM": {"draft", "proposed", "approved", "deprecated"},
-    "VISION": {"draft", "proposed", "approved", "superseded", "deprecated"},
-    "BRQ": {"identified", "analyzed", "approved", "allocated", "covered", "deprecated"},
-    "BR": {"draft", "proposed", "approved", "deprecated"},
-    "CTRL": {"identified", "defined", "allocated", "implemented", "verified", "audited", "deprecated"},
-}
+_MANIFEST = load_manifest()
+VALID_STATUSES = valid_statuses(_MANIFEST)          # {prefix: set(statuses)}
+TRANSITIONS = transitions(_MANIFEST)                # {prefix: {from: [to,...]}}
 
-# Status ordering for consistency checks
+# Ordering used only for the parent/child consistency heuristic.
 REQ_STATUS_ORDER = ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"]
 
 
-def extract_frontmatter(filepath: Path) -> dict | None:
-    text = filepath.read_text(encoding="utf-8")
+def extract_frontmatter_text(text: str) -> dict | None:
     match = FRONTMATTER_RE.match(text)
     if not match:
         return None
@@ -61,6 +53,10 @@ def extract_frontmatter(filepath: Path) -> dict | None:
         return yaml.safe_load(match.group(1))
     except yaml.YAMLError:
         return None
+
+
+def extract_frontmatter(filepath: Path) -> dict | None:
+    return extract_frontmatter_text(filepath.read_text(encoding="utf-8"))
 
 
 def extract_ids(value) -> list[str]:
@@ -74,12 +70,13 @@ def extract_ids(value) -> list[str]:
     return ids
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Check status transitions")
-    parser.add_argument("--path", default=".", help="Root of requirements vault")
-    args = parser.parse_args()
+def prefix_of(aid: str) -> str:
+    return aid.split("-")[0]
 
-    root = Path(args.path)
+
+# ─── Snapshot checks ─────────────────────────────────────────────────────────
+
+def run_snapshot_check(root: Path) -> list[str]:
     artifacts = {}
     issues = []
 
@@ -91,13 +88,11 @@ def main():
             continue
         artifacts[fm["id"]] = {"fm": fm, "path": md_file}
 
-    # Build computed reverse-link maps (v0.5.0: "link up only" principle).
-    # Test.verifies → requirement, Task.implements → requirement
-    verified_by_map = {}  # req_id -> [test_ids]
-    implemented_by_map = {}  # req_id -> [task_ids]
+    verified_by_map = {}
+    implemented_by_map = {}
     for aid_inner, info_inner in artifacts.items():
         fm_inner = info_inner["fm"]
-        prefix_inner = aid_inner.split("-")[0]
+        prefix_inner = prefix_of(aid_inner)
         if prefix_inner == "TEST":
             for vid in extract_ids(fm_inner.get("verifies", [])):
                 verified_by_map.setdefault(vid, []).append(aid_inner)
@@ -107,10 +102,9 @@ def main():
 
     for aid, info in artifacts.items():
         fm = info["fm"]
-        prefix = aid.split("-")[0]
+        prefix = prefix_of(aid)
         status = fm.get("status", "")
 
-        # Check valid status
         if prefix in VALID_STATUSES:
             if status not in VALID_STATUSES[prefix]:
                 issues.append(
@@ -118,7 +112,6 @@ def main():
                     f"allowed: {', '.join(sorted(VALID_STATUSES[prefix]))}"
                 )
 
-        # Cross-check: requirement is "implemented" but has tasks still "in-progress"
         if prefix in ("FR", "NFR") and status == "implemented":
             for task_id in implemented_by_map.get(aid, []):
                 if task_id in artifacts:
@@ -128,8 +121,6 @@ def main():
                             f"INCONSISTENT: {aid} is 'implemented' but {task_id} is '{task_status}'"
                         )
 
-        # Cross-check: requirement is "verified" but tests are not "passed"
-        # (computed from Test.verifies instead of deprecated FR.verified_by)
         if prefix in ("FR", "NFR") and status == "verified":
             for vid in verified_by_map.get(aid, []):
                 if vid in artifacts:
@@ -139,7 +130,6 @@ def main():
                             f"INCONSISTENT: {aid} is 'verified' but test {vid} is '{test_status}'"
                         )
 
-        # Cross-check: task is "ready" but parent requirement is not "approved" or beyond
         if prefix == "TASK":
             implements = extract_ids(fm.get("implements", ""))
             for req_id in implements:
@@ -151,6 +141,90 @@ def main():
                         issues.append(
                             f"PREMATURE: {aid} is '{status}' but parent {req_id} is only '{req_status}'"
                         )
+    return issues
+
+
+# ─── Transition (git) check ──────────────────────────────────────────────────
+
+def git(args: list[str], cwd: Path) -> str | None:
+    try:
+        out = subprocess.run(
+            ["git", *args], cwd=cwd, capture_output=True, text=True, check=False
+        )
+    except FileNotFoundError:
+        return None
+    if out.returncode != 0:
+        return None
+    return out.stdout
+
+
+def run_transition_check(root: Path, base_ref: str) -> tuple[list[str], bool]:
+    """Returns (issues, ran). ran=False means git was unavailable → skipped."""
+    issues = []
+
+    # Confirm we're in a git repo
+    if git(["rev-parse", "--is-inside-work-tree"], root) is None:
+        return ["(git not available or not a git repo — transition check skipped)"], False
+
+    changed = git(["diff", "--name-only", base_ref, "--", "*.md"], root)
+    if changed is None:
+        return [f"(could not diff against '{base_ref}' — transition check skipped)"], False
+
+    for rel in [line.strip() for line in changed.splitlines() if line.strip().endswith(".md")]:
+        path = root / rel
+        if not path.exists():
+            continue  # deleted file
+        if "templates" in Path(rel).parts:
+            continue
+
+        new_fm = extract_frontmatter(path)
+        if not new_fm or "id" not in new_fm:
+            continue
+        aid = new_fm["id"]
+        prefix = prefix_of(aid)
+        if prefix not in TRANSITIONS or not TRANSITIONS[prefix]:
+            continue  # no lifecycle (e.g., SRC)
+
+        old_text = git(["show", f"{base_ref}:{rel}"], root)
+        if old_text is None:
+            continue  # newly added file — no prior status to compare
+        old_fm = extract_frontmatter_text(old_text)
+        if not old_fm:
+            continue
+        old_status = old_fm.get("status")
+        new_status = new_fm.get("status")
+        if not old_status or not new_status or old_status == new_status:
+            continue
+
+        allowed = TRANSITIONS[prefix].get(old_status, [])
+        if new_status not in allowed:
+            allowed_str = ", ".join(allowed) if allowed else "(terminal — no transitions)"
+            issues.append(
+                f"ILLEGAL TRANSITION: {aid} changed '{old_status}' → '{new_status}'. "
+                f"Allowed from '{old_status}': {allowed_str}"
+            )
+    return issues, True
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Check status transitions")
+    parser.add_argument("--path", default=".", help="Root of requirements vault")
+    parser.add_argument("--git", action="store_true", help="Validate status *transitions* against git history (honest gate)")
+    parser.add_argument("--git-base", default="HEAD", help="Git ref to diff against (default: HEAD)")
+    args = parser.parse_args()
+
+    root = Path(args.path)
+    issues = run_snapshot_check(root)
+
+    ran_transition = True
+    if args.git:
+        t_issues, ran_transition = run_transition_check(root, args.git_base)
+        if ran_transition:
+            issues.extend(t_issues)
+        else:
+            # Skipped (no git) — surface as a note, not a failure.
+            for note in t_issues:
+                print(f"  ℹ {note}")
 
     if issues:
         print(f"\n{'='*60}")
@@ -161,7 +235,7 @@ def main():
         print()
         sys.exit(1)
     else:
-        print(f"\n✓ All statuses valid and consistent. Checked {len(artifacts)} artifacts.")
+        print("\n✓ All statuses valid and consistent.")
         sys.exit(0)
 
 

@@ -1,65 +1,44 @@
 ---
 id: NFR-SEC-001
-title: Data encryption at rest
-type: non-functional-requirement
+title: Encrypt battery passport data at rest
 status: proposed
 priority: critical
 owner: "@techlead"
 domain: SEC
 quality_attribute: security
-component: [encryption]
-source_docs: []
-related_adrs: []
+parent_epic: "[[EPIC-INGEST-001]]"
+derives_from:
+  - "[[CTRL-SEC-001]]"
 depends_on: []
-implemented_by: []
-verified_by: []
-release_target: 2026-Q3
-risk: high
-tags: [nfr, security, encryption]
+measurement_method: Security audit of storage configuration plus infrastructure scanning for unencrypted volumes
+target_value: 100% of data at rest encrypted with AES-256; master keys rotated at least annually
 updated: 2026-03-28
 ---
 
 # Summary
-Encryption at rest protects sensitive battery passport data from unauthorized disclosure in the event of physical storage compromise, theft, or unauthorized access. This is a foundational security control mandated by EU 2023/1542 and industry best practices.
+
+Battery passport data at rest must be encrypted so that a physical storage compromise does not disclose proprietary manufacturer data or personal data protected under EU 2023/1542.
 
 # Context
-Battery passport data includes proprietary information from manufacturers (composition, sourcing, performance characteristics) and personal information about users and authorities. Confidential data as defined by regulation must be stored separately with independent access controls to prevent cross-tier exposure.
+
+Passport data includes proprietary manufacturer information and personal data about users and authorities. Confidential data must be protected independently of the application layer.
 
 # Requirement Statement
-All battery passport data at rest shall be encrypted using AES-256. Confidential data (per regulation) shall be stored in a separate secure storage partition with independent access controls.
+
+All battery passport data at rest shall be encrypted using AES-256, and confidential data shall reside in a storage partition with independent access controls.
 
 # Measurement
-- Encryption algorithm and key size verification via security audit
-- Key management compliance check (key rotation, storage, access logging)
-- Separation of confidential and non-confidential data partitions verified through infrastructure code review
+
+Encryption algorithm and key size are verified via security audit; key rotation and access logging are checked against the key-management policy; partition separation is verified through infrastructure-as-code review.
 
 # Target
-- 100% of data at rest encrypted with AES-256
-- Key rotation policy: rotate master keys annually; rotate data keys on schedule or after compromise
-- All encryption key access logged and auditable
 
-# Conditions
-Applies to:
-- All persistent storage (databases, data lakes, backups, archives)
-- Temporary caches (if any retain sensitive data for >1 hour)
-- Snapshots and replicas of encrypted data
-
-Does NOT require in-flight encryption (covered by separate TLS/mTLS requirements).
+100% of data at rest encrypted with AES-256; master keys rotated at least annually; all key access logged and auditable.
 
 # Verification
-- Annual penetration testing targeting data at rest
-- Key management audit by internal security team or third party
-- Compliance certification (SOC 2, ISO 27001)
-- Infrastructure scanning to detect unencrypted storage
 
-# Risks
-If this requirement is not met:
-- Regulatory non-compliance with EU 2023/1542
-- Potential data breach exposure if storage is compromised
-- Loss of user and manufacturer trust
-- Legal and financial penalties
+Annual penetration testing targeting data at rest, key-management audit, and infrastructure scanning to detect unencrypted storage.
 
 # Open Questions
-- Are there performance implications of AES-256 vs. AES-128 or hardware-accelerated encryption?
-- How often should data encryption keys be rotated vs. master keys?
-- Should we support customer-managed encryption keys (CMEK) for future flexibility?
+
+- Should the platform support customer-managed encryption keys (CMEK) for future flexibility?

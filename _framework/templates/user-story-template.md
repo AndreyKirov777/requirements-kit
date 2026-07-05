@@ -46,8 +46,3 @@ This user story delivers the following functional requirements:
 # Notes
 
 Additional context, screenshots, or references.
-
-# Links
-
-- Epic: [[EPIC-XXX-000]]
-- Persona: [[PERSONA-XXX-000]]

@@ -38,9 +38,3 @@ Explain the value to users or the business.
 # Open Questions
 
 - ...
-
-# Links
-
-- Epic: [[EPIC-XXX-000]]
-- ADR:
-- Tests:

@@ -71,8 +71,3 @@ Brief description of what this API/interface does and who consumes it.
 | --------- | --------------- |
 | Latency   | p95 < 300 ms    |
 | Availability | 99.9%        |
-
-# Links
-
-- Requirement: [[FR-XXX-000]]
-- ADR: [[ADR-XXX-000]]

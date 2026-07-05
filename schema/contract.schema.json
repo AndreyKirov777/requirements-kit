@@ -4,10 +4,21 @@
   "title": "API contract frontmatter schema",
   "description": "Schema for CONTRACT artifacts",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "owner", "domain", "protocol", "updated"],
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "domain",
+    "protocol",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,28 +30,48 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "deprecated"]
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "deprecated"
+      ]
     },
     "protocol": {
       "type": "string",
-      "enum": ["REST", "gRPC", "Event", "GraphQL", "WebSocket", "Other"]
+      "enum": [
+        "REST",
+        "gRPC",
+        "Event",
+        "GraphQL",
+        "WebSocket",
+        "Other"
+      ]
     },
     "component": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "related_requirements": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "related_adrs": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

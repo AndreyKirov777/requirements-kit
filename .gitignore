@@ -17,3 +17,10 @@ __pycache__/
 
 # Migration reports (generated, not committed)
 migration-report.md
+
+# Scratch / transient
+_temp/
+*.test
+
+# Obsidian plugin snapshot data (local to each user)
+.snapshots/

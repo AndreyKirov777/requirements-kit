@@ -1,7 +1,7 @@
 ---
 id: META-TRACEABILITY
 title: Auto-Generated Traceability Map
-updated: 2026-03-29
+updated: 2026-07-04
 ---
 
 # Traceability Map
@@ -21,6 +21,18 @@ Status: `approved`
 Status: `approved`
 
 
+### [[PERSONA-DBP-002]] — Integration Engineer Ravi
+Status: `approved`
+
+
+## JOURNEY
+
+### [[JOURNEY-DBP-001]] — Economic operator submits battery data for the first time
+Status: `approved`
+
+- **persona**: [[PERSONA-DBP-002]]
+- **related_requirements**: [[FR-INGEST-001]]
+
 ## ASSUM
 
 ### [[ASSUM-DBP-001]] — Economic operator provides all battery data
@@ -39,35 +51,64 @@ Status: `proposed`
 ### [[US-INGEST-001]] — Submit static battery data via REST API
 Status: `proposed`
 
+- **parent_epic**: [[EPIC-INGEST-001]]
+- **delivers**: [[FR-INGEST-001]]
 - **persona**: [[PERSONA-DBP-002]]
 
 ## FR
 
 ### [[FR-INGEST-001]] — Ingest static battery data via REST API
-Status: `proposed`
+Status: `approved`
 
-- **source_docs**: [[EPIC-INGEST-001]]
-- **verified_by**: [[TEST-INGEST-001]]
+- **derives_from**: [[BR-COMPLY-001]]
+- **parent_epic**: [[EPIC-INGEST-001]]
 
 ## NFR
 
-### [[NFR-SEC-001]] — Data encryption at rest
+### [[NFR-SEC-001]] — Encrypt battery passport data at rest
 Status: `proposed`
 
+- **derives_from**: [[CTRL-SEC-001]]
+- **parent_epic**: [[EPIC-INGEST-001]]
 
 ## CON
 
 ### [[CON-SEC-001]] — Legitimate-interest access rules pending implementing acts
 Status: `approved`
 
-- **source_docs**: [[VISION-DBP-001]]
+- **derives_from**: [[BRQ-SEC-001]]
+- **source_ref**: [[SRC-COMPLY-001#article-77]]
+
+## UC
+
+### [[UC-INGEST-001]] — Submit static battery data
+Status: `approved`
+
+- **related_epics**: [[EPIC-INGEST-001]]
+- **related_requirements**: [[FR-INGEST-001]]
 
 ## ADR
 
 ### [[ADR-INGEST-001]] — Use three-tier data architecture for battery passport data
 Status: `proposed`
 
-- **related_requirements**: [[FR-INGEST-001]], [[FR-INGEST-003]], [[FR-PASSPORT-001]]
+- **related_requirements**: [[FR-INGEST-001]]
+
+## CONTRACT
+
+### [[CONTRACT-INGEST-001]] — Static battery data ingestion REST API
+Status: `proposed`
+
+- **related_requirements**: [[FR-INGEST-001]]
+- **related_adrs**: [[ADR-INGEST-001]]
+
+## DM
+
+### [[DM-INGEST-001]] — Bronze-layer static battery record
+Status: `proposed`
+
+- **related_requirements**: [[FR-INGEST-001]]
+- **related_adrs**: [[ADR-INGEST-001]]
 
 ## TASK
 
@@ -75,6 +116,22 @@ Status: `proposed`
 Status: `backlog`
 
 - **implements**: [[FR-INGEST-001]]
+- **part_of_story**: [[US-INGEST-001]]
+
+## RISK
+
+### [[RISK-INGEST-001]] — Bronze-layer write throughput may not sustain bulk migration
+Status: `open`
+
+- **affects**: [[FR-INGEST-001]], [[EPIC-INGEST-001]]
+
+## REL
+
+### [[REL-DBP-001]] — DBP Accelerator 1.0 — Ingestion foundation
+Status: `planned`
+
+- **requirements_included**: [[FR-INGEST-001]], [[NFR-SEC-001]]
+- **epics_included**: [[EPIC-INGEST-001]]
 
 ## TEST
 
@@ -82,6 +139,13 @@ Status: `backlog`
 Status: `draft`
 
 - **verifies**: [[FR-INGEST-001]]
+- **covers_criteria**: [[AC-1]], [[AC-2]], [[AC-3]], [[AC-4]]
+
+### [[TEST-SEC-001]] — Verify encryption at rest and differentiated data access
+Status: `draft`
+
+- **verifies**: [[NFR-SEC-001]]
+- **verifies_control**: [[CTRL-SEC-001]]
 
 ## CR
 
@@ -94,11 +158,18 @@ Status: `proposed`
 
 These artifacts are not referenced by any other artifact:
 
-- [[ADR-INGEST-001]] — Use three-tier data architecture for battery passport data
+- [[ARCH-INGEST-001]] — Ingestion pipeline architecture
+- [[ARCH-OVERVIEW]] — DBP Accelerator — Architecture Overview
 - [[ASSUM-DBP-001]] — Economic operator provides all battery data
 - [[CON-SEC-001]] — Legitimate-interest access rules pending implementing acts
+- [[CONTRACT-INGEST-001]] — Static battery data ingestion REST API
 - [[CR-INGEST-001]] — Add batch ingestion support to static data endpoint
-- [[NFR-SEC-001]] — Data encryption at rest
+- [[DM-INGEST-001]] — Bronze-layer static battery record
+- [[JOURNEY-DBP-001]] — Economic operator submits battery data for the first time
 - [[PERSONA-DBP-001]] — Compliance Officer Clara
+- [[REL-DBP-001]] — DBP Accelerator 1.0 — Ingestion foundation
+- [[RISK-INGEST-001]] — Bronze-layer write throughput may not sustain bulk migration
 - [[TASK-INGEST-001]] — Implement REST API endpoint for static battery data ingestion
-- [[US-INGEST-001]] — Submit static battery data via REST API
+- [[TEST-INGEST-001]] — Verify static battery data ingestion via REST API
+- [[TEST-SEC-001]] — Verify encryption at rest and differentiated data access
+- [[UC-INGEST-001]] — Submit static battery data

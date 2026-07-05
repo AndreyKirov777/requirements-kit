@@ -43,8 +43,3 @@ What to do if the risk materializes despite mitigation.
 # Monitoring
 
 How do we detect early signs of this risk?
-
-# Links
-
-- Affected requirements: [[FR-XXX-000]]
-- Related ADR: [[ADR-XXX-000]]

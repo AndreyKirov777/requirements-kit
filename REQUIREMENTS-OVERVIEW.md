@@ -1,7 +1,7 @@
 ---
 id: META-KIT-OVERVIEW
 title: Requirements Kit — Live Overview
-updated: 2026-04-10
+updated: 2026-07-04
 ---
 
 # Requirements Kit — Live Overview
@@ -34,7 +34,7 @@ const folders = {
   "NFR":          '"02-requirements/nfr"',
   "ADR":          '"03-architecture/adr"',
   "Data Model":   '"03-architecture/data-model"',
-  "Contract":     '"03-architecture/integrations"',
+  "Contract":     '"03-architecture/contracts"',
   "Task":         '"04-delivery/tasks"',
   "CR":           '"04-delivery/change-requests"',
   "Risk":         '"04-delivery/risks"',
@@ -128,6 +128,7 @@ const typeMap = {
   "02-requirements/nfr":              "NFR",
   "03-architecture/adr":              "ADR",
   "03-architecture/data-model":       "DM",
+  "03-architecture/contracts":        "CONTRACT",
   "04-delivery/tasks":                "TASK",
   "04-delivery/change-requests":      "CR",
   "04-delivery/risks":                "RISK",
@@ -216,17 +217,33 @@ dv.table(
 
 ## 7 — Traceability Gaps
 
+> **Note:** The kit stores links **upward only** (child → parent). Reverse links (`verified_by`, `delivered_by`, `implemented_by`) are never written to frontmatter — the queries below compute them on the fly by scanning the child artifacts' up-links.
+
 ### 7a — FRs / NFRs missing verification
 
-Requirements that have no `verified_by` link — meaning no test covers them yet.
+Requirements that no TEST references in its `verifies` field — meaning no test covers them yet.
 
 ```dataviewjs
+// Collect requirement IDs verified by at least one TEST (computed reverse link)
+const extractIds = (val) => {
+  const arr = Array.isArray(val) ? val : (val ? [val] : []);
+  return arr
+    .map(v => String(v).match(/([A-Z]+-[A-Z0-9]+-[0-9]{3,})/))
+    .filter(m => m)
+    .map(m => m[1]);
+};
+
+const verified = new Set();
+for (const t of dv.pages('"05-quality/acceptance"').where(t => t.id)) {
+  for (const reqId of extractIds(t.verifies)) verified.add(reqId);
+}
+
 const pages = dv.pages('"02-requirements/fr" or "02-requirements/nfr"')
-  .where(p => p.id && (!p.verified_by || p.verified_by.length === 0))
+  .where(p => p.id && p.status !== "deprecated" && !verified.has(String(p.id)))
   .sort(p => p.id, "asc");
 
 if (pages.length === 0) {
-  dv.paragraph("✅ All FRs and NFRs have at least one verification link.");
+  dv.paragraph("✅ All FRs and NFRs are verified by at least one test.");
 } else {
   dv.table(
     ["ID", "Title", "Status", "Priority"],
@@ -287,6 +304,43 @@ if (pages.length === 0) {
       p.title || "",
       p.status || "—",
       p.assigned_to || "—",
+    ])
+  );
+}
+```
+
+### 7d — FRs without a delivering User Story
+
+FRs that no User Story references in its `delivers` field — the requirement has no carrier of acceptance criteria.
+
+```dataviewjs
+const extractIds = (val) => {
+  const arr = Array.isArray(val) ? val : (val ? [val] : []);
+  return arr
+    .map(v => String(v).match(/([A-Z]+-[A-Z0-9]+-[0-9]{3,})/))
+    .filter(m => m)
+    .map(m => m[1]);
+};
+
+const delivered = new Set();
+for (const us of dv.pages('"02-requirements/user-stories"').where(u => u.id)) {
+  for (const frId of extractIds(us.delivers)) delivered.add(frId);
+}
+
+const pages = dv.pages('"02-requirements/fr"')
+  .where(p => p.id && p.status !== "deprecated" && !delivered.has(String(p.id)))
+  .sort(p => p.id, "asc");
+
+if (pages.length === 0) {
+  dv.paragraph("✅ Every FR is delivered by at least one User Story.");
+} else {
+  dv.table(
+    ["ID", "Title", "Status", "Priority"],
+    pages.map(p => [
+      p.file.link,
+      p.title || "",
+      p.status || "—",
+      p.priority || "—",
     ])
   );
 }

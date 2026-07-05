@@ -4,10 +4,21 @@
   "title": "User Story frontmatter schema",
   "description": "Schema for US (User Story) artifacts",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "status", "priority", "owner", "domain", "persona", "updated"],
+  "required": [
+    "id",
+    "title",
+    "status",
+    "priority",
+    "owner",
+    "domain",
+    "persona",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,11 +30,24 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"]
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "in-implementation",
+        "implemented",
+        "verified",
+        "deprecated"
+      ]
     },
     "priority": {
       "type": "string",
-      "enum": ["critical", "high", "medium", "low"]
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ]
     },
     "owner": {
       "type": "string",
@@ -43,7 +67,9 @@
     },
     "delivers": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Wiki links to FRs that this story delivers"
     },
     "updated": {
@@ -51,5 +77,5 @@
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

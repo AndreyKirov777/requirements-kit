@@ -16,7 +16,6 @@ agent_instructions:
     - code-maps
     - contracts
     - data-models
-    - integrations
   approval_gate: human
   parseable_sections:
     - architecture_style

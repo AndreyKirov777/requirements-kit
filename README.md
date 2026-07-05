@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC 
 
-> **Version 1.6.2** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 2.1.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -27,19 +27,21 @@ All instruction files are domain-agnostic templates. Customize the placeholders 
 ## What is Inside
 
 - A vault folder structure with clear separation of concerns
+- `kit-manifest.json` — the single machine-readable registry of artifact types (prefix, folder, schema, tier, statuses, transition graph, up-links). Scripts and generators read it; nothing is hardcoded twice.
 - Ready-to-use templates for all artifact types (`_framework/templates/`)
 - One working example of each artifact type (`_examples/`) — uses DBP (Digital Battery Passport) as a sample project
-- JSON Schemas for all artifact types (`schema/`) — 25 schemas for frontmatter validation
-- Status transition rules (state machines) for all artifact types (`_framework/status-transitions.md`)
+- JSON Schemas for all artifact types (`schema/`) for frontmatter validation, with a closed field set (unknown fields are rejected; project-specific fields use an `x_` prefix)
+- Status transition rules (state machines) for all artifact types (`_framework/status-transitions.md`) — generated from the manifest by `scripts/generate-status-transitions.py`
 - A domain glossary and taxonomy starters (`00-meta/glossary/`, `00-meta/taxonomy/`)
 - An SDLC pipeline definition with stages and gates (`_framework/sdlc-pipeline.md`)
 - Validation scripts for CI integration (`scripts/`)
 - Agent prompts for each role in the AI SDLC (`scripts/agent-prompts.md`)
+- An always-loaded architecture rulebook (`03-architecture/architecture-rules.md`) — normative rules extracted from the `# Rules` sections of accepted ADRs by `scripts/generate-architecture-rules.py`, binding on every coding-agent task
 
 ## Quick Start
 
 1. Copy this folder into your repository (monorepo recommended).
-2. Configure agent instruction files — customize `CLAUDE.md` and/or the agent file for your tool.
+2. Configure agent instruction files — edit the canonical `docs/agent-instructions.md`, then run `python scripts/install-agent-files.py` to generate the per-tool files (`CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/…`, `.kiro/steering.md`). The root `CLAUDE.md` appears only after this step.
 3. Read `_framework/sdlc-pipeline.md` to understand the stages and gates.
 4. Update `00-meta/taxonomy/domains.md` with your project's domains and components.
 5. Update `00-meta/glossary/` with your domain terminology.
@@ -90,12 +92,13 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
   user-stories/              # US-* user stories
 
 03-architecture/                     # Design Space (HOW)
-  architecture-overview.md   # System-wide architecture (one per project)
+  architecture-overview.md   # System-wide architecture (create from the template; one per project)
+  architecture-rules.md      # GENERATED agent rulebook (from accepted ADRs) — do not edit
   ARCH-{DOMAIN}-{NNN}.md     # Domain-specific architecture documents
-  adr/                       # ADR-* architecture decision records
+  adr/                       # ADR-* architecture decision records (each carries a # Rules section)
   code-map/                  # Domain → source file mappings
-  contracts/                 # API and interface contracts
-  data-model/                # Data model definitions
+  contracts/                 # CONTRACT-* API and interface contracts
+  data-model/                # DM-* data model definitions
 
 04-delivery/
   tasks/                     # TASK-* implementation units for AI agents
@@ -105,13 +108,13 @@ _framework/                  # Kit infrastructure — do not edit (updated from 
 
 05-quality/
   acceptance/                # TEST-* test definitions
-  test-ideas/                # Exploratory test ideas
   traceability/              # Auto-generated traceability map, matrix, and chain reports
 
 99-attachments/              # Images, diagrams, reference docs
 
-schema/                      # JSON Schemas per artifact type
-scripts/                     # Validation scripts and agent prompts
+kit-manifest.json            # Single source of truth: artifact-type registry
+schema/                      # JSON Schemas per artifact type (closed field set)
+scripts/                     # Validation scripts, generators, and agent prompts
 docs/                        # Kit-level documentation
   success-criteria.md        # 37 success criteria for evaluating the kit
 
@@ -158,13 +161,31 @@ Domain codes are registered in `00-meta/taxonomy/domains.md`. IDs use three or m
 ## Core Principles
 
 1. **One requirement per file.** Atomic, linkable, diffable.
-2. **Every artifact links upstream and downstream.** [SRC →] BRQ → [BR →] [CTRL →] Epic → FR ↔ US → Task → Test. SRC (source documents), BRQ, BR, CTRL, and CON live in `01-product/` (the obligation stack: "why", domain rules, controls, and external forces). FR, NFR, US, and Epic live in `02-requirements/` (the system specification). FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`/`delivered_by`.
+2. **Every artifact links upstream.** Traceability has **two distinct dimensions** — do not conflate them:
+   - **Obligation chain** (why the system must do something): `SRC → BRQ → BR / CTRL —(derives_from)→ FR / NFR`. SRC (source documents), BRQ, BR, CTRL, and CON live in `01-product/` — the "why", domain rules, controls, and external forces.
+   - **Solution structure** (how the work is organized): `Epic ⊃ (FR ↔ US) → TASK → TEST`. FR, NFR, US, and Epic live in `02-requirements/`. An Epic is a *grouping* of solution-space work, not a link in the obligation chain. FR and US are peer-level: FR defines *what* the system shall do, US defines *for whom* and carries Acceptance Criteria. They link via `delivers`.
+
+   Links are stored **upward only** (child → parent). Reverse links (`implemented_by`, `verified_by`, `delivered_by`, …) are computed on the fly, never written to frontmatter.
 3. **Glossary-driven naming.** Domain terms map to code identifiers via the glossary.
 4. **Human gates at strategic points.** Vision, requirements, and architecture require human approval.
 5. **Structured acceptance criteria.** Use Given/When/Then format with AC-N identifiers.
-6. **Status transitions are enforced.** See `_framework/status-transitions.md`.
+6. **Status transitions are enforced.** Each artifact's status must be valid for its type, and each *change* to a `status` field must follow an allowed edge in the state machine. `check-status-transitions.py` validates current statuses and parent/child consistency; `check-status-transitions.py --git` compares old vs new status against the transition graph in CI and rejects state-skips (e.g., `draft → approved`). Both the graph and `_framework/status-transitions.md` are generated from `kit-manifest.json`.
 7. **Code-map bridges requirements to code.** AI agents find targets via `03-architecture/code-map/`.
 8. **Architecture has two levels.** `architecture-overview.md` describes the whole system; `ARCH-{DOMAIN}-*` files detail each domain.
+
+## Kit Manifest
+
+`kit-manifest.json` is the single machine-readable source of truth for the artifact-type registry. For every type it records the ID prefix, folder, schema file, tier, whether it has a managed lifecycle, its valid statuses, the allowed status-transition graph, and its up-link fields (with the target types each link may point to).
+
+Scripts read the manifest instead of hardcoding the registry, which is what previously caused drift:
+
+- `scripts/validate-frontmatter.py` — prefix → schema mapping
+- `scripts/check-status-transitions.py` — valid statuses and the transition graph
+- `scripts/generate-fileclasses.py` — folders, icons, and Metadata Menu fileClasses
+- `scripts/generate-status-transitions.py` — regenerates `_framework/status-transitions.md`
+- `scripts/assemble-context.py` — folder resolution and up-link traversal
+
+When you add or change an artifact type, edit `kit-manifest.json` and the corresponding schema, then re-run the generators. Project-specific frontmatter fields must be prefixed with `x_` so schema validation can reject typos in standard field names.
 
 ## AI Agent Roles
 
@@ -182,10 +203,18 @@ pip install pyyaml jsonschema
 
 python scripts/validate-frontmatter.py --path .
 python scripts/check-orphans.py --path .
-python scripts/check-status-transitions.py --path .
+python scripts/check-status-transitions.py --path .          # current-status + consistency
+python scripts/check-status-transitions.py --git --git-base origin/main   # transition gate (CI)
 python scripts/generate-traceability.py --path .
 python scripts/generate-traceability-matrix.py --path .
 python scripts/generate-trace-chains.py --path .
+
+# Generators (run after editing kit-manifest.json or schemas)
+python scripts/generate-status-transitions.py
+python scripts/generate-fileclasses.py
+
+# Assemble a full trace-chain context bundle for one task
+python scripts/assemble-context.py TASK-INGEST-001 --path .
 ```
 
 ## Git Workflow

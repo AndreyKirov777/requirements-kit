@@ -4,10 +4,21 @@
   "title": "Domain Architecture frontmatter schema",
   "description": "Schema for domain-specific Architecture artifacts (ARCH-{DOMAIN}-{NNN})",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "owner", "domain", "updated", "parent_overview"],
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "domain",
+    "updated",
+    "parent_overview"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,7 +30,12 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "deprecated"]
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "deprecated"
+      ]
     },
     "domain": {
       "type": "string",
@@ -32,27 +48,39 @@
     },
     "related_requirements": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "related_adrs": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "agent_instructions": {
       "type": "object",
       "properties": {
-        "next_stage": { "type": "string" },
+        "next_stage": {
+          "type": "string"
+        },
         "generates": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "approval_gate": { "type": "string" },
+        "approval_gate": {
+          "type": "string"
+        },
         "parseable_sections": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         }
       }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

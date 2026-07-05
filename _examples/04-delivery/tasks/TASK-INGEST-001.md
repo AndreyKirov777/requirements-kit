@@ -1,7 +1,6 @@
 ---
 id: TASK-INGEST-001
 title: Implement REST API endpoint for static battery data ingestion
-type: implementation-task
 status: backlog
 owner: "@techlead"
 assigned_to: ai-agent
@@ -12,9 +11,7 @@ target_files:
   - src/ingest/api/static-data-handler.ts
   - src/ingest/api/static-data-handler.test.ts
   - src/ingest/api/routes.ts
-depends_on_tasks: []
 estimated_complexity: medium
-release_target: 2026-Q3
 tags: [task, ingest]
 updated: 2026-03-28
 ---
@@ -41,11 +38,9 @@ Implement the REST API endpoint `POST /api/v1/batteries/{batteryId}/static-data`
 
 # Acceptance Criteria Covered
 
-From [[US-INGEST-001]]:
-
-- **AC-1**: Given valid static data payload and authenticated submitter, when POST endpoint is called, then data is persisted to `bronzeLayer` with HTTP 201 and ingestion receipt. `testable_by: integration`
-- **AC-2**: Given invalid or incomplete payload, when submitted, then HTTP 400 with validation errors. `testable_by: unit`
-- **AC-3**: Given unauthenticated request, when submitted, then HTTP 401. `testable_by: unit`
+Covers `AC-1, AC-2, AC-3` (see `acceptance_criteria_subset`). Read the full
+criterion text from the parent User Story [[US-INGEST-001]] — it is not copied
+here so it cannot drift when the story is edited.
 
 # Done Checklist
 
@@ -55,5 +50,5 @@ From [[US-INGEST-001]]:
 - [ ] Ingestion receipt returned on success
 - [ ] Structured error response on validation failure
 - [ ] Unit tests for all 3 acceptance criteria
-- [ ] FR-INGEST-001 `implemented_by` updated
+- [ ] FR-INGEST-001 status set to `implemented` once all its tasks are done (reverse links are computed, not authored)
 - [ ] Validation scripts pass

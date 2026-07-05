@@ -2,6 +2,12 @@
 """
 Validate frontmatter in all markdown files against JSON schemas.
 
+The artifact-type → schema mapping comes from kit-manifest.json (single source
+of truth) via kit_manifest.py. Schemas enforce a closed field set
+(additionalProperties: false); project-specific fields must be prefixed with
+`x_`. Unknown fields that look like a typo of a known field get a
+"did you mean" hint.
+
 Usage:
     python scripts/validate-frontmatter.py [--path PATH]
 
@@ -14,46 +20,41 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kit_manifest import load_manifest, prefix_schema_map, special_id_schema_map
+
 try:
     import yaml
-    from jsonschema import validate, ValidationError, Draft7Validator
+    from jsonschema import Draft7Validator
 except ImportError:
     print("ERROR: Install dependencies first: pip install pyyaml jsonschema")
     sys.exit(1)
 
 FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 
-# Map ID prefixes to schema files
-PREFIX_SCHEMA_MAP = {
-    "FR": "fr.schema.json",
-    "NFR": "nfr.schema.json",
-    "CON": "constraint.schema.json",
-    "US": "user-story.schema.json",
-    "EPIC": "epic.schema.json",
-    "ADR": "adr.schema.json",
-    "TEST": "test.schema.json",
-    "TASK": "task.schema.json",
-    "CR": "change-request.schema.json",
-    "PERSONA": "persona.schema.json",
-    "ASSUM": "assumption.schema.json",
-    "RISK": "risk.schema.json",
-    "REL": "release.schema.json",
-    "JOURNEY": "journey.schema.json",
-    "UC": "use-case.schema.json",
-    "CONTRACT": "contract.schema.json",
-    "DM": "data-model.schema.json",
-    "VISION": "vision.schema.json",
-    "ARCH": "domain-architecture.schema.json",
-    "BRQ": "brq.schema.json",
-    "CTRL": "ctrl.schema.json",
-    "BR": "br.schema.json",
-    "SRC": "src.schema.json",
-}
+# Registry mappings — loaded from kit-manifest.json (no hardcoded drift).
+_MANIFEST = load_manifest()
+PREFIX_SCHEMA_MAP = prefix_schema_map(_MANIFEST)
+SPECIAL_ID_SCHEMA_MAP = special_id_schema_map(_MANIFEST)
 
-# Special-case IDs that don't follow the TYPE-DOMAIN-NNN pattern
-SPECIAL_ID_SCHEMA_MAP = {
-    "ARCH-OVERVIEW": "architecture-overview.schema.json",
-}
+# Extension escape hatch: project-specific fields must start with this prefix.
+EXTENSION_PREFIX = "x_"
+
+
+def levenshtein(a: str, b: str) -> int:
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            cur.append(min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        prev = cur
+    return prev[-1]
 
 
 def load_schemas(schema_dir: Path) -> dict:
@@ -72,17 +73,21 @@ def load_schemas(schema_dir: Path) -> dict:
         if name == "base.schema.json":
             schemas[name] = schema
             continue
-        # Only merge base into schemas that explicitly reference it via allOf
         if "allOf" in schema:
             schema = {k: v for k, v in schema.items() if k != "allOf"}
             merged_props = dict(base.get("properties", {}))
             merged_props.update(schema.get("properties", {}))
             schema["properties"] = merged_props
-            # Merge required fields
             base_req = set(base.get("required", []))
             schema_req = set(schema.get("required", []))
             schema["required"] = list(base_req | schema_req)
-        schema["additionalProperties"] = True
+            # Inherit base's additionalProperties unless the type schema overrides it.
+            if "additionalProperties" not in schema:
+                schema["additionalProperties"] = base.get("additionalProperties", False)
+        # Allow project extension fields (x_*) regardless of additionalProperties.
+        pattern_props = dict(schema.get("patternProperties", {}))
+        pattern_props.setdefault(f"^{re.escape(EXTENSION_PREFIX)}", {})
+        schema["patternProperties"] = pattern_props
         schemas[name] = schema
     return schemas
 
@@ -96,8 +101,7 @@ def extract_frontmatter(filepath: Path) -> dict | None:
         fm = yaml.safe_load(match.group(1))
         if fm is None:
             return None
-        # YAML auto-parses dates as datetime.date — convert back to string for validation
-        for key in ("updated", "date", "release_date"):
+        for key in ("updated", "date", "release_date", "publication_date", "effective_date", "compliance_deadline"):
             if key in fm and not isinstance(fm[key], str):
                 fm[key] = str(fm[key])
         return fm
@@ -106,18 +110,37 @@ def extract_frontmatter(filepath: Path) -> dict | None:
 
 
 def get_schema_for_artifact(artifact_id: str, schemas: dict) -> dict | None:
-    # Check special-case IDs first (e.g., ARCH-OVERVIEW)
     if artifact_id in SPECIAL_ID_SCHEMA_MAP:
         schema_name = SPECIAL_ID_SCHEMA_MAP[artifact_id]
         if schema_name in schemas:
             return schemas[schema_name]
-    # Then check prefix-based mapping
     prefix = artifact_id.split("-")[0]
     schema_name = PREFIX_SCHEMA_MAP.get(prefix)
     if schema_name and schema_name in schemas:
         return schemas[schema_name]
-    # Fall back to base schema
     return schemas.get("base.schema.json")
+
+
+def unknown_field_hints(fm: dict, schema: dict) -> list[str]:
+    """Report unknown (non-x_) fields with a did-you-mean suggestion."""
+    allowed = set(schema.get("properties", {}).keys())
+    hints = []
+    for key in fm:
+        if key in allowed or key.startswith(EXTENSION_PREFIX):
+            continue
+        # Closest known field by edit distance
+        best, best_d = None, 99
+        for cand in allowed:
+            d = levenshtein(key, cand)
+            if d < best_d:
+                best, best_d = cand, d
+        if best is not None and best_d <= 2:
+            hints.append(f"unknown field '{key}' — did you mean '{best}'? "
+                         f"(or prefix a real custom field with '{EXTENSION_PREFIX}')")
+        else:
+            hints.append(f"unknown field '{key}' — not in schema "
+                         f"(prefix project-specific fields with '{EXTENSION_PREFIX}')")
+    return hints
 
 
 def validate_file(filepath: Path, schemas: dict) -> list[str]:
@@ -138,8 +161,15 @@ def validate_file(filepath: Path, schemas: dict) -> list[str]:
         errors.append(f"{filepath}: no schema found for ID prefix '{artifact_id.split('-')[0]}'")
         return errors
 
+    # Nicer, per-field messages for unknown fields (replaces the generic
+    # jsonschema additionalProperties error, which we suppress below).
+    for hint in unknown_field_hints(fm, schema):
+        errors.append(f"{filepath}: {hint}")
+
     validator = Draft7Validator(schema)
     for error in validator.iter_errors(fm):
+        if error.validator == "additionalProperties":
+            continue  # covered by unknown_field_hints with a better message
         path = " → ".join(str(p) for p in error.absolute_path) if error.absolute_path else "(root)"
         errors.append(f"{filepath}: [{path}] {error.message}")
 
@@ -154,15 +184,13 @@ def main():
 
     root = Path(args.path)
 
-    # Determine schema directory
     if args.schema_dir:
         schema_dir = Path(args.schema_dir)
     else:
-        # First look in root/schema, then walk up parent directories
         schema_dir = root / "schema"
         if not schema_dir.exists():
-            current = root.parent
-            while current != current.parent:  # Stop at filesystem root
+            current = root.resolve().parent
+            while current != current.parent:
                 candidate = current / "schema"
                 if candidate.exists():
                     schema_dir = candidate
@@ -176,10 +204,8 @@ def main():
     schemas = load_schemas(schema_dir)
     all_errors = []
 
-    # Folders to skip — contain reference docs, not tracked artifacts
-    skip_folders = {"templates", "scripts", ".codex"}
+    skip_folders = {"templates", "scripts", ".codex", "_metadata-menu", ".git", ".snapshots"}
 
-    # Scan all markdown files except templates and reference docs
     for md_file in sorted(root.rglob("*.md")):
         if any(part in skip_folders for part in md_file.parts):
             continue
@@ -188,9 +214,8 @@ def main():
 
         fm = extract_frontmatter(md_file)
         if fm is None:
-            continue  # Skip files without frontmatter (non-artifact files)
+            continue
 
-        # Skip meta/reference files that don't follow artifact ID patterns
         artifact_id = fm.get("id", "")
         if artifact_id.startswith("META-") or artifact_id.startswith("GLOSS-") or artifact_id.startswith("CODEMAP-"):
             continue

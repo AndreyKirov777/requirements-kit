@@ -4,10 +4,20 @@
   "title": "Persona frontmatter schema",
   "description": "Schema for PERSONA artifacts",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "owner", "domain", "updated"],
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "owner",
+    "domain",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,12 +29,19 @@
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "proposed", "approved", "deprecated"]
+      "enum": [
+        "draft",
+        "proposed",
+        "approved",
+        "deprecated"
+      ]
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

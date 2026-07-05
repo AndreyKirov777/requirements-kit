@@ -40,6 +40,12 @@ python scripts/check-status-transitions.py --path .
 
 # Regenerate traceability map
 python scripts/generate-traceability.py --path .
+
+# Regenerate the agent-facing architecture rulebook from accepted ADRs
+python scripts/generate-architecture-rules.py --path .
+
+# Lint ADR # Rules sections (CI-friendly: exit 1 on violations)
+python scripts/generate-architecture-rules.py --path . --check
 ```
 
 ## Recommended Git Workflow

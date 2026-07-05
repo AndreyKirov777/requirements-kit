@@ -4,10 +4,22 @@
   "title": "Risk frontmatter schema",
   "description": "Schema for RISK artifacts",
   "allOf": [
-    { "$ref": "base.schema.json" }
+    {
+      "$ref": "base.schema.json"
+    }
   ],
   "type": "object",
-  "required": ["id", "title", "type", "status", "severity", "likelihood", "owner", "domain", "updated"],
+  "required": [
+    "id",
+    "title",
+    "type",
+    "status",
+    "severity",
+    "likelihood",
+    "owner",
+    "domain",
+    "updated"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -19,27 +31,45 @@
     },
     "status": {
       "type": "string",
-      "enum": ["open", "mitigating", "mitigated", "accepted", "closed"]
+      "enum": [
+        "open",
+        "mitigating",
+        "mitigated",
+        "accepted",
+        "closed"
+      ]
     },
     "severity": {
       "type": "string",
-      "enum": ["high", "medium", "low"]
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
     },
     "likelihood": {
       "type": "string",
-      "enum": ["high", "medium", "low"]
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
     },
     "affects": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "mitigation_status": {
       "type": "string"
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false
 }

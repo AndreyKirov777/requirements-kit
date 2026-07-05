@@ -43,8 +43,3 @@ Moments of friction or confusion in the current experience.
 # Opportunities
 
 Where can the experience be improved?
-
-# Links
-
-- Persona: [[PERSONA-XXX-000]]
-- Related requirements: [[FR-XXX-000]]

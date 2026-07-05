@@ -32,14 +32,24 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 
 ## Before Starting Any Task
 
+> **Shortcut:** `python {{VAULT_PREFIX}}/scripts/assemble-context.py TASK-XXX-NNN` collects the full trace chain below (task, requirement, user story with AC, obligation chain, related ADRs, target files) into a single markdown bundle — one read instead of ten. Use it, then only open individual files if you need more depth.
+>
+> The steps are **tiered**. Do the *always* steps for every task; do the *conditional* steps only when the trigger applies. This keeps the ritual cheap for simple tasks without cutting corners on complex ones.
+
+**Always (every task):**
+
 1. **Find your task.** Look in `{{VAULT_PREFIX}}/04-delivery/tasks/` for a `TASK-*` file with `status: ready` assigned to you (or unassigned).
 2. **Read the requirement.** Follow the `implements` field to the parent functional requirement (FR) in `{{VAULT_PREFIX}}/02-requirements/fr/`. Read the full file — especially the **Requirement** section (what the system shall do) and **Out of Scope** (what NOT to do). Then follow `part_of_story` to the User Story (US) in `{{VAULT_PREFIX}}/02-requirements/user-stories/` to read the **Acceptance Criteria** (how we verify the delivered value) and understand the "why" and "for whom".
-3. **Trace the "why".** Follow the `derives_from` field in the FR/NFR to the parent artifact. This may be a business rule (`BR-*` in `{{VAULT_PREFIX}}/01-product/business-rules/`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/01-product/controls/`), a constraint (`CON-*` in `{{VAULT_PREFIX}}/01-product/constraints/`), or a business requirement (`BRQ-*` in `{{VAULT_PREFIX}}/01-product/business-requirements/`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed; CON defines external constraints (business, regulatory, or technical) that limit the solution space. If a BRQ or CON has a `source_ref` field, follow it to the Source Document (`SRC-*` in `{{VAULT_PREFIX}}/01-product/sources/`) to read the original regulation, strategy, or policy text.
-4. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
-5. **Read the architecture.** Start with `{{VAULT_PREFIX}}/03-architecture/architecture-overview.md` for the system-wide picture. If your task belongs to a specific domain, read the corresponding `ARCH-{DOMAIN}-*` file. Then follow `related_adrs` in the requirement to understand specific decisions.
-6. **Find target files.** Check `target_files` in the task, or look up `{{VAULT_PREFIX}}/03-architecture/code-map/` for the component mapping.
-7. **Read the glossary.** Check `{{VAULT_PREFIX}}/00-meta/glossary/{{GLOSSARY_DOMAIN}}.md` for the domain. Use the specified `code_name` for all identifiers (do not invent alternate names).
-8. **Check constraints.** Read `{{VAULT_PREFIX}}/01-product/constraints/` — these define external constraints (business, regulatory, or technical) that limit the solution space.
+3. **Read the glossary.** Check `{{VAULT_PREFIX}}/00-meta/glossary/{{GLOSSARY_DOMAIN}}.md` for the domain. Use the specified `code_name` for all identifiers (do not invent alternate names).
+4. **Find target files.** Check `target_files` in the task, or look up `{{VAULT_PREFIX}}/03-architecture/code-map/` for the component mapping.
+5. **Check dependencies.** Read `depends_on` — verify those requirements are already `implemented` or `verified`. If not, flag a blocker.
+6. **Read the architecture rules.** Read `{{VAULT_PREFIX}}/03-architecture/architecture-rules.md` — the normative rulebook auto-generated from accepted ADRs. Every rule is binding on every task; rules are cited by ID (e.g., `ADR-CORE-001.R2`) in reviews. Open the full ADR only when you need the rationale behind a rule.
+
+**Conditional (only when the trigger applies):**
+
+7. **Trace the "why"** — *when the task touches compliance, security, or regulated behavior, or when the "what" is unclear.* Follow the `derives_from` field in the FR/NFR to the parent artifact: a business rule (`BR-*`), a control (`CTRL-*` in `{{VAULT_PREFIX}}/01-product/controls/`), a constraint (`CON-*` in `{{VAULT_PREFIX}}/01-product/constraints/`), or a business requirement (`BRQ-*`). BRQ tells you the business or regulatory motivation; BR encodes the specific domain rule or regulatory logic; CTRL specifies what must be enforced and what evidence is needed; CON defines external constraints that limit the solution space. If a BRQ or CON has a `source_ref` field, follow it to the Source Document (`SRC-*` in `{{VAULT_PREFIX}}/01-product/sources/`) for the original text.
+8. **Read the architecture** — *when `estimated_complexity: complex`, or the task introduces a component, integration, or data-model change.* Start with `{{VAULT_PREFIX}}/03-architecture/architecture-overview.md`, then the domain `ARCH-{DOMAIN}-*` file, then any ADRs whose `related_requirements` include your FR.
+9. **Check constraints** — *when the task involves platform, performance, cost, or regulatory limits.* Read `{{VAULT_PREFIX}}/01-product/constraints/`.
 
 ## During Implementation
 
@@ -48,8 +58,9 @@ The system is organized into domains: {{DOMAIN_LIST}}. See `{{VAULT_PREFIX}}/00-
 - Follow naming conventions from the glossary — do not invent new names for existing concepts.
 - Use the code names specified in the glossary, not alternate variants or abbreviations.
 - Respect the {{ARCHITECTURE_PATTERN}} architecture: do not bypass intended data flow or layer separation.
+- Respect every rule in `{{VAULT_PREFIX}}/03-architecture/architecture-rules.md`. If a rule blocks your intended approach, do not work around it silently — flag it, citing the rule ID.
 - Respect constraints from `{{VAULT_PREFIX}}/01-product/constraints/`.
-- If you need to make an architectural choice not covered by an existing ADR, create a new `ADR-*` file in `{{VAULT_PREFIX}}/03-architecture/adr/` with status `proposed` and stop for review.
+- If you need to make an architectural choice not covered by an existing ADR, create a new `ADR-*` file in `{{VAULT_PREFIX}}/03-architecture/adr/` with status `proposed` (including a draft `# Rules` section) and stop for review.
 
 ## After Implementation
 
@@ -75,7 +86,12 @@ The kit follows a layered requirement model aligned with BABOK and INCOSE:
 - **ADR/ARCH** (Design) = HOW WE CHOSE TO DO IT
 - **TEST** (Evidence) = HOW WE PROVE IT
 
-Traceability chain: `[SRC →] BRQ → [BR →] [CTRL →] Epic → FR ↔ US → TASK → TEST`
+Traceability has **two distinct dimensions** — keep them separate:
+
+- **Obligation chain** (why the system must act): `SRC → BRQ → BR / CTRL —(derives_from)→ FR / NFR`
+- **Solution structure** (how the work is organized): `Epic ⊃ (FR ↔ US) → TASK → TEST`
+
+An **Epic groups** solution-space work; it is *not* a link in the obligation chain (there is no semantic "CTRL → Epic" edge). FR/NFR carry the `derives_from` link into the obligation chain and `parent_epic` into the solution structure.
 
 **SRC** (Source Document) is a passive reference artifact — a regulation, strategy, policy, standard, or contract stored as structured markdown in `01-product/sources/`. SRC has no lifecycle statuses, no ownership, and does not participate in the obligation stack. BRQ and CON can reference specific SRC sections via the `source_ref` field (e.g., `SRC-GDPR-001#article-17`). Not all projects need SRC — it is optional and most useful for regulatory-driven or strategy-driven projects where traceability to original documents is important.
 
@@ -95,6 +111,12 @@ All artifact IDs follow: `<TYPE>-<DOMAIN>-<NNN>` where:
 - NNN: three or more digits, zero-padded
 
 When creating new artifacts, check existing IDs in the target folder and increment. The filename must match the ID exactly (e.g., `FR-INGEST-001.md` for `id: FR-INGEST-001`). IDs must be globally unique across the entire vault — run `python {{VAULT_PREFIX}}/scripts/check-duplicates.py` to verify.
+
+## Resolving Wiki Links
+
+A wiki link `[[ID]]` (optionally `[[ID#section]]` or `[[ID|alias]]`) resolves to the file `ID.md`. Because every ID is globally unique, the link is unambiguous. The folder that holds the file is determined by the ID's **type prefix** via `kit-manifest.json` (`artifact_types.<TYPE>.folder`) — for example `[[FR-INGEST-001]]` lives in `02-requirements/fr/`, `[[BRQ-COMPLY-001]]` in `01-product/business-requirements/`.
+
+If you are not running inside Obsidian (which resolves links automatically), resolve a link by locating the file named `ID.md` anywhere under the vault root, or by looking up the folder for the ID's prefix in `kit-manifest.json`. Links are stored **upward only**; never write reverse links into frontmatter.
 
 ## Acceptance Criteria Format
 

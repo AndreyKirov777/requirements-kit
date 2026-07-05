@@ -30,8 +30,3 @@ How and when will this assumption be validated?
 # Impact if Wrong
 
 What changes if this assumption turns out to be false? Which requirements or decisions are affected?
-
-# Links
-
-- Related requirements: [[FR-XXX-000]]
-- Related ADR: [[ADR-XXX-000]]

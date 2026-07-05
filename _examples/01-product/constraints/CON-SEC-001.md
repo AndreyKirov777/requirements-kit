@@ -9,8 +9,7 @@ domain: SEC
 derives_from:
   - "[[BRQ-SEC-001]]"
 depends_on: []
-source_docs:
-  - "[[VISION-DBP-001]]"
+source_ref: "SRC-COMPLY-001#article-77"
 updated: 2026-03-28
 ---
 

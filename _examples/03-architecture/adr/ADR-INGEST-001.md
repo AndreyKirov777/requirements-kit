@@ -4,7 +4,7 @@ title: Use three-tier data architecture for battery passport data
 status: proposed
 owner: "@techlead"
 date: 2026-03-28
-related_requirements: ["[[FR-INGEST-001]]", "[[FR-INGEST-003]]", "[[FR-PASSPORT-001]]"]
+related_requirements: ["[[FR-INGEST-001]]"]
 tags: [adr, ingest, architecture]
 updated: 2026-03-28
 ---
@@ -65,8 +65,13 @@ Data flows unidirectionally: Bronze → Silver → Gold. Each tier is independen
 ## Trade-offs
 Increased storage and pipeline complexity are justified by stronger auditability and regulatory alignment. The three-tier model trades operational simplicity for governance and forensic capability—appropriate for a heavily regulated domain like battery passports.
 
-# Links
-- Requirements: [[FR-INGEST-001]], [[FR-INGEST-003]], [[FR-PASSPORT-001]]
-- NFR: [[NFR-INGEST-001]] (latency budget applies to Bronze persistence)
-- Related ADRs: [[ADR-SEC-001]] (applies encryption to all tiers)
-- Tickets: INGEST-45, INGEST-67
+# Rules
+- MUST write ingested data to the Bronze tier unmodified, with source metadata (timestamp, origin, format) attached
+- MUST NOT mutate or delete records in the Bronze tier; corrections happen by re-processing into Silver
+- MUST NOT read Bronze-tier data from business-logic or API modules; they consume Silver or Gold only
+- MUST keep data flow unidirectional Bronze → Silver → Gold; no tier writes back to an upstream tier
+- SHOULD record validation status and quality flags on every Silver-tier record [check: schema validation]
+
+# Notes
+
+The encryption-at-rest requirement [[NFR-SEC-001]] applies to all three tiers.

@@ -41,5 +41,5 @@ fields:
 
 # ASSUM
 
-> Auto-generated from `schema/` by `scripts/generate-fileclasses.mjs`.
+> Auto-generated from `schema/` by `scripts/generate-fileclasses.py`.
 > Do not edit manually — re-run the script after changing schemas.

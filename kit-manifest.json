@@ -1,0 +1,475 @@
+{
+  "$comment": "SINGLE SOURCE OF TRUTH for the artifact-type registry. Scripts (validate-frontmatter.py, check-status-transitions.py, generate-fileclasses.py, generate-status-transitions.py, assemble-context.py) read this file — do not hardcode the registry anywhere else. When adding or changing an artifact type, edit this file, then re-run the generators. See README 'Kit Manifest'.",
+  "kit_version": "2.1.0",
+  "updated": "2026-07-05",
+  "id_pattern": "^<TYPE>-[A-Z0-9]+-[0-9]{3,}$",
+  "wikilink_rule": "A wiki link [[ID]] resolves to the file ID.md. IDs are globally unique across the entire vault, so [[ID]] is unambiguous. The folder that holds the file is determined by the ID's TYPE prefix via this manifest (artifact_types.<TYPE>.folder). Non-Obsidian agents resolve links by matching the filename ID.md anywhere under the vault root.",
+  "tiers": {
+    "core": "Relevant to any project.",
+    "discovery": "Product discovery — optional.",
+    "compliance": "Regulated / obligation-driven projects — optional.",
+    "source": "Passive source documents for traceability — optional.",
+    "architecture": "Complex systems — optional.",
+    "delivery": "Release management — optional.",
+    "meta": "Kit infrastructure and dashboards."
+  },
+  "field_conventions": {
+    "reverse_links_are_computed": "Reverse links (implemented_by, verified_by, delivered_by, derived_requirements, derived_controls, related_requirements-as-backlink) are NEVER stored in frontmatter. They are computed on the fly from the up-links of child artifacts. Do not add them manually.",
+    "project_extension_fields": "Project-specific frontmatter fields must be prefixed with 'x_' (e.g., x_jira_key). Schemas reject unknown fields that are not x_-prefixed, which catches typos in standard field names."
+  },
+  "artifact_types": {
+    "VISION": {
+      "schema": "vision.schema.json",
+      "folder": "01-product/vision",
+      "tier": "core",
+      "icon": "eye",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "superseded", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["superseded", "deprecated"],
+        "superseded": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {}
+    },
+    "PERSONA": {
+      "schema": "persona.schema.json",
+      "folder": "01-product/personas",
+      "tier": "discovery",
+      "icon": "users",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {}
+    },
+    "JOURNEY": {
+      "schema": "journey.schema.json",
+      "folder": "01-product/journeys",
+      "tier": "discovery",
+      "icon": "map",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "persona": { "targets": ["PERSONA"], "cardinality": "one" }
+      }
+    },
+    "ASSUM": {
+      "schema": "assumption.schema.json",
+      "folder": "01-product/assumptions",
+      "tier": "discovery",
+      "icon": "help-circle",
+      "has_lifecycle": true,
+      "statuses": ["unvalidated", "validating", "validated", "invalidated", "deprecated"],
+      "transitions": {
+        "unvalidated": ["validating", "deprecated"],
+        "validating": ["validated", "invalidated", "deprecated"],
+        "validated": ["invalidated", "deprecated"],
+        "invalidated": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": [],
+      "up_links": {}
+    },
+    "UC": {
+      "schema": "use-case.schema.json",
+      "folder": "01-product/use-cases",
+      "tier": "discovery",
+      "icon": "git-branch",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {}
+    },
+    "SRC": {
+      "schema": "src.schema.json",
+      "folder": "01-product/sources",
+      "tier": "source",
+      "icon": "file-text",
+      "has_lifecycle": false,
+      "statuses": ["in_force", "adopted", "draft", "proposed"],
+      "transitions": {},
+      "human_gate_statuses": [],
+      "up_links": {}
+    },
+    "BRQ": {
+      "schema": "brq.schema.json",
+      "folder": "01-product/business-requirements",
+      "tier": "compliance",
+      "icon": "briefcase",
+      "has_lifecycle": true,
+      "statuses": ["identified", "analyzed", "approved", "allocated", "covered", "deprecated"],
+      "transitions": {
+        "identified": ["analyzed", "deprecated"],
+        "analyzed": ["approved", "identified", "deprecated"],
+        "approved": ["allocated", "deprecated"],
+        "allocated": ["covered", "deprecated"],
+        "covered": ["allocated", "deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["analyzed"],
+      "up_links": {
+        "source_ref": { "targets": ["SRC"], "cardinality": "one", "form": "ref" }
+      }
+    },
+    "BR": {
+      "schema": "br.schema.json",
+      "folder": "01-product/business-rules",
+      "tier": "compliance",
+      "icon": "book-open",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "derives_from": { "targets": ["BRQ"], "cardinality": "many" }
+      }
+    },
+    "CTRL": {
+      "schema": "ctrl.schema.json",
+      "folder": "01-product/controls",
+      "tier": "compliance",
+      "icon": "lock",
+      "has_lifecycle": true,
+      "statuses": ["identified", "defined", "allocated", "implemented", "verified", "audited", "deprecated"],
+      "transitions": {
+        "identified": ["defined", "deprecated"],
+        "defined": ["allocated", "deprecated"],
+        "allocated": ["implemented", "deprecated"],
+        "implemented": ["verified", "deprecated"],
+        "verified": ["audited", "implemented", "deprecated"],
+        "audited": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["defined"],
+      "up_links": {
+        "derives_from": { "targets": ["BRQ"], "cardinality": "many" }
+      }
+    },
+    "CON": {
+      "schema": "constraint.schema.json",
+      "folder": "01-product/constraints",
+      "tier": "core",
+      "icon": "alert-triangle",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "derives_from": { "targets": ["BRQ", "CTRL"], "cardinality": "many" },
+        "parent_epic": { "targets": ["EPIC"], "cardinality": "one" },
+        "depends_on": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "source_ref": { "targets": ["SRC"], "cardinality": "one", "form": "ref" }
+      }
+    },
+    "EPIC": {
+      "schema": "epic.schema.json",
+      "folder": "02-requirements/epics",
+      "tier": "core",
+      "icon": "layers",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "in-progress", "completed", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["in-progress", "deprecated"],
+        "in-progress": ["completed", "deprecated"],
+        "completed": ["in-progress", "deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {}
+    },
+    "US": {
+      "schema": "user-story.schema.json",
+      "folder": "02-requirements/user-stories",
+      "tier": "core",
+      "icon": "user",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["in-implementation", "deprecated"],
+        "in-implementation": ["implemented", "deprecated"],
+        "implemented": ["verified", "in-implementation", "deprecated"],
+        "verified": ["in-implementation", "deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "parent_epic": { "targets": ["EPIC"], "cardinality": "one" },
+        "persona": { "targets": ["PERSONA"], "cardinality": "one" },
+        "delivers": { "targets": ["FR"], "cardinality": "many" }
+      }
+    },
+    "FR": {
+      "schema": "fr.schema.json",
+      "folder": "02-requirements/fr",
+      "tier": "core",
+      "icon": "file-check",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["in-implementation", "deprecated"],
+        "in-implementation": ["implemented", "deprecated"],
+        "implemented": ["verified", "in-implementation", "deprecated"],
+        "verified": ["in-implementation", "deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "parent_epic": { "targets": ["EPIC"], "cardinality": "one" },
+        "derives_from": { "targets": ["BRQ", "BR", "CTRL", "CON"], "cardinality": "many" },
+        "depends_on": { "targets": ["FR", "NFR"], "cardinality": "many" }
+      }
+    },
+    "NFR": {
+      "schema": "nfr.schema.json",
+      "folder": "02-requirements/nfr",
+      "tier": "core",
+      "icon": "shield-check",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "in-implementation", "implemented", "verified", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["in-implementation", "deprecated"],
+        "in-implementation": ["implemented", "deprecated"],
+        "implemented": ["verified", "in-implementation", "deprecated"],
+        "verified": ["in-implementation", "deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "parent_epic": { "targets": ["EPIC"], "cardinality": "one" },
+        "derives_from": { "targets": ["BRQ", "BR", "CTRL", "CON"], "cardinality": "many" },
+        "depends_on": { "targets": ["FR", "NFR"], "cardinality": "many" }
+      }
+    },
+    "ARCH-OVERVIEW": {
+      "schema": "architecture-overview.schema.json",
+      "folder": "03-architecture",
+      "tier": "architecture",
+      "icon": "layout",
+      "has_lifecycle": true,
+      "special_id": "ARCH-OVERVIEW",
+      "fixed_filename": "architecture-overview.md",
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {}
+    },
+    "ARCH": {
+      "schema": "domain-architecture.schema.json",
+      "folder": "03-architecture",
+      "tier": "architecture",
+      "icon": "layout",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "parent_overview": { "targets": ["ARCH-OVERVIEW"], "cardinality": "one" },
+        "related_requirements": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "related_adrs": { "targets": ["ADR"], "cardinality": "many" }
+      }
+    },
+    "ADR": {
+      "schema": "adr.schema.json",
+      "folder": "03-architecture/adr",
+      "tier": "core",
+      "icon": "git-commit",
+      "has_lifecycle": true,
+      "statuses": ["proposed", "accepted", "rejected", "superseded", "deprecated"],
+      "transitions": {
+        "proposed": ["accepted", "rejected"],
+        "accepted": ["superseded", "deprecated"],
+        "rejected": [],
+        "superseded": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "related_requirements": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "superseded_by": { "targets": ["ADR"], "cardinality": "one", "form": "ref" }
+      }
+    },
+    "DM": {
+      "schema": "data-model.schema.json",
+      "folder": "03-architecture/data-model",
+      "tier": "architecture",
+      "icon": "database",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "related_requirements": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "related_adrs": { "targets": ["ADR"], "cardinality": "many" }
+      }
+    },
+    "CONTRACT": {
+      "schema": "contract.schema.json",
+      "folder": "03-architecture/contracts",
+      "tier": "architecture",
+      "icon": "file-signature",
+      "has_lifecycle": true,
+      "statuses": ["draft", "proposed", "approved", "deprecated"],
+      "transitions": {
+        "draft": ["proposed", "deprecated"],
+        "proposed": ["approved", "draft", "deprecated"],
+        "approved": ["deprecated"],
+        "deprecated": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "related_requirements": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "related_adrs": { "targets": ["ADR"], "cardinality": "many" }
+      }
+    },
+    "TASK": {
+      "schema": "task.schema.json",
+      "folder": "04-delivery/tasks",
+      "tier": "core",
+      "icon": "check-square",
+      "has_lifecycle": true,
+      "statuses": ["backlog", "ready", "in-progress", "done", "blocked"],
+      "transitions": {
+        "backlog": ["ready", "blocked"],
+        "ready": ["in-progress", "backlog", "blocked"],
+        "in-progress": ["done", "blocked"],
+        "blocked": ["ready", "in-progress", "backlog"],
+        "done": []
+      },
+      "human_gate_statuses": [],
+      "up_links": {
+        "implements": { "targets": ["FR", "NFR"], "cardinality": "one" },
+        "part_of_story": { "targets": ["US"], "cardinality": "one" }
+      }
+    },
+    "CR": {
+      "schema": "change-request.schema.json",
+      "folder": "04-delivery/change-requests",
+      "tier": "core",
+      "icon": "git-pull-request",
+      "has_lifecycle": true,
+      "statuses": ["proposed", "approved", "applied", "rejected"],
+      "transitions": {
+        "proposed": ["approved", "rejected"],
+        "approved": ["applied", "rejected"],
+        "applied": [],
+        "rejected": []
+      },
+      "human_gate_statuses": ["proposed"],
+      "up_links": {
+        "affects": { "targets": ["FR", "NFR", "US", "BRQ", "CTRL", "BR", "CON", "EPIC"], "cardinality": "many" }
+      }
+    },
+    "RISK": {
+      "schema": "risk.schema.json",
+      "folder": "04-delivery/risks",
+      "tier": "delivery",
+      "icon": "alert-octagon",
+      "has_lifecycle": true,
+      "statuses": ["open", "mitigating", "mitigated", "accepted", "closed"],
+      "transitions": {
+        "open": ["mitigating", "accepted", "closed"],
+        "mitigating": ["mitigated", "accepted", "closed"],
+        "mitigated": ["closed", "open"],
+        "accepted": ["closed", "open"],
+        "closed": []
+      },
+      "human_gate_statuses": [],
+      "up_links": {
+        "affects": { "targets": ["FR", "NFR", "US", "EPIC", "CTRL"], "cardinality": "many" }
+      }
+    },
+    "REL": {
+      "schema": "release.schema.json",
+      "folder": "04-delivery/releases",
+      "tier": "delivery",
+      "icon": "rocket",
+      "has_lifecycle": true,
+      "statuses": ["planned", "ready", "released", "rolled-back"],
+      "transitions": {
+        "planned": ["ready"],
+        "ready": ["released", "planned"],
+        "released": ["rolled-back"],
+        "rolled-back": []
+      },
+      "human_gate_statuses": [],
+      "up_links": {
+        "requirements_included": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "epics_included": { "targets": ["EPIC"], "cardinality": "many" }
+      }
+    },
+    "TEST": {
+      "schema": "test.schema.json",
+      "folder": "05-quality/acceptance",
+      "tier": "core",
+      "icon": "test-tube",
+      "has_lifecycle": true,
+      "statuses": ["draft", "ready", "passed", "failed"],
+      "transitions": {
+        "draft": ["ready"],
+        "ready": ["passed", "failed"],
+        "passed": ["failed"],
+        "failed": ["ready", "passed"]
+      },
+      "human_gate_statuses": [],
+      "up_links": {
+        "verifies": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "verifies_control": { "targets": ["CTRL"], "cardinality": "many" }
+      }
+    }
+  }
+}

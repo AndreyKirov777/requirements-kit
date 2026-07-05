@@ -1,7 +1,6 @@
 ---
 id: US-INGEST-001
 title: Submit static battery data via REST API
-type: user-story
 status: proposed
 priority: high
 owner: "@techlead"
@@ -60,9 +59,4 @@ This user story delivers the following functional requirements:
 
 # Notes
 
-Relates to systems operated by [[PERSONA-DBP-002|Admin Alex]] and upstream data providers.
-
-# Links
-
-- Epic: [[EPIC-INGEST-001]]
-- Persona: [[PERSONA-DBP-002]]
+Relates to systems operated by [[PERSONA-DBP-002|Integration Engineer Ravi]] and upstream data providers.
