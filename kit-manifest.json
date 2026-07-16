@@ -1,7 +1,7 @@
 {
   "$comment": "SINGLE SOURCE OF TRUTH for the artifact-type registry. Scripts (validate-frontmatter.py, check-status-transitions.py, generate-fileclasses.py, generate-status-transitions.py, assemble-context.py) read this file — do not hardcode the registry anywhere else. When adding or changing an artifact type, edit this file, then re-run the generators. See README 'Kit Manifest'.",
-  "kit_version": "2.1.0",
-  "updated": "2026-07-05",
+  "kit_version": "2.2.0",
+  "updated": "2026-07-16",
   "id_pattern": "^<TYPE>-[A-Z0-9]+-[0-9]{3,}$",
   "wikilink_rule": "A wiki link [[ID]] resolves to the file ID.md. IDs are globally unique across the entire vault, so [[ID]] is unambiguous. The folder that holds the file is determined by the ID's TYPE prefix via this manifest (artifact_types.<TYPE>.folder). Non-Obsidian agents resolve links by matching the filename ID.md anywhere under the vault root.",
   "tiers": {
@@ -12,6 +12,34 @@
     "architecture": "Complex systems — optional.",
     "delivery": "Release management — optional.",
     "meta": "Kit infrastructure and dashboards."
+  },
+  "profiles": {
+    "$comment": "A profile is a named scale preset that enables a set of artifact types, selected via project-config.json's 'profile' field. 'types' lists explicit prefixes; 'tiers' pulls in every type of those tiers (a profile may use either or both — resolved types are the union). No profile selected (project-config.json absent, or no 'profile' field) means every type is enabled — full backward compatibility with pre-2.2.0 vaults. See docs/profiles-spec.md for the full design.",
+    "S": {
+      "description": "Small projects — solo developer or small team working with AI coding agents. Atom is the User Story (AC live in its body); no FR/NFR/EPIC/CON/CR.",
+      "types": ["VISION", "US", "TASK", "TEST", "ADR"]
+    },
+    "M": {
+      "description": "Standard projects. Equivalent to the core tier.",
+      "tiers": ["core"]
+    },
+    "L": {
+      "description": "Large or complex systems. Core + discovery + architecture + delivery. Add the 'compliance' and/or 'sources' flags for regulated projects.",
+      "tiers": ["core", "discovery", "architecture", "delivery"]
+    }
+  },
+  "flags": {
+    "$comment": "Flags are orthogonal to profiles — selected via project-config.json's 'flags' array, combinable with any profile except where explicitly forbidden. Forbidden combinations are enforced by scripts/kit_manifest.py, not expressible here.",
+    "compliance": {
+      "description": "Regulated / obligation-driven projects.",
+      "tiers": ["compliance"],
+      "forbidden_with_profiles": ["S"],
+      "forbidden_reason": "BRQ/BR/CTRL derive into FR/NFR via derives_from, but FR/NFR are not part of profile S. Use profile M or L with the compliance flag for regulated small projects."
+    },
+    "sources": {
+      "description": "Regulatory-driven or strategy-driven projects that need traceability to original source documents.",
+      "tiers": ["source"]
+    }
   },
   "field_conventions": {
     "reverse_links_are_computed": "Reverse links (implemented_by, verified_by, delivered_by, derived_requirements, derived_controls, related_requirements-as-backlink) are NEVER stored in frontmatter. They are computed on the fly from the up-links of child artifacts. Do not add them manually.",
@@ -467,7 +495,7 @@
       },
       "human_gate_statuses": [],
       "up_links": {
-        "verifies": { "targets": ["FR", "NFR"], "cardinality": "many" },
+        "verifies": { "targets": ["FR", "NFR", "US"], "cardinality": "many" },
         "verifies_control": { "targets": ["CTRL"], "cardinality": "many" }
       }
     }

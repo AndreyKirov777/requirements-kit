@@ -120,7 +120,9 @@ def emit(index: dict, task_id: str) -> str:
     if notes: lines += ["", "**Implementation Notes**", "", notes]
     lines.append("")
 
-    # FR / NFR
+    # FR / NFR (profile M/L — TASK links via `implements`). If absent, this
+    # TASK links directly to a User Story via `part_of_story` instead (profile
+    # S has no FR/NFR) — handled in the fallback branch below.
     req_ids = ids_in(tfm.get("implements", ""))
     for rid in req_ids:
         if rid not in index:
@@ -190,6 +192,45 @@ def emit(index: dict, task_id: str) -> str:
             lines.append(f"### ADR — {aid}: {a['fm'].get('title','')} (status: {a['fm'].get('status','—')})")
             dec = section(a["body"], "Decision")
             if dec: lines += ["", dec]
+            lines.append("")
+
+    if not req_ids:
+        # No FR/NFR to walk (profile S, or any task authored without
+        # `implements`) — enter the chain directly via `part_of_story`.
+        us_ids = ids_in(tfm.get("part_of_story", ""))
+        if not us_ids:
+            lines.append("_No `implements` or `part_of_story` link found on this task — nothing to trace._\n")
+        for uid in us_ids:
+            if uid not in index:
+                lines.append(f"## User Story — {uid} (NOT FOUND)\n")
+                continue
+            u = index[uid]; ufm = u["fm"]
+            lines.append(f"## User Story — {uid}: {ufm.get('title','')}")
+            lines.append(f"- status: {ufm.get('status','—')} | priority: {ufm.get('priority','—')} | domain: {ufm.get('domain','—')}")
+            story = section(u["body"], "Story", "User Story")
+            ac = section(u["body"], "Acceptance Criteria")
+            if story: lines += ["", story]
+            if ac: lines += ["", "**Acceptance Criteria**", "", ac]
+            lines.append("")
+
+            # Related ADRs (computed reverse link) — same lookup as the FR
+            # path, keyed on the US id instead of an FR/NFR id.
+            adrs = [aid for aid, a in index.items()
+                    if prefix(aid) == "ADR" and uid in ids_in(a["fm"].get("related_requirements", []))]
+            for aid in adrs:
+                a = index[aid]
+                lines.append(f"### ADR — {aid}: {a['fm'].get('title','')} (status: {a['fm'].get('status','—')})")
+                dec = section(a["body"], "Decision")
+                if dec: lines += ["", dec]
+                lines.append("")
+
+        # VISION context — profile S has no Epic/BRQ obligation chain, so
+        # surface the product vision directly as the project-level "why".
+        for vid in (aid for aid in index if prefix(aid) == "VISION"):
+            v = index[vid]
+            lines.append(f"## Vision — {vid}: {v['fm'].get('title','')}")
+            vs = section(v["body"], "Vision", "Summary")
+            if vs: lines += ["", vs]
             lines.append("")
 
     return "\n".join(lines).rstrip() + "\n"

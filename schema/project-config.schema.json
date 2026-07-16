@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "project-config.schema.json",
+  "title": "Project configuration schema",
+  "description": "Schema for project-config.json — project-specific values (domains, owners) plus the scale profile and flags that select which artifact types are enabled. Copy project-config.example.json to project-config.json and fill in your values, then run scripts/generate-fileclasses.py.",
+  "type": "object",
+  "properties": {
+    "profile": {
+      "type": "string",
+      "enum": ["S", "M", "L"],
+      "description": "Scale profile preset, resolved via kit-manifest.json's 'profiles' section. S = small projects (VISION, US, TASK, TEST, ADR). M = standard projects (core tier, 10 types). L = large/complex systems (core + discovery + architecture + delivery tiers). Omit this field entirely to disable filtering — every artifact type is enabled, matching pre-2.2.0 behavior."
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["compliance", "sources"]
+      },
+      "description": "Orthogonal type groups to enable in addition to the profile, resolved via kit-manifest.json's 'flags' section. 'compliance' adds BRQ/BR/CTRL; 'sources' adds SRC. profile: S combined with flags: [compliance] is invalid — BRQ/BR/CTRL derive into FR/NFR, which profile S does not include. Use profile M or L for regulated projects."
+    },
+    "domains": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Project's domain codes (used for ID generation and Metadata Menu dropdowns). Keep in sync with 00-meta/taxonomy/domains.md."
+    },
+    "owners": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Valid owner identifiers (used for Metadata Menu dropdowns)."
+    }
+  },
+  "additionalProperties": false
+}

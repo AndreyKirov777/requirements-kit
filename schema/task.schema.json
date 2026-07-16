@@ -7,7 +7,11 @@
     { "$ref": "base.schema.json" }
   ],
   "type": "object",
-  "required": ["id", "title", "status", "owner", "implements", "updated"],
+  "required": ["id", "title", "status", "owner", "updated"],
+  "anyOf": [
+    { "required": ["implements"] },
+    { "required": ["part_of_story"] }
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -23,7 +27,7 @@
     },
     "implements": {
       "type": "string",
-      "description": "Wiki link to the parent functional requirement (FR)"
+      "description": "Wiki link to the parent functional requirement (FR). In profile S (no FR/NFR) a TASK links only via part_of_story instead."
     },
     "part_of_story": {
       "type": "string",

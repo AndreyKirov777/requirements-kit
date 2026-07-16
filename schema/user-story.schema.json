@@ -16,7 +16,6 @@
     "priority",
     "owner",
     "domain",
-    "persona",
     "updated"
   ],
   "properties": {
@@ -59,7 +58,7 @@
     },
     "persona": {
       "type": "string",
-      "description": "Wiki link to the primary persona"
+      "description": "Wiki link to the primary persona, or a plain-text actor name (e.g. \"Developer\", \"Operator\") in projects that don't use the discovery tier (PERSONA). Optional — profile S and core-only M projects may omit it."
     },
     "parent_epic": {
       "type": "string",

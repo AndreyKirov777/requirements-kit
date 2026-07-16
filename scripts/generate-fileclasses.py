@@ -26,7 +26,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from kit_manifest import load_manifest
+from kit_manifest import (
+    load_manifest,
+    resolve_project_config,
+    active_profile,
+    enabled_types,
+    ProfileConfigError,
+)
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -57,6 +63,7 @@ def _build_artifact_map() -> dict:
             "name": _FILECLASS_NAME_OVERRIDE.get(prefix, prefix),
             "paths": [cfg["folder"]],
             "icon": cfg.get("icon", "file"),
+            "prefix": prefix,
         }
     return out
 
@@ -186,6 +193,17 @@ def build_fileclass(artifact_name, icon, paths, fields):
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
+    try:
+        project_config = resolve_project_config(ROOT)
+        profile = active_profile(project_config, _MANIFEST)
+        enabled = enabled_types(project_config, _MANIFEST)
+    except ProfileConfigError as e:
+        print(f"ERROR: invalid project-config.json — {e}")
+        sys.exit(1)
+
+    if profile is not None:
+        print(f"📐 Profile: {profile} — {len(enabled)} artifact type(s) enabled\n")
+
     # Load shared fields: base schema enums + project config
     base_enum_fields = load_base_enum_fields()
     project_fields = load_project_config_fields()
@@ -228,6 +246,11 @@ def main():
 
         if not config:
             print(f"⚠  No mapping for {file_name} — skipping")
+            skipped += 1
+            continue
+
+        if enabled is not None and config["prefix"] not in enabled:
+            print(f"⊘  {config['name']}: outside profile {profile} — skipping (schema still validates if authored)")
             skipped += 1
             continue
 

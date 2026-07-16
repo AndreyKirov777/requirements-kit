@@ -21,7 +21,17 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from kit_manifest import load_manifest, prefix_schema_map, special_id_schema_map
+from kit_manifest import (
+    load_manifest,
+    prefix_schema_map,
+    special_id_schema_map,
+    prefix_for_id,
+    resolve_project_config,
+    active_profile,
+    enabled_types,
+    out_of_profile_hint,
+    ProfileConfigError,
+)
 
 try:
     import yaml
@@ -36,6 +46,8 @@ FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 _MANIFEST = load_manifest()
 PREFIX_SCHEMA_MAP = prefix_schema_map(_MANIFEST)
 SPECIAL_ID_SCHEMA_MAP = special_id_schema_map(_MANIFEST)
+
+
 
 # Extension escape hatch: project-specific fields must start with this prefix.
 EXTENSION_PREFIX = "x_"
@@ -201,8 +213,17 @@ def main():
         print(f"ERROR: Schema directory not found: {schema_dir}")
         sys.exit(1)
 
+    project_config = resolve_project_config(root)
+    try:
+        profile = active_profile(project_config, _MANIFEST)
+        enabled = enabled_types(project_config, _MANIFEST)
+    except ProfileConfigError as e:
+        print(f"ERROR: invalid project-config.json — {e}")
+        sys.exit(1)
+
     schemas = load_schemas(schema_dir)
     all_errors = []
+    profile_warnings = []
 
     skip_folders = {"templates", "scripts", ".codex", "_metadata-menu", ".git", ".snapshots"}
 
@@ -222,6 +243,24 @@ def main():
 
         errors = validate_file(md_file, schemas)
         all_errors.extend(errors)
+
+        # Out-of-profile check: schema validation above still ran unconditionally
+        # (a disabled type must still be internally valid) — this only warns.
+        if enabled is not None:
+            prefix = prefix_for_id(artifact_id, _MANIFEST) if artifact_id else None
+            if prefix and prefix not in enabled:
+                hint = out_of_profile_hint(prefix, _MANIFEST)
+                profile_warnings.append(
+                    f"{md_file}: {artifact_id} is type {prefix}, outside profile {profile} — {hint}"
+                )
+
+    if profile_warnings:
+        print(f"\n{'-'*60}")
+        print(f"PROFILE WARNINGS — {len(profile_warnings)} artifact(s) outside profile '{profile}'")
+        print(f"{'-'*60}\n")
+        for warn in profile_warnings:
+            print(f"  ⚠ {warn}")
+        print()
 
     if all_errors:
         print(f"\n{'='*60}")

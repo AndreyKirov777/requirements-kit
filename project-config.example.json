@@ -1,6 +1,8 @@
 {
   "$schema": "./schema/project-config.schema.json",
-  "$comment": "Copy this file to project-config.json and fill in your project-specific values. Run `python scripts/generate-fileclasses.py` after editing.",
+  "$comment": "Copy this file to project-config.json and fill in your project-specific values. Run `python scripts/generate-fileclasses.py` after editing. 'profile' shown here (S) is a small-project starting point — see docs/profiles-spec.md and README 'Profiles' for the S/M/L composition and upgrade path. Remove the 'profile' field entirely to disable filtering (every artifact type enabled — pre-2.2.0 behavior).",
+  "profile": "S",
+  "flags": [],
   "domains": [
     "auth",
     "payments",

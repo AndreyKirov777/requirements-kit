@@ -21,13 +21,33 @@ Usage:
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kit_manifest import (
+    load_manifest,
+    resolve_project_config,
+    active_profile,
+    active_flags,
+    ProfileConfigError,
+)
 
 # --- Markers ------------------------------------------------------------------
 
 BEGIN_MARKER = "<!-- BEGIN REQUIREMENTS-KIT (managed by install-agent-files.py — do not edit manually) -->"
 END_MARKER = "<!-- END REQUIREMENTS-KIT -->"
+
+# Profile-conditional blocks inside docs/agent-instructions.md (v2.2.0+).
+# <!-- IF-PROFILE S --> ... <!-- END-IF -->   kept only when the active profile is S
+# <!-- IF-PROFILE M L --> ... <!-- END-IF --> kept when the active profile is M or L
+# <!-- IF-FLAG compliance --> ... <!-- END-IF --> kept when the "compliance" flag is active
+# Blocks are flat (no nesting). In full mode (no profile selected) every
+# block is kept, matching pre-2.2.0 output exactly.
+CONDITIONAL_BLOCK_RE = re.compile(
+    r"<!-- IF-(PROFILE|FLAG) ([^>]+?) -->\n(.*?)<!-- END-IF -->\n?", re.DOTALL
+)
 
 # --- Agent targets ------------------------------------------------------------
 # Each entry: (file path relative to project root, header for new files)
@@ -89,6 +109,36 @@ def read_canonical_source(vault_path: Path) -> str:
         print(f"ERROR: Canonical source not found: {source}", file=sys.stderr)
         sys.exit(1)
     return source.read_text(encoding="utf-8")
+
+
+def filter_conditional_blocks(text: str, profile: str | None, flags: list[str]) -> str:
+    """Strip IF-PROFILE / IF-FLAG blocks that don't apply to the active
+    profile+flags.
+
+    Full mode (profile is None) must reproduce the pre-2.2.0 document
+    byte-for-byte, so it is NOT simply "keep every block": IF-FLAG blocks are
+    purely additive (the compliance/sources content they gate was always
+    present, unconditionally, before flags existed) and are always kept.
+    IF-PROFILE blocks are kept in full mode UNLESS the block is gated
+    exclusively to "S" — S-only phrasing exists to describe the ABSENCE of
+    FR/NFR/EPIC/CON/CR, which is meaningless in full mode where every type is
+    present; every other profile combination (e.g. "M L") represents content
+    that existed unconditionally pre-2.2.0 and is kept.
+    """
+
+    def replace(match: re.Match) -> str:
+        kind, names_str, content = match.group(1), match.group(2), match.group(3)
+        names = names_str.split()
+        if kind == "FLAG":
+            if profile is None:
+                return content
+            return content if any(name in flags for name in names) else ""
+        # PROFILE
+        if profile is None:
+            return content if any(name != "S" for name in names) else ""
+        return content if profile in names else ""
+
+    return CONDITIONAL_BLOCK_RE.sub(replace, text)
 
 
 def replace_prefix(content: str, prefix: str) -> str:
@@ -158,7 +208,22 @@ def main():
         action="store_true",
         help="Show what would change without writing files.",
     )
+    parser.add_argument(
+        "--profile",
+        choices=["S", "M", "L"],
+        help="Override the active scale profile for this run (ignores project-config.json). Mainly for testing.",
+    )
+    parser.add_argument(
+        "--flags",
+        nargs="*",
+        default=None,
+        help="Override the active flags for this run (space-separated, e.g. --flags compliance). Requires --profile.",
+    )
     args = parser.parse_args()
+
+    if args.flags is not None and args.profile is None:
+        print("ERROR: --flags requires --profile.", file=sys.stderr)
+        sys.exit(1)
 
     script_path = Path(__file__)
 
@@ -176,16 +241,34 @@ def main():
 
     vault_path = project_root / prefix if prefix else project_root
 
+    # Determine active profile/flags: CLI override takes precedence over
+    # project-config.json (which resolve_project_config looks up at vault_path).
+    if args.profile is not None:
+        profile, flags = args.profile, list(args.flags or [])
+    else:
+        try:
+            project_config = resolve_project_config(vault_path)
+            manifest = load_manifest()
+            profile = active_profile(project_config, manifest)
+            flags = active_flags(project_config, manifest)
+        except ProfileConfigError as e:
+            print(f"ERROR: invalid project-config.json — {e}", file=sys.stderr)
+            sys.exit(1)
+
     print(f"Project root : {project_root}")
     print(f"Vault prefix : {prefix or '(root)'}")
     print(f"Vault path   : {vault_path}")
+    print(f"Profile      : {profile or '(full — every type enabled)'}")
+    if flags:
+        print(f"Flags        : {', '.join(flags)}")
     if args.dry_run:
         print("Mode         : DRY RUN (no files will be written)")
     print()
 
     # Read and process canonical source
     raw_instructions = read_canonical_source(vault_path)
-    instructions = replace_prefix(raw_instructions, prefix)
+    filtered_instructions = filter_conditional_blocks(raw_instructions, profile, flags)
+    instructions = replace_prefix(filtered_instructions, prefix)
 
     # Build the managed block
     managed_block = build_managed_block(instructions)

@@ -1,6 +1,6 @@
 # Obsidian Requirements Kit for AI SDLC 
 
-> **Version 2.1.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
+> **Version 2.2.0** — Domain-agnostic edition | [Changelog](CHANGELOG.md)
 
 This kit turns an Obsidian vault into an AI-agent-friendly requirements hub designed for the full autonomous software development lifecycle.
 
@@ -41,14 +41,52 @@ All instruction files are domain-agnostic templates. Customize the placeholders 
 ## Quick Start
 
 1. Copy this folder into your repository (monorepo recommended).
-2. Configure agent instruction files — edit the canonical `docs/agent-instructions.md`, then run `python scripts/install-agent-files.py` to generate the per-tool files (`CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/…`, `.kiro/steering.md`). The root `CLAUDE.md` appears only after this step.
-3. Read `_framework/sdlc-pipeline.md` to understand the stages and gates.
-4. Update `00-meta/taxonomy/domains.md` with your project's domains and components.
-5. Update `00-meta/glossary/` with your domain terminology.
-6. Browse `_examples/` to see working samples of each artifact.
-7. Use templates from `_framework/templates/` to create your first real artifacts.
-8. Run `python scripts/validate-frontmatter.py --path .` to verify metadata.
-9. Use agent prompts from `scripts/agent-prompts.md` or let agents discover tasks automatically.
+2. Copy `project-config.example.json` to `project-config.json` and pick a scale **profile** (`S`/`M`/`L`) — see [Profiles](#profiles) below. Fill in your domains and owners.
+3. Configure agent instruction files — edit the canonical `docs/agent-instructions.md`, then run `python scripts/install-agent-files.py` to generate the per-tool files (`CLAUDE.md`, `.codex/instructions.md`, `.cursor/rules/…`, `.kiro/steering.md`). The root `CLAUDE.md` appears only after this step, and its content is filtered to the types your profile enables.
+4. Read `_framework/sdlc-pipeline.md` to understand the stages and gates.
+5. Update `00-meta/taxonomy/domains.md` with your project's domains and components.
+6. Update `00-meta/glossary/` with your domain terminology.
+7. Browse `_examples/` to see working samples of each artifact.
+8. Use templates from `_framework/templates/` to create your first real artifacts.
+9. Run `python scripts/validate-frontmatter.py --path .` to verify metadata.
+10. Use agent prompts from `scripts/agent-prompts.md` or let agents discover tasks automatically.
+
+## Profiles
+
+Not every project needs all 24 artifact types. `project-config.json`'s `profile` field selects a scale preset — a named subset of artifact types, resolved from `kit-manifest.json`'s `profiles` section:
+
+| Profile | Intent | Types enabled | Count |
+|---------|--------|----------------|-------|
+| **S** | Small projects — solo developer or small team working with AI coding agents | VISION, US, TASK, TEST, ADR | 5 |
+| **M** | Standard projects | core tier: VISION, CON, EPIC, US, FR, NFR, ADR, TASK, CR, TEST | 10 |
+| **L** | Large or complex systems | core + discovery + architecture + delivery tiers | 20 |
+
+Two orthogonal flags add compliance/traceability types on top of any profile:
+
+| Flag | Adds | Note |
+|------|------|------|
+| `compliance` | BRQ, BR, CTRL | Cannot combine with profile **S** — BRQ/BR/CTRL derive into FR/NFR via `derives_from`, and profile S has no FR/NFR. Use `M` or `L` for regulated small projects. |
+| `sources` | SRC | For regulatory- or strategy-driven projects that need traceability to original source documents. |
+
+```json
+{
+  "profile": "S",
+  "flags": [],
+  "domains": ["auth", "payments"],
+  "owners": ["@alice"]
+}
+```
+
+Omit the `profile` field entirely (or omit `project-config.json` altogether) to disable filtering — every artifact type is enabled, which is the kit's behavior prior to 2.2.0.
+
+**What changes once a profile is set:**
+- `validate-frontmatter.py` and `check-orphans.py` **warn** (never error) on artifacts whose type falls outside the active profile, with a hint on which profile or flag would enable it. This never blocks a build — it supports organic growth from S toward M/L.
+- `install-agent-files.py` generates agent instructions describing only the enabled types — the single biggest win for small projects, since instruction text about types you don't use dilutes every coding-agent task's context.
+- `generate-fileclasses.py` skips Obsidian Metadata Menu fileClasses for disabled types.
+- `check-orphans.py`'s orphan rules adapt to the profile: in **S**, the User Story is the requirement artifact that needs a verifying TEST and (once approved) an implementing TASK; everywhere else, that role belongs to FR/NFR.
+- `assemble-context.py` follows `part_of_story` directly to the User Story when a TASK has no `implements` link, so the S-profile trace chain (`US → TASK → TEST`) still assembles into one context bundle.
+
+**Upgrading a project** (S → M → L): change `profile` in `project-config.json` and re-run the generators. Nothing existing breaks — `TEST.verifies` and `TASK.part_of_story` accept a User Story as a valid target in every profile, so an S-authored chain stays valid after switching; you simply start authoring FR/NFR/EPIC/CON/CR going forward. See `docs/profiles-spec.md` for the full design, the exact script-by-script behavior, and open questions still under review.
 
 ## Evaluating the Kit
 
@@ -119,12 +157,15 @@ docs/                        # Kit-level documentation
   success-criteria.md        # 37 success criteria for evaluating the kit
 
 # Artifact Tiers:
-#   [core]         — relevant to any project (10 types)
-#   [discovery]    — product discovery, optional (4 types)
-#   [compliance]   — regulated projects (3 types)
-#   [source]       — source documents for traceability (1 type: SRC)
-#   [architecture] — complex systems, optional (4 types)
-#   [delivery]     — release management, optional (2 types)
+#   [core]         — relevant to any project (10 types)          — profile M, L
+#   [discovery]    — product discovery, optional (4 types)       — profile L
+#   [compliance]   — regulated projects (3 types)                — flag: compliance
+#   [source]       — source documents for traceability (1 type: SRC) — flag: sources
+#   [architecture] — complex systems, optional (4 types)         — profile L
+#   [delivery]     — release management, optional (2 types)      — profile L
+#
+# Profile S enables only 5 types (VISION, US, TASK, TEST, ADR) — a subset of
+# core, not a tier of its own. See "Profiles" above.
 ```
 
 ## Naming Convention
@@ -186,6 +227,8 @@ Scripts read the manifest instead of hardcoding the registry, which is what prev
 - `scripts/assemble-context.py` — folder resolution and up-link traversal
 
 When you add or change an artifact type, edit `kit-manifest.json` and the corresponding schema, then re-run the generators. Project-specific frontmatter fields must be prefixed with `x_` so schema validation can reject typos in standard field names.
+
+The manifest also carries the `profiles` and `flags` sections that back the [Profiles](#profiles) feature — `scripts/kit_manifest.py` resolves `project-config.json`'s `profile`/`flags` fields against these sections (`enabled_types()`), and every script above consumes that resolution instead of hardcoding profile logic.
 
 ## AI Agent Roles
 

@@ -11,7 +11,31 @@ Versioning follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATC
 
 ---
 
-## [2.1.0] — 2026-07-05
+## [2.2.0] — 2026-07-16
+
+Scale profiles: a machine-readable way to shrink the kit for small projects instead of asking every project to carry all 24 artifact types. Profiles are additive on top of the existing tier model — a named preset of enabled types (`S`/`M`/`L`) plus two orthogonal flags (`compliance`, `sources`), selected via `project-config.json` and resolved everywhere from `kit-manifest.json`. No profile selected (the pre-2.2.0 default) disables filtering entirely — every script's behavior is unchanged for existing vaults. See `docs/profiles-spec.md` for the full design.
+
+### Added
+
+- **`kit-manifest.json` `profiles` and `flags` sections** — `S` (VISION, US, TASK, TEST, ADR — 5 types), `M` (= core tier, 10 types), `L` (core + discovery + architecture + delivery, 20 types); flags `compliance` (+BRQ, BR, CTRL) and `sources` (+SRC). `compliance` is forbidden together with profile `S` (BRQ/BR/CTRL derive into FR/NFR via `derives_from`, which `S` does not include) — enforced as a config error, not silently ignored.
+- **`project-config.json` `profile` / `flags` fields** — new `schema/project-config.schema.json` validates them; `project-config.example.json` now ships with `"profile": "S"` as the default onboarding example.
+- **`scripts/kit_manifest.py` profile-resolution API** — `load_project_config()`, `resolve_project_config()`, `active_profile()`, `active_flags()`, `enabled_types()`, `is_type_enabled()`, `profile_membership()`, `out_of_profile_hint()`. Every other script imports this instead of re-implementing profile logic. Raises `ProfileConfigError` on an unknown profile/flag name or a forbidden combination.
+- **`TEST.up_links.verifies` now accepts `US` as a target** (in addition to `FR`/`NFR`) — closes the profile-S trace chain `US → TASK → TEST` without a schema change to `test.schema.json` (target-type checking is manifest-driven, not schema-driven).
+- **Profile-aware out-of-profile warnings** in `validate-frontmatter.py` and `check-orphans.py` — an artifact whose type falls outside the active profile gets a `PROFILE WARNING`/`⚠` line naming which profile or flag would enable it, and is excluded from that profile's orphan rules. Warnings never affect the exit code — this supports organic growth from `S` toward `M`/`L`, per the agreed "warn, never block" design.
+- **`check-orphans.py` profile-aware requirement rules** — in profile `S`, the User Story is the artifact checked for an incoming `TEST.verifies` and (once `approved`) an incoming `TASK` link; everywhere else that role stays with `FR`/`NFR`. `TASK`'s reverse-link map now unions `implements` and `part_of_story`, so the checker stays correct through an `S` → `M` upgrade where both link styles can coexist.
+- **`install-agent-files.py` conditional instruction blocks** — `docs/agent-instructions.md` gains `<!-- IF-PROFILE S|M|L --> ... <!-- END-IF -->` and `<!-- IF-FLAG compliance|sources --> ... <!-- END-IF -->` markers (flat, no nesting). The generator filters them against the active profile/flags before injecting into `CLAUDE.md` / `.codex/instructions.md` / `.cursor/rules/…` / `.kiro/steering.md`, so a small project's agent instructions describe only the 5 types it uses instead of all 24. New `--profile`/`--flags` CLI flags override `project-config.json` for testing. Full/legacy mode (no `project-config.json`) reproduces the pre-2.2.0 file's rendered output exactly, aside from two illustrative example-ID swaps (`FR-INGEST-001` → `US-INGEST-001`, `BRQ-COMPLY-001` → `ADR-INGEST-001`) made so the doc's own examples don't reference a type profile S excludes.
+- **`generate-fileclasses.py` skips fileClasses for disabled types** — reports each skip as "outside profile X" alongside the pre-existing "no mapping" skips.
+- **`assemble-context.py` falls back to `part_of_story` when `implements` is absent** — a profile-`S` task (`US` linked, no `FR`) now assembles a full bundle: the User Story with its Acceptance Criteria, related ADRs, and the project `VISION`, instead of an empty requirement section.
+- **`docs/profiles-spec.md`** — the design spec this release implements: profile composition, manifest/schema changes, per-script behavior, upgrade path (`S → M → L`), and an acceptance checklist.
+
+### Changed
+
+- **`schema/task.schema.json`**: `implements` is no longer unconditionally required; a new `anyOf` requires either `implements` or `part_of_story` — a TASK must link upward to something, but profile `S` has no FR/NFR to `implements`.
+- **`schema/user-story.schema.json`**: `persona` is no longer required (it named a discovery-tier type that core/M-profile projects were never guaranteed to have — a latent inconsistency profiles surfaced). The field stays available for projects that use `PERSONA`; others may leave it blank or use a plain-text actor name.
+- **`docs/agent-instructions.md`**: FR-centric steps and paragraphs across every section (task-reading order, "During Implementation", "After Implementation", "Requirement Hierarchy", "ID Format", "What NOT to Do", the ASCII workflow summary, "Key Reminders") now have an `S`-profile alternative, and compliance/sources content is flag-gated. Re-run `python scripts/install-agent-files.py` to refresh the per-tool instruction files.
+- **README**: new "Profiles" section (composition table, config example, upgrade path); Quick Start gains a "pick a profile" step; the artifact-tier legend in the folder layout now cross-references which profile/flag enables each tier.
+
+
 
 Architecture rules: a deterministic bridge from ADRs to an always-loaded, agent-facing rulebook. Distillation of a decision into normative rules happens at ADR authoring time (by the author or an agent, reviewed at the ADR's human gate); generation is verbatim extraction and is CI-friendly.
 
